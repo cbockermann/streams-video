@@ -4,6 +4,7 @@
 package stream.image;
 
 import java.io.ByteArrayInputStream;
+import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 
@@ -22,7 +23,7 @@ public abstract class AbstractImageProcessor extends AbstractProcessor {
 	/**
 	 * @return the data
 	 */
-	public String getData() {
+	public String getImage() {
 		return data;
 	}
 
@@ -31,7 +32,7 @@ public abstract class AbstractImageProcessor extends AbstractProcessor {
 	 *            the data to set
 	 */
 	@Parameter(description = "The name of the attribute that contains the byte array data of the image.", required = true)
-	public void setData(String data) {
+	public void setImage(String data) {
 		this.data = data;
 	}
 
@@ -40,6 +41,12 @@ public abstract class AbstractImageProcessor extends AbstractProcessor {
 	 */
 	@Override
 	public Data process(Data input) {
+
+		Serializable value = input.get(data);
+		if (value instanceof ImageRGB) {
+			Data result = process(input, (ImageRGB) value);
+			return result;
+		}
 
 		byte[] bytes = (byte[]) input.get(data);
 		if (bytes == null) {
