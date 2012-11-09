@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import stream.AbstractProcessor;
 import stream.Data;
 import stream.ProcessContext;
+import stream.annotations.Parameter;
 
 /**
  * @author chris
@@ -54,11 +55,10 @@ public class DisplayImage extends AbstractProcessor {
 
 		Image image = null;
 
-		if (val instanceof Image) {
+		if (val instanceof RGBImage) {
 			log.info("Found image already as image object!");
-			image = (Image) val;
+			image = ((RGBImage) val).createImage();
 		}
-
 		if (val.getClass().isArray()
 				&& val.getClass().getComponentType() == byte.class) {
 			try {
@@ -104,6 +104,7 @@ public class DisplayImage extends AbstractProcessor {
 	 * @param key
 	 *            the key to set
 	 */
+	@Parameter(description = "The name/key of the attribute containing the RGB image object, defaults to `image`.")
 	public void setKey(String key) {
 		this.key = key;
 	}

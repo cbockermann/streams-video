@@ -4,7 +4,6 @@
 package stream.io;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -13,7 +12,7 @@ import java.util.zip.GZIPInputStream;
  */
 public class MJpegImageStream extends AbstractImageStream {
 
-	public MJpegImageStream(URL url) throws Exception {
+	public MJpegImageStream(SourceURL url) throws Exception {
 		super(openUrl(url), AbstractImageStream.JPG_SIGNATURE);
 	}
 
@@ -21,7 +20,7 @@ public class MJpegImageStream extends AbstractImageStream {
 		super(in, AbstractImageStream.JPG_SIGNATURE);
 	}
 
-	public final static InputStream openUrl(URL url) throws Exception {
+	public final static InputStream openUrl(SourceURL url) throws Exception {
 		if (url.toString().toLowerCase().endsWith(".gz")) {
 			return new GZIPInputStream(url.openStream());
 		} else

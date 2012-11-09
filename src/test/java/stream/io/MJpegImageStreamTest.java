@@ -1,4 +1,5 @@
 package stream.io;
+
 /**
  * 
  */
@@ -18,13 +19,13 @@ public class MJpegImageStreamTest {
 	static Logger log = LoggerFactory.getLogger(MJpegImageStreamTest.class);
 
 	@Test
-	public void test() {
-	}
-
-	public static void main(String[] args) throws Exception {
+	public void test() throws Exception {
 		URL url = MJpegImageStreamTest.class
 				.getResource("/test-mjpeg-stream.xml");
 		log.info("Starting MJpegImageStream-test from {}", url);
 		stream.run.main(url);
+	}
+
+	public static void main(String[] args) throws Exception {
 	}
 }

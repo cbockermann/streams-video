@@ -4,11 +4,16 @@
         id="video"
         class="stream.io.MJpegImageStream"
         url="http://download.jwall.org/stuff/KaffeeFilm.mjpeg.gz" />
+    <!-- 
+        url="tcp://localhost:12345" />
+     -->
 
     <process input="video" >
 
         <CreateID key="frame:id" />
 
+        <!-- 
+         -->
         <stream.image.DisplayImage key="data" />
 
         <stream.image.AverageRGB />
