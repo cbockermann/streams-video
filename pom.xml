@@ -3,6 +3,15 @@
   <groupId>org.jwall</groupId>
   <artifactId>streams-video</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  
+  	<repositories>
+		<repository>
+			<id>sonatype-snapshots</id>
+			<name>sonatype Snapshot Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</repository>
+	</repositories>
+  
   <dependencies>
   	<dependency>
   		<groupId>org.jwall</groupId>
