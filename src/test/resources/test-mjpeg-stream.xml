@@ -11,9 +11,9 @@
     <process input="video" >
 
         <CreateID key="frame:id" />
+        
+        <stream.image.DiffImage />
 
-        <!-- 
-         -->
         <stream.image.DisplayImage key="data" />
 
         <stream.image.AverageRGB />
