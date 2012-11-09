@@ -55,9 +55,9 @@ public class DisplayImage extends AbstractProcessor {
 
 		Image image = null;
 
-		if (val instanceof RGBImage) {
+		if (val instanceof ImageRGB) {
 			log.info("Found image already as image object!");
-			image = ((RGBImage) val).createImage();
+			image = ((ImageRGB) val).createImage();
 		}
 		if (val.getClass().isArray()
 				&& val.getClass().getComponentType() == byte.class) {

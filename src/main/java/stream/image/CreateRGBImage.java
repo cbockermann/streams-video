@@ -40,7 +40,7 @@ public class CreateRGBImage implements Processor {
 		try {
 			byte[] data = (byte[]) input.get("data");
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
-			RGBImage image = new RGBImage(img);
+			ImageRGB image = new ImageRGB(img);
 			input.put(key, image);
 		} catch (Exception e) {
 			log.error(e.getMessage());

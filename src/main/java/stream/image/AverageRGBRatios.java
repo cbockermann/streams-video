@@ -3,8 +3,6 @@
  */
 package stream.image;
 
-import java.awt.image.BufferedImage;
-
 import stream.Data;
 
 /**
@@ -18,7 +16,7 @@ public class AverageRGBRatios extends AbstractImageProcessor {
 	 *      java.awt.image.BufferedImage)
 	 */
 	@Override
-	public Data process(Data item, BufferedImage img) {
+	public Data process(Data item, ImageRGB img) {
 
 		int width = img.getWidth();
 		int height = img.getHeight();

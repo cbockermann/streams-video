@@ -3,7 +3,6 @@
  */
 package stream.image;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 
 import javax.imageio.ImageIO;
@@ -48,7 +47,8 @@ public abstract class AbstractImageProcessor extends AbstractProcessor {
 		}
 
 		try {
-			BufferedImage img = ImageIO.read(new ByteArrayInputStream(bytes));
+			ImageRGB img = new ImageRGB(ImageIO.read(new ByteArrayInputStream(
+					bytes)));
 			Data result = process(input, img);
 			return result;
 		} catch (Exception e) {
@@ -58,5 +58,5 @@ public abstract class AbstractImageProcessor extends AbstractProcessor {
 		return input;
 	}
 
-	public abstract Data process(Data item, BufferedImage img);
+	public abstract Data process(Data item, ImageRGB img);
 }

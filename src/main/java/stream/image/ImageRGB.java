@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
  * 
  */
-public class RGBImage implements Serializable {
+public class ImageRGB implements Serializable {
 
 	/** The unique class ID */
 	private static final long serialVersionUID = -2042395350522979787L;
@@ -28,7 +28,7 @@ public class RGBImage implements Serializable {
 	 * @param height
 	 * @param width
 	 */
-	public RGBImage(int height, int width) {
+	public ImageRGB(int height, int width) {
 		this.height = height;
 		this.width = width;
 		pixels = new int[height * width];
@@ -37,13 +37,13 @@ public class RGBImage implements Serializable {
 		}
 	}
 
-	public RGBImage(int height, int width, int[] data) {
+	public ImageRGB(int height, int width, int[] data) {
 		this.height = height;
 		this.width = width;
 		pixels = data;
 	}
 
-	public RGBImage(BufferedImage img) {
+	public ImageRGB(BufferedImage img) {
 		this.height = img.getHeight();
 		this.width = img.getWidth();
 		pixels = new int[width * height];
