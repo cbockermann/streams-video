@@ -1,7 +1,5 @@
 package stream.image;
 
-import java.awt.Color;
-
 import stream.Data;
 
 public class DiffImage extends AbstractImageProcessor {
@@ -41,9 +39,9 @@ public class DiffImage extends AbstractImageProcessor {
 					gdiff = 255 - gdiff;
 					bdiff = 255 - bdiff;
 					
-					if (rdiff < 20) { rdiff = 0; }
-					if (gdiff < 20) { gdiff = 0; }
-					if (bdiff < 20) { bdiff = 0; }
+					//if (rdiff < 20) { rdiff = 0; }
+					//if (gdiff < 20) { gdiff = 0; }
+					//if (bdiff < 20) { bdiff = 0; }
 					
 					//int rgbdiff = rdiff * 65536 + gdiff * 265 + bdiff;
 					int rgbdiff = rdiff;
