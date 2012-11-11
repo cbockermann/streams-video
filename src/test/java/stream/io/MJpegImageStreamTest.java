@@ -27,5 +27,6 @@ public class MJpegImageStreamTest {
 	}
 
 	public static void main(String[] args) throws Exception {
+		new MJpegImageStreamTest().test();
 	}
 }

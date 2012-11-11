@@ -38,7 +38,7 @@ public class CreateRGBImage implements Processor {
 	@Override
 	public Data process(Data input) {
 		try {
-			byte[] data = (byte[]) input.get("data");
+			byte[] data = (byte[]) input.get(from);
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
 			ImageRGB image = new ImageRGB(img);
 			input.put(key, image);

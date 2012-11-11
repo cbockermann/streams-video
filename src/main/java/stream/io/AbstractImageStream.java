@@ -22,12 +22,13 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 	public final static byte[] GIF_SIGNATURE = new byte[] { 0x47, 0x49, 0x46,
 			0x38 };
 	public final static byte[] JPG_SIGNATURE = new byte[] { (byte) 0xff,
-			(byte) 0xd8, (byte) 0xff, (byte) 0xfe, 0x00, 0x0e, 0x4c, 0x61 };
+			(byte) 0xd8, (byte) 0xff }; // , (byte) 0xfe, 0x00, 0x0e, 0x4c, 0x61
+										// };
 
 	int chunkSize = 1;
 	URL url;
 	BufferedInputStream input;
-	byte[] buffer = new byte[2048 * 1024];
+	byte[] buffer = new byte[2048 * 1024 * 16];
 	int start = 0;
 	long frameId;
 	int limit = 0;
@@ -71,12 +72,14 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 		int read = input.read(buffer, limit, buffer.length - limit);
 		if (read > 0)
 			limit += read;
-		// log.info("Read {} bytes from input stream.", read);
-		// log.info("   buffer.limit is {}", limit);
+		log.debug("Read {} bytes from input stream: {}", read,
+				this.getHex(buffer, 64));
+		log.debug("Signature is: {}", getHex(signature, 64));
+		// log.debug("   buffer.limit is {}", limit);
 
 		start = 0;
 		int idx = findBytes(buffer, start, signature);
-		if (idx != 0) {
+		while (idx != 0) {
 			log.error(
 					"Error! Expecting stream to start with image signature! Found index {}",
 					idx);
@@ -117,7 +120,7 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 		}
 		limit -= end;
 		start = 0;
-		log.info("## Frame offset is {}   decimal: {}",
+		log.debug("## Frame offset is {}   decimal: {}",
 				Long.toHexString(offset), offset);
 		offset += end;
 		instance.put("frame:id", frameId++);
@@ -136,9 +139,9 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 		return -1;
 	}
 
-	public static String getHex(byte[] bytes) {
+	public static String getHex(byte[] bytes, int len) {
 		StringBuffer s = new StringBuffer("[");
-		for (int i = 0; i < bytes.length; i++) {
+		for (int i = 0; i < bytes.length && i < len; i++) {
 			s.append(Integer.toHexString((int) bytes[i]));
 			if (i + 1 < bytes.length)
 				s.append(", ");
@@ -171,7 +174,7 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 			}
 		}
 
-		log.info("Found signature {} at position {}", new String(sig), pos);
+		log.debug("Found signature {} at position {}", new String(sig), pos);
 		return true;
 	}
 }

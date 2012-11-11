@@ -56,13 +56,13 @@ public class DisplayImage extends AbstractProcessor {
 		Image image = null;
 
 		if (val instanceof ImageRGB) {
-			log.info("Found image already as image object!");
+			log.debug("Found image already as image object!");
 			image = ((ImageRGB) val).createImage();
 		}
 		if (val.getClass().isArray()
 				&& val.getClass().getComponentType() == byte.class) {
 			try {
-				log.info("creating image from bytes");
+				log.debug("creating image from bytes");
 				image = ImageIO.read(new ByteArrayInputStream((byte[]) val));
 			} catch (Exception e) {
 				log.error("Failed to read image from byte array: {}",
@@ -74,6 +74,8 @@ public class DisplayImage extends AbstractProcessor {
 			imagePanel.setFrame(image);
 			frame.repaint();
 			frame.validate();
+			if (!frame.isVisible())
+				frame.setVisible(true);
 		}
 
 		return input;
