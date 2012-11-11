@@ -75,6 +75,81 @@ public class ImageRGB implements Serializable {
 		pixels[idx] = rgba;
 		return pixels[idx];
 	}
+	
+	/**
+	 * Returns the value of the red color channel
+	 * @author Matthias
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public int getRED(int x, int y) {
+		int rgb = getRGB(x, y);
+		int red = (rgb >> 16) & 0xFF;
+		return red;
+	}
+	
+	public void setRED(int x, int y, int red) {
+		int rgb = getRGB(x, y);
+		int green = (rgb >> 8) & 0xFF;
+		int blue = rgb & 0xFF;
+		
+		int rgbnew = red;
+		rgbnew = (rgbnew << 8) + green;
+		rgbnew = (rgbnew << 8) + blue; 
+		
+		setRGB(x, y, rgbnew);
+	}
+	
+	/**
+	 * Returns the value of the green color channel
+	 * @author Matthias
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public int getGREEN(int x, int y) {
+		int rgb = getRGB(x, y);
+		int green = (rgb >> 8) & 0xFF;
+		return green;
+	}
+	
+	public void setGREEN(int x, int y, int green) {
+		int rgb = getRGB(x, y);
+		int red = (rgb >> 16) & 0xFF;
+		int blue = rgb & 0xFF;
+		
+		int rgbnew = red;
+		rgbnew = (rgbnew << 8) + green;
+		rgbnew = (rgbnew << 8) + blue; 
+		
+		setRGB(x, y, rgbnew);
+	}
+	
+	/**
+	 * Returns the value of the blue color channel
+	 * @author Matthias
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public int getBLUE(int x, int y) {
+		int rgb = getRGB(x, y);
+		int blue = rgb & 0xFF;
+		return blue;
+	}
+	
+	public void setBLUE(int x, int y, int blue) {
+		int rgb = getRGB(x, y);
+		int green = (rgb >> 8) & 0xFF;
+		int red = (rgb >> 16) & 0xFF;
+		
+		int rgbnew = red;
+		rgbnew = (rgbnew << 8) + green;
+		rgbnew = (rgbnew << 8) + blue; 
+		
+		setRGB(x, y, rgbnew);
+	}
 
 	/**
 	 * @return the height
