@@ -35,9 +35,9 @@ public class DiffImage extends AbstractImageProcessor {
 					int gdiff = Math.abs(gold - gnew);
 					int bdiff = Math.abs(bold - bnew);
 					
-					rdiff = 255 - rdiff;
-					gdiff = 255 - gdiff;
-					bdiff = 255 - bdiff;
+//					rdiff = 255 - rdiff;
+//					gdiff = 255 - gdiff;
+//					bdiff = 255 - bdiff;
 					
 					//if (rdiff < 20) { rdiff = 0; }
 					//if (gdiff < 20) { gdiff = 0; }

@@ -4,9 +4,6 @@
         id="video"
         class="stream.io.MJpegImageStream"
         url="http://download.jwall.org/stuff/KaffeeFilm.mjpeg.gz" />
-    <!-- 
-        url="tcp://localhost:12345" />
-     -->
 
     <process input="video" >
 
@@ -17,6 +14,7 @@
         <stream.image.DisplayImage key="data" />
 
         <stream.image.AverageRGB />
+        
         <!--
         <stream.io.BinaryWriter key="data" url="file:/Volumes/RamDisk/frame-%{data.@frame:id}.jpg" />
         <stream.flow.Delay time="25ms" />
@@ -25,11 +23,14 @@
         <stream.flow.Skip condition="%{data.frame:blue:avg} == null " />
 
         <stream.image.AverageRGBRatios />
+        
+        <stream.image.ChangedPixelRatio />
+        
         <PrintData />
         <stream.plotter.Plotter
             history="1000"
             keepOpen="true"
-            keys="frame:red:green,frame:red:blue,frame:green:blue" />
+            keys="frame:diff:changeratio" />
 
         <Delay time="25ms" />
     </process>

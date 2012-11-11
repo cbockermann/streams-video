@@ -2,13 +2,13 @@ package stream.image;
 
 import stream.Data;
 
-public class ChangesPixelCounter extends AbstractImageProcessor {
+public class ChangedPixelRatio extends AbstractImageProcessor {
 
 	@Override
 	/**
 	 * This operator expects img to be a DiffImage and counts the ratio of pixels, that have
 	 * changed significantly. A significant changes is every change, where the value of the
-	 * red + green + blue-channel has changes by at least 20.
+	 * red + green + blue-channel has changes by at least 25.
 	 */
 	public Data process(Data item, ImageRGB img) {
 		
@@ -21,12 +21,14 @@ public class ChangesPixelCounter extends AbstractImageProcessor {
 				int green = img.getGREEN(i, j);
 				int blue = img.getBLUE(i, j);
 				
-				if (red+green+blue > 20) { counter++; }
+				if (red+green+blue > 25) { counter++; }
 
 			}
 		}
 		
-		item.put("frame:diff:changeratio", counter / (img.getHeight() * img.getWidth()));
+		Double ratio = (double) counter / (double)(img.getHeight()*img.getWidth());
+		
+		item.put("frame:diff:changeratio", ratio);
 		
 		return item;
 	}
