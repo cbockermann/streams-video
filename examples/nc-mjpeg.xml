@@ -1,0 +1,30 @@
+<container>
+
+    <stream
+        id="video"
+        class="stream.io.MJpegImageStream"
+        url="tcp://192.168.128.98:9100/" />
+
+    <process input="video" >
+
+        <CreateID key="frame:id" />
+        <!--
+        <stream.image.DiffImage />
+          -->
+
+        <stream.image.DisplayImage key="data" />
+
+        <stream.image.AverageRGB />
+
+        <stream.flow.Skip condition="%{data.frame:blue:avg} == null " />
+
+        <WithKeys keys="frame:*">
+        	<stream.plotter.Plotter
+       		     history="1000"
+	            keepOpen="true"
+	            keys="frame:red:avg,frame:green:avg,frame:blue:avg" />
+        </WithKeys>
+
+    </process>
+
+</container>
