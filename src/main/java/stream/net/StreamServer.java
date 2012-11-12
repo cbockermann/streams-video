@@ -48,6 +48,7 @@ public class StreamServer {
 			public void run() {
 				try {
 					MJpegImageStream stream = new MJpegImageStream(input);
+					stream.init();
 					int frame = 0;
 					Data item = stream.readNext();
 					while (item != null) {

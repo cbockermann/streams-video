@@ -10,14 +10,14 @@ import java.util.zip.GZIPInputStream;
  * @author chris
  * 
  */
-public class MJpegImageStream extends AbstractImageStream {
+public class MJpegImageStream extends ByteChunkStream {
 
 	public MJpegImageStream(SourceURL url) throws Exception {
-		super(openUrl(url), AbstractImageStream.JPG_SIGNATURE);
+		super(openUrl(url), ByteChunkStream.JPG_SIGNATURE);
 	}
 
 	public MJpegImageStream(InputStream in) throws Exception {
-		super(in, AbstractImageStream.JPG_SIGNATURE);
+		super(in, ByteChunkStream.JPG_SIGNATURE);
 	}
 
 	public final static InputStream openUrl(SourceURL url) throws Exception {

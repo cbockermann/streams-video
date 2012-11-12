@@ -3,10 +3,10 @@
  */
 package stream.io;
 
-import java.io.BufferedInputStream;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.zip.GZIPInputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +16,9 @@ import stream.annotations.Parameter;
 
 /**
  * <p>
- * This class implements a stream of byte chunks which are created by reading
- * until a byte signature within the underlying stream indicates the start of a
- * new byte chunk.
- * </p>
- * <p>
- * This can be used for reading for example a stream of GIF of JPEG images from
- * a stream and splitting this stream in to the byte chunks for each image.
+ * This class implements a fast byte-oriented stream of byte chunks. The chunks
+ * are found by checking for a start-signature (i.e. byte array). The stream
+ * returns a sequence of data items, each holding a chunk of bytes.
  * </p>
  * 
  * @author Christian Bockermann &lt;chris@jwall.org&gt;
@@ -34,33 +30,62 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	public final static byte[] GIF_SIGNATURE = new byte[] { 0x47, 0x49, 0x46,
 			0x38 };
 	public final static byte[] JPG_SIGNATURE = new byte[] { (byte) 0xff,
-			(byte) 0xd8, (byte) 0xff, (byte) 0xfe, 0x00, 0x0e, 0x4c, 0x61 };
+			(byte) 0xd8 };
 
-	int chunkSize = 1;
-	URL url;
-	BufferedInputStream input;
-	byte[] buffer = new byte[2048 * 1024];
-	int start = 0;
-	long frameId;
-	int limit = 0;
-	long offset = 0L;
-	byte[] signature;
+	SourceURL url;
+	ByteBuffer buffer;
 
-	public ByteChunkStream(URL url, byte[] signature) throws Exception {
-		this(openUrl(url), signature);
+	/* The byte-channel which is being read from using NIO */
+	final ReadableByteChannel channel;
+
+	Long frameId = 0L;
+	final byte[] signature;
+
+	/* The name of the attribute into which the byte arrays (chunks) are put */
+	String key = "data";
+
+	// The 'look-ahead' buffer
+	int bufferSize = 2 * 16 * 1024;
+
+	// the timestamp of the first read (for debugging/timing-measurement)
+	Long firstRead = 0L;
+
+	// the number of bytes read so fare
+	Long bytesRead = 0L;
+
+	public ByteChunkStream(SourceURL url, byte[] signature) throws Exception {
+		this(url.openStream(), signature);
 		this.url = url;
 	}
 
 	public ByteChunkStream(InputStream in, byte[] signature) throws Exception {
-		this.input = new BufferedInputStream(in);
+		// this.input = new BufferedInputStream(in);
+		channel = Channels.newChannel(in);
 		this.signature = signature;
 	}
 
-	public final static InputStream openUrl(URL url) throws Exception {
-		if (url.toString().toLowerCase().endsWith(".gz")) {
-			return new GZIPInputStream(url.openStream());
-		} else
-			return url.openStream();
+	/**
+	 * @see stream.io.AbstractDataStream#init()
+	 */
+	@Override
+	public void init() throws Exception {
+		super.init();
+		int bufSize = 1024 * 16;
+		try {
+			bufSize = new Integer(System.getProperty(
+					"stream.io.ImageStream.buffer", "" + (2 * 1024 * 16)));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			bufSize = 1024 * 16;
+		}
+		log.info("Using buffer size of {}k", bufSize / 1024);
+		buffer = ByteBuffer.allocateDirect(bufSize);
+		if (buffer.isDirect()) {
+			log.info("ByteBuffer is using direct memory.");
+		} else {
+			log.info("ByteBuffer is non-direct memory.");
+		}
 	}
 
 	/**
@@ -68,7 +93,8 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	 */
 	@Override
 	public void close() throws Exception {
-		input.close();
+		buffer.clear();
+		channel.close();
 	}
 
 	/**
@@ -79,30 +105,65 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	}
 
 	/**
-	 * 
-	 * @param str
+	 * @return the bufferSize
 	 */
-	@Parameter(description = "The byte-signature for splitting the binary stream into chunks. This expects a comma separated list of byte values in hex-form, e.g. '0xa0,0xd0'.")
-	public void setSignature(String str) {
+	public int getBufferSize() {
+		return bufferSize;
+	}
 
-		if (str.indexOf(",") > 0) {
-			String[] tok = str.split(",");
-			byte[] sig = new byte[tok.length];
-			for (int i = 0; i < tok.length; i++) {
-				int val;
-				if (tok[i].startsWith("0x"))
-					val = Integer.parseInt(tok[i].substring(2));
-				else
-					val = Integer.parseInt(tok[i]);
+	/**
+	 * @param bufferSize
+	 *            the bufferSize to set
+	 */
+	@Parameter(description = "The internal buffer size of this stream.")
+	public void setBufferSize(int bufferSize) {
+		this.bufferSize = bufferSize;
+	}
 
-				if (val < 0 || val > 255) {
-					throw new RuntimeException("Invalid byte value '" + tok[i]
-							+ "'!");
-				} else {
-					sig[i] = (byte) val;
-				}
+	/**
+	 * 
+	 * @param sig
+	 * @return
+	 */
+	private int indexOf(byte[] sig) {
+		return indexOf(sig, 0);
+	}
+
+	/**
+	 * 
+	 * @param sig
+	 * @param from
+	 * @return
+	 */
+	private int indexOf(byte[] sig, int from) {
+		int pos = from;
+		while (pos + sig.length < buffer.limit() && !isSignatureAt(pos, sig)) {
+			pos++;
+		}
+
+		if (pos + sig.length >= buffer.limit()) {
+			return -1;
+		}
+
+		return pos;
+	}
+
+	/**
+	 * 
+	 * 
+	 * @param pos
+	 * @param sig
+	 * @return
+	 */
+	private boolean isSignatureAt(int pos, byte[] sig) {
+
+		for (int i = 0; i < sig.length; i++) {
+			if (buffer.get(pos + i) != sig[i]) {
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 	/**
@@ -110,112 +171,94 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	 */
 	@Override
 	public synchronized Data readItem(Data instance) throws Exception {
+		// log.debug("Reading FRAME-" + frameId);
 
-		log.info("Reading FRAME-" + frameId);
-		int read = input.read(buffer, limit, buffer.length - limit);
-		if (read > 0)
-			limit += read;
-		// log.info("Read {} bytes from input stream.", read);
-		// log.info("   buffer.limit is {}", limit);
-
-		start = 0;
-		int idx = findBytes(buffer, start, signature);
-		if (idx != 0) {
-			log.error(
-					"Error! Expecting stream to start with image signature! Found index {}",
-					idx);
-			byte[] begin = new byte[32];
-			for (int i = 0; i < begin.length && i < buffer.length; i++) {
-				begin[i] = buffer[i];
+		int read = channel.read(buffer);
+		while (read == 0) {
+			Thread.yield();
+			read = channel.read(buffer);
+			if (read < 0) {
+				return null;
 			}
-			log.error("   byte prefix was: {}", begin);
+		}
+
+		if (read < 0) {
 			return null;
 		}
 
-		int end = -1;
-		do {
-			end = findBytes(buffer, idx + signature.length, signature);
-			if (end < 0) {
-				while (limit < buffer.length) {
-					int b = input.read();
-					if (b > 0) {
-						buffer[limit++] = (byte) b;
-					} else
-						break;
-				}
-				end = findBytes(buffer, idx + signature.length, signature);
-			}
-		} while (end < 0 && read > 0);
+		if (read > 0)
+			bytesRead += read;
 
-		//
-		// copy the detected image to the image buffer and remove the bytes
-		// from the temporary buffer
-		//
-		byte[] img = new byte[end];
-		for (int k = 0; k < img.length; k++) {
-			img[k] = buffer[k];
-			buffer[k] = buffer[k + end];
+		int start = indexOf(signature);
+		while (start < 0) {
+			//
+			// skip to the end of the buffer and clear it
+			//
+			buffer.position(buffer.limit() - signature.length);
+			buffer.compact();
+
+			// read new data into the buffer
+			//
+			read = channel.read(buffer);
+
+			while (read == 0) {
+				Thread.yield();
+				read = channel.read(buffer);
+			}
+
+			if (read < 0) {
+				return null;
+			}
+
+			bytesRead += read;
+			start = indexOf(signature);
 		}
-		for (int i = end + 1; i < limit - end; i++) {
-			buffer[i] = buffer[i + end];
+
+		buffer.mark();
+
+		int end = indexOf(signature, start + signature.length);
+		while (end < 0 && buffer.capacity() > 0) {
+			read = channel.read(buffer);
+
+			while (read == 0) {
+				Thread.yield();
+				read = channel.read(buffer);
+			}
+
+			if (read < 0) {
+				return null;
+			}
+
+			end = indexOf(signature);
 		}
-		limit -= end;
-		start = 0;
-		log.info("## Frame offset is {}   decimal: {}",
-				Long.toHexString(offset), offset);
-		offset += end;
-		instance.put("@chunk:id", frameId++);
-		instance.put("@bytes", img);
+
+		if (end < 0) {
+			return null;
+		}
+
+		buffer.position(start);
+
+		byte[] output = new byte[end - start];
+		buffer.get(output, 0, (end - start));
+
+		buffer.compact();
+		instance.put("frame:id", frameId++);
+		instance.put(key, output);
+
+		if (firstRead == 0L) {
+			firstRead = System.currentTimeMillis();
+		} else {
+			if (log.isDebugEnabled()) {
+				if (frameId % 100 == 0) {
+					Long seconds = (System.currentTimeMillis() - firstRead);
+					log.debug("Reading rate after {} frames is {} fps",
+							frameId, (1000 * (frameId.doubleValue() / seconds
+									.doubleValue())));
+					log.debug("{} bytes read", bytesRead);
+				}
+			}
+		}
+
 		return instance;
-	}
-
-	public static int findBytes(byte[] buf, int from, byte[] sig) {
-
-		for (int i = from; i + sig.length < buf.length; i++) {
-
-			if (checkBytes(buf, i, sig))
-				return i;
-		}
-
-		return -1;
-	}
-
-	public static String getHex(byte[] bytes) {
-		StringBuffer s = new StringBuffer("[");
-		for (int i = 0; i < bytes.length; i++) {
-			s.append(Integer.toHexString((int) bytes[i]));
-			if (i + 1 < bytes.length)
-				s.append(", ");
-		}
-		s.append("]");
-		return s.toString();
-	}
-
-	protected static byte[] getFirst(byte[] buffer, int len) {
-		return getFirst(buffer, 0, len);
-	}
-
-	protected static byte[] getFirst(byte[] buffer, int off, int len) {
-		byte[] begin = new byte[len];
-		for (int i = off; i < begin.length && i < buffer.length; i++) {
-			begin[i] = buffer[i];
-		}
-		return begin;
-	}
-
-	protected static boolean checkBytes(byte[] buf, int pos, byte[] sig) {
-
-		if (pos + sig.length < buf.length) {
-
-			for (int p = 0; p < sig.length; p++) {
-
-				if (buf[pos + p] != sig[p]) {
-					return false;
-				}
-			}
-		}
-
-		log.info("Found signature {} at position {}", new String(sig), pos);
-		return true;
 	}
 }

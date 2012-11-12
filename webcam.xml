@@ -1,0 +1,19 @@
+<container>
+    
+<!--
+    <stream id="video" class="stream.io.ProcessStream"
+        	command="mencoder tv:// -tv device=/dev/video0  -ovc lavc -nosound -of rawvideo -lavcopts vcodec=mjpeg -fps 25 -vf scale=160:120 -o /dev/null"
+        	format="stream.io.MJpegImageStream" />
+  -->
+    
+    <stream id="video" class="stream.io.MJpegImageStream"
+	   url="file:webcam" />
+    
+    <process input="video">
+        
+        <stream.net.DataTap address="0.0.0.0" port="9100" />
+        
+    </process>
+    
+    
+</container>

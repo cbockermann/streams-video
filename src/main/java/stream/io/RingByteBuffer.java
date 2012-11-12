@@ -93,9 +93,6 @@ public class RingByteBuffer {
 
 	protected int checkBytes(final int pos, final byte[] sig) {
 
-		log.info("Checking signature '{}' against '{}'",
-				AbstractImageStream.getHex(sig, sig.length),
-				getHex(buffer, pos, 32));
 		// log.info("Starting check at buffer[{}:..] = {}", pos,
 		// getHex(buffer, pos, 32));
 

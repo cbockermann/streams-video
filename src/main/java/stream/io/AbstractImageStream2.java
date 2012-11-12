@@ -16,32 +16,34 @@ import stream.Data;
  * @author chris
  * 
  */
-public abstract class AbstractImageStream extends AbstractDataStream {
+public abstract class AbstractImageStream2 extends AbstractDataStream {
 
-	static Logger log = LoggerFactory.getLogger(AbstractImageStream.class);
+	static Logger log = LoggerFactory.getLogger(AbstractImageStream2.class);
 	public final static byte[] GIF_SIGNATURE = new byte[] { 0x47, 0x49, 0x46,
 			0x38 };
 	public final static byte[] JPG_SIGNATURE = new byte[] { (byte) 0xff,
 			(byte) 0xd8 }; // , (byte) 0xfe, 0x00, 0x0e, 0x4c, 0x61
 							// };
 
+	final int defaultBufferSize = 64 * 1024;
 	int chunkSize = 1;
 	URL url;
 	BufferedInputStream input;
-	byte[] buffer = new byte[2048 * 1024 * 16];
+	byte[] buffer = new byte[defaultBufferSize];
 	int start = 0;
 	long frameId;
 	int limit = 0;
 	long offset = 0L;
 	final byte[] signature;
 	String key = "data";
+	Long firstRead = 0L;
 
-	public AbstractImageStream(URL url, byte[] signature) throws Exception {
+	public AbstractImageStream2(URL url, byte[] signature) throws Exception {
 		this(url.openStream(), signature);
 		this.url = url;
 	}
 
-	public AbstractImageStream(InputStream in, byte[] signature)
+	public AbstractImageStream2(InputStream in, byte[] signature)
 			throws Exception {
 		this.input = new BufferedInputStream(in);
 		this.signature = signature;
@@ -53,14 +55,14 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 	@Override
 	public void init() throws Exception {
 		super.init();
-		int bufSize = 2048 * 1024 * 16;
+		int bufSize = defaultBufferSize;
 		try {
 			bufSize = new Integer(System.getProperty(
-					"stream.io.ImageStream.buffer", "" + (2048 * 1024 * 16)));
+					"stream.io.ImageStream.buffer", "" + (defaultBufferSize)));
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			bufSize = 2048 * 1024 * 16;
+			bufSize = defaultBufferSize;
 		}
 		log.info("Using buffer size of {}k", bufSize / 1024);
 		buffer = new byte[bufSize];
@@ -87,7 +89,7 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 	@Override
 	public synchronized Data readItem(Data instance) throws Exception {
 
-		log.debug("Reading FRAME-" + frameId);
+		// log.debug("Reading FRAME-" + frameId);
 		// log.info("buffer.length = {}, limit = {}", buffer.length, limit);
 		int read = input.read(buffer, limit, buffer.length - limit);
 		if (read > 0)
@@ -145,6 +147,17 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 		offset += end;
 		instance.put("frame:id", frameId++);
 		instance.put(key, img);
+
+		if (firstRead == 0L)
+			firstRead = System.currentTimeMillis();
+		else {
+			if (frameId % 1000 == 0) {
+				Long seconds = (System.currentTimeMillis() - firstRead) / 1000;
+				log.info("Reading rate after {} frames is {} fps", frameId,
+						(frameId / seconds.doubleValue()));
+			}
+		}
+
 		return instance;
 	}
 
@@ -194,7 +207,7 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 			}
 		}
 
-		log.debug("Found signature {} at position {}", new String(sig), pos);
+		// log.debug("Found signature {} at position {}", new String(sig), pos);
 		return true;
 	}
 }
