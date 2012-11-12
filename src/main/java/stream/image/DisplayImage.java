@@ -6,6 +6,7 @@ package stream.image;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 
@@ -33,6 +34,7 @@ public class DisplayImage extends AbstractProcessor {
 
 	String key = "frame:data";
 	boolean onTop = true;
+	boolean initialSize = false;
 
 	public DisplayImage() {
 		frame = new JFrame();
@@ -53,7 +55,7 @@ public class DisplayImage extends AbstractProcessor {
 		if (val == null)
 			return input;
 
-		Image image = null;
+		BufferedImage image = null;
 
 		if (val instanceof ImageRGB) {
 			log.debug("Found image already as image object!");
@@ -64,6 +66,7 @@ public class DisplayImage extends AbstractProcessor {
 			try {
 				log.debug("creating image from bytes");
 				image = ImageIO.read(new ByteArrayInputStream((byte[]) val));
+
 			} catch (Exception e) {
 				log.error("Failed to read image from byte array: {}",
 						e.getMessage());
@@ -74,6 +77,10 @@ public class DisplayImage extends AbstractProcessor {
 			imagePanel.setFrame(image);
 			frame.repaint();
 			frame.validate();
+			if (!initialSize) {
+				frame.setSize(image.getWidth(), image.getHeight());
+				initialSize = true;
+			}
 			if (!frame.isVisible())
 				frame.setVisible(true);
 		}

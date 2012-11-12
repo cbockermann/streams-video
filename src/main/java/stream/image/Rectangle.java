@@ -109,13 +109,12 @@ public class Rectangle extends AbstractImageProcessor {
 	public Data process(Data item, ImageRGB img) {
 
 		int[] orig = img.getPixels();
-		int[] copy = new int[orig.length];
 
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
 				int porig = (i + y) * img.getWidth() + (j + x);
 				// copy[porig] = orig[porig];
-				if (i == 0 || i == width || j == 0 || j == height)
+				if (i == 0 || i == height || j == 0 || j == width)
 					orig[porig] = 0;
 			}
 		}

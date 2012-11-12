@@ -15,7 +15,7 @@
         <CreateID key="frame:id" />
         <Skip condition="%{date.frame:id} @lt 100"/>
         
-        <stream.image.Rectangle x="120" y="20" width="80" height="80" output="data" />
+        <stream.image.Rectangle x="120" y="20" width="120" height="80" output="data" />
         <stream.image.DisplayImage key="data" />
         
         <!-- 
@@ -24,9 +24,9 @@
          -->
         <!-- 
 		<stream.image.DiffImage />
+        <stream.flow.Delay time="25ms" />
         
          -->
-        <stream.flow.Delay time="25ms" />
 
     </process>
 </container>
