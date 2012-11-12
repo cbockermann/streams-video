@@ -22,8 +22,8 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 	public final static byte[] GIF_SIGNATURE = new byte[] { 0x47, 0x49, 0x46,
 			0x38 };
 	public final static byte[] JPG_SIGNATURE = new byte[] { (byte) 0xff,
-			(byte) 0xd8, (byte) 0xff }; // , (byte) 0xfe, 0x00, 0x0e, 0x4c, 0x61
-										// };
+			(byte) 0xd8 }; // , (byte) 0xfe, 0x00, 0x0e, 0x4c, 0x61
+							// };
 
 	int chunkSize = 1;
 	URL url;
@@ -48,6 +48,25 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 	}
 
 	/**
+	 * @see stream.io.AbstractDataStream#init()
+	 */
+	@Override
+	public void init() throws Exception {
+		super.init();
+		int bufSize = 2048 * 1024 * 16;
+		try {
+			bufSize = new Integer(System.getProperty(
+					"stream.io.ImageStream.buffer", "" + (2048 * 1024 * 16)));
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			bufSize = 2048 * 1024 * 16;
+		}
+		log.info("Using buffer size of {}k", bufSize / 1024);
+		buffer = new byte[bufSize];
+	}
+
+	/**
 	 * @see stream.io.DataStream#close()
 	 */
 	@Override
@@ -69,12 +88,13 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 	public synchronized Data readItem(Data instance) throws Exception {
 
 		log.debug("Reading FRAME-" + frameId);
+		// log.info("buffer.length = {}, limit = {}", buffer.length, limit);
 		int read = input.read(buffer, limit, buffer.length - limit);
 		if (read > 0)
 			limit += read;
-		log.debug("Read {} bytes from input stream: {}", read,
-				this.getHex(buffer, 64));
-		log.debug("Signature is: {}", getHex(signature, 64));
+		// log.debug("Read {} bytes from input stream: {}", read,
+		// this.getHex(buffer, 64));
+		// log.debug("Signature is: {}", getHex(signature, 64));
 		// log.debug("   buffer.limit is {}", limit);
 
 		start = 0;
@@ -120,8 +140,8 @@ public abstract class AbstractImageStream extends AbstractDataStream {
 		}
 		limit -= end;
 		start = 0;
-		log.debug("## Frame offset is {}   decimal: {}",
-				Long.toHexString(offset), offset);
+		// log.debug("## Frame offset is {}   decimal: {}",
+		// Long.toHexString(offset), offset);
 		offset += end;
 		instance.put("frame:id", frameId++);
 		instance.put(key, img);

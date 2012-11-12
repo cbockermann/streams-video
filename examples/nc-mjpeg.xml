@@ -3,7 +3,7 @@
     <stream
         id="video"
         class="stream.io.MJpegImageStream"
-        url="tcp://192.168.128.98:9100/" />
+        url="tcp://192.168.128.96:9100/" />
 
     <process input="video" >
 

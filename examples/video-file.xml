@@ -3,7 +3,7 @@
     <stream
         id="video"
         class="stream.io.DataObjectStream"
-        url="tcp://192.168.128.96:9100/" />
+        url="file:/Volumes/RamDisk/coffee.obj.stream.gz" />
 
     <process input="video" >
 
@@ -19,7 +19,6 @@
         <stream.image.AverageRGB />
 
         <stream.flow.Skip condition="%{data.frame:blue:avg} == null " />
-<!--
 
         <WithKeys keys="frame:*">
         	<stream.plotter.Plotter
@@ -32,9 +31,8 @@
                 keepOpen="true"
                 keys="frame:diff:changeratio" />                
         </WithKeys>
--->
 
-        <stream.io.DataObjectWriter file="/Volumes/RamDisk/coffee.obj.stream.gz" />
+        <stream.io.DataItemWriter file="/Volumes/RamDisk/coffee.obj.stream.gz" />
 
         <!--
                 keys="frame:diff:changeratio" />

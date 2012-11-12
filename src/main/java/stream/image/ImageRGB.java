@@ -28,7 +28,7 @@ public class ImageRGB implements Serializable {
 	 * @param height
 	 * @param width
 	 */
-	public ImageRGB(int height, int width) {
+	public ImageRGB(int width, int height) {
 		this.height = height;
 		this.width = width;
 		pixels = new int[height * width];
@@ -37,7 +37,7 @@ public class ImageRGB implements Serializable {
 		}
 	}
 
-	public ImageRGB(int height, int width, int[] data) {
+	public ImageRGB(int width, int height, int[] data) {
 		this.height = height;
 		this.width = width;
 		pixels = data;
@@ -75,9 +75,10 @@ public class ImageRGB implements Serializable {
 		pixels[idx] = rgba;
 		return pixels[idx];
 	}
-	
+
 	/**
 	 * Returns the value of the red color channel
+	 * 
 	 * @author Matthias
 	 * @param x
 	 * @param y
@@ -88,21 +89,22 @@ public class ImageRGB implements Serializable {
 		int red = (rgb >> 16) & 0xFF;
 		return red;
 	}
-	
+
 	public void setRED(int x, int y, int red) {
 		int rgb = getRGB(x, y);
 		int green = (rgb >> 8) & 0xFF;
 		int blue = rgb & 0xFF;
-		
+
 		int rgbnew = red;
 		rgbnew = (rgbnew << 8) + green;
-		rgbnew = (rgbnew << 8) + blue; 
-		
+		rgbnew = (rgbnew << 8) + blue;
+
 		setRGB(x, y, rgbnew);
 	}
-	
+
 	/**
 	 * Returns the value of the green color channel
+	 * 
 	 * @author Matthias
 	 * @param x
 	 * @param y
@@ -113,21 +115,22 @@ public class ImageRGB implements Serializable {
 		int green = (rgb >> 8) & 0xFF;
 		return green;
 	}
-	
+
 	public void setGREEN(int x, int y, int green) {
 		int rgb = getRGB(x, y);
 		int red = (rgb >> 16) & 0xFF;
 		int blue = rgb & 0xFF;
-		
+
 		int rgbnew = red;
 		rgbnew = (rgbnew << 8) + green;
-		rgbnew = (rgbnew << 8) + blue; 
-		
+		rgbnew = (rgbnew << 8) + blue;
+
 		setRGB(x, y, rgbnew);
 	}
-	
+
 	/**
 	 * Returns the value of the blue color channel
+	 * 
 	 * @author Matthias
 	 * @param x
 	 * @param y
@@ -138,16 +141,16 @@ public class ImageRGB implements Serializable {
 		int blue = rgb & 0xFF;
 		return blue;
 	}
-	
+
 	public void setBLUE(int x, int y, int blue) {
 		int rgb = getRGB(x, y);
 		int green = (rgb >> 8) & 0xFF;
 		int red = (rgb >> 16) & 0xFF;
-		
+
 		int rgbnew = red;
 		rgbnew = (rgbnew << 8) + green;
-		rgbnew = (rgbnew << 8) + blue; 
-		
+		rgbnew = (rgbnew << 8) + blue;
+
 		setRGB(x, y, rgbnew);
 	}
 
