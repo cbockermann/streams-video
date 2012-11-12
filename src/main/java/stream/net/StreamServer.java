@@ -3,7 +3,9 @@
  */
 package stream.net;
 
+import java.io.File;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
@@ -26,10 +28,14 @@ import stream.io.SourceURL;
 public class StreamServer {
 
 	static Logger log = LoggerFactory.getLogger(StreamServer.class);
+
+	public static String[] logSearchPath = new String[] { "" };
+
 	ServerSocket server;
 	final List<ClientHandler> clients = new ArrayList<ClientHandler>();
 	final Thread inputDispatcher;
 	int delay = 0;
+	int clientBuffer = 100;
 
 	public StreamServer(int port, final InputStream input) throws Exception {
 		server = new ServerSocket(port);
@@ -51,6 +57,7 @@ public class StreamServer {
 								if (clients.isEmpty()) {
 									log.info("Dropping frame {}", frame);
 								} else {
+									log.info("Sending frame {}", frame);
 									for (ClientHandler handler : clients) {
 										handler.add((byte[]) item.get("data"));
 									}
@@ -87,7 +94,8 @@ public class StreamServer {
 				Socket socket = server.accept();
 				log.info("new client connection: {}", socket);
 				synchronized (clients) {
-					ClientHandler handler = new ClientHandler(socket);
+					ClientHandler handler = new ClientHandler(socket,
+							clientBuffer);
 					handler.start();
 					clients.add(handler);
 				}
@@ -102,9 +110,11 @@ public class StreamServer {
 		static Logger log = LoggerFactory.getLogger(ClientHandler.class);
 		Socket socket;
 		LinkedBlockingQueue<byte[]> chunks = new LinkedBlockingQueue<byte[]>();
+		int clientBuffer = 100;
 
-		public ClientHandler(Socket sock) {
+		public ClientHandler(Socket sock, int clientBuffer) {
 			this.socket = sock;
+			this.clientBuffer = clientBuffer;
 		}
 
 		public void run() {
@@ -112,7 +122,8 @@ public class StreamServer {
 			while (socket.isConnected()) {
 
 				try {
-					byte[] chunk = chunks.take();
+					byte[] chunk = null;
+					chunk = chunks.take();
 					if (chunk != null)
 						socket.getOutputStream().write(chunk);
 				} catch (SocketException se) {
@@ -126,7 +137,12 @@ public class StreamServer {
 		}
 
 		public void add(byte[] chunk) {
-			chunks.add(chunk);
+			if (chunks.size() > clientBuffer) {
+				log.debug("Client buffer of size {} exceeded, dropping chunk",
+						clientBuffer);
+				chunks.remove();
+				chunks.add(chunk);
+			}
 		}
 	}
 
@@ -136,20 +152,63 @@ public class StreamServer {
 	public static void main(String[] args) {
 
 		try {
-			if (args.length == 0) {
+
+			setupLogging();
+			List<String> params = stream.run.handleArguments(args);
+
+			if (params.isEmpty()) {
 				log.info("You need to specify the source-URL to stream from!");
 				return;
 			}
 
-			SourceURL url = new SourceURL(args[0]);
+			SourceURL url = new SourceURL(params.get(params.size() - 1));
 			log.info("Reading MJpegStream from {}", url);
-			int port = new Integer(System.getProperty("port", "9999"));
+			int port = new Integer(System.getProperty("port", "9100"));
 			log.info("Starting server on port {}", port);
 			StreamServer server = new StreamServer(port, url.openStream());
 			server.run();
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Error while running StreamServer: {}", e.getMessage());
+			if (log.isDebugEnabled())
+				e.printStackTrace();
+		}
+	}
+
+	public static void setupLogging() {
+
+		List<String> searchPaths = new ArrayList<String>();
+		if (System.getenv("STREAMS_HOME") != null)
+			searchPaths.add(System.getenv("STREAMS_HOME") + File.separator
+					+ "conf");
+
+		for (String path : logSearchPath)
+			searchPaths.add(path);
+
+		for (String path : searchPaths) {
+			String p = path;
+			if (!p.isEmpty())
+				p = path + File.separator + "log4j.properties";
+			else
+				p = "log4j.properties";
+
+			File logProp = new File(p);
+			if (logProp.canRead()) {
+				System.err.println("Using log settings from "
+						+ logProp.getAbsolutePath());
+				try {
+					Class<?> configurator = Class
+							.forName("org.apache.log4j.PropertyConfigurator");
+					Method configure = configurator.getMethod("configure",
+							String.class);
+					configure.invoke(null, logProp.getAbsolutePath());
+					break;
+				} catch (Exception e) {
+					System.err
+							.println("Failed to setup logging with log4j.properties: "
+									+ e.getMessage());
+				}
+			}
 		}
 	}
 }
