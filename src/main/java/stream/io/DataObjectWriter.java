@@ -20,6 +20,8 @@ public class DataObjectWriter extends AbstractProcessor {
 
 	File file;
 	ObjectOutputStream out;
+	long cnt = 0L;
+	Integer reset = 25;
 
 	/**
 	 * @return the file
@@ -57,6 +59,10 @@ public class DataObjectWriter extends AbstractProcessor {
 		if (input != null) {
 			try {
 				out.writeObject(input);
+				this.cnt++;
+				if (cnt % reset == 0) {
+					out.reset();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -72,5 +78,20 @@ public class DataObjectWriter extends AbstractProcessor {
 		super.finish();
 		out.flush();
 		out.close();
+	}
+
+	/**
+	 * @return the reset
+	 */
+	public Integer getReset() {
+		return reset;
+	}
+
+	/**
+	 * @param reset
+	 *            the reset to set
+	 */
+	public void setReset(Integer reset) {
+		this.reset = Math.max(1, reset);
 	}
 }

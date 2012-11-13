@@ -31,7 +31,7 @@ public class StreamServer {
 
 	public static String[] logSearchPath = new String[] { "" };
 
-	ServerSocket server;
+	final ServerSocket server;
 	final List<ClientHandler> clients = new ArrayList<ClientHandler>();
 	final Thread inputDispatcher;
 	int delay = 0;
@@ -49,6 +49,7 @@ public class StreamServer {
 				try {
 					MJpegImageStream stream = new MJpegImageStream(input);
 					stream.init();
+
 					int frame = 0;
 					Data item = stream.readNext();
 					while (item != null) {
@@ -92,13 +93,15 @@ public class StreamServer {
 
 		try {
 			while (true) {
-				Socket socket = server.accept();
+				final Socket socket = server.accept();
 				log.info("new client connection: {}", socket);
 				synchronized (clients) {
-					ClientHandler handler = new ClientHandler(socket,
-							clientBuffer);
+					final ClientHandler handler = new ClientHandler(socket,
+							clientBuffer, this);
 					handler.start();
-					clients.add(handler);
+					synchronized (clients) {
+						clients.add(handler);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -106,16 +109,24 @@ public class StreamServer {
 		}
 	}
 
-	public static class ClientHandler extends Thread {
+	public void removeClient(ClientHandler client) {
+		synchronized (clients) {
+			clients.remove(client);
+		}
+	}
 
-		static Logger log = LoggerFactory.getLogger(ClientHandler.class);
-		Socket socket;
-		LinkedBlockingQueue<byte[]> chunks = new LinkedBlockingQueue<byte[]>();
-		int clientBuffer = 100;
+	public final static class ClientHandler extends Thread {
 
-		public ClientHandler(Socket sock, int clientBuffer) {
+		final static Logger log = LoggerFactory.getLogger(ClientHandler.class);
+		final Socket socket;
+		final LinkedBlockingQueue<byte[]> chunks = new LinkedBlockingQueue<byte[]>();
+		final int clientBuffer;
+		final StreamServer server;
+
+		public ClientHandler(Socket sock, int clientBuffer, StreamServer server) {
 			this.socket = sock;
 			this.clientBuffer = clientBuffer;
+			this.server = server;
 		}
 
 		public void run() {
@@ -130,11 +141,14 @@ public class StreamServer {
 				} catch (SocketException se) {
 					log.error("Socket error: {}", se.getMessage());
 					log.info("Disconnecting client...");
-					return;
+					break;
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
+
+			log.info("Client handler for {} exiting...", socket);
+			chunks.clear();
 		}
 
 		public void add(byte[] chunk) {

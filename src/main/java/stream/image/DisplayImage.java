@@ -70,6 +70,7 @@ public class DisplayImage extends AbstractProcessor {
 			} catch (Exception e) {
 				log.error("Failed to read image from byte array: {}",
 						e.getMessage());
+				return input;
 			}
 		}
 
@@ -78,7 +79,7 @@ public class DisplayImage extends AbstractProcessor {
 			frame.repaint();
 			frame.validate();
 			if (!initialSize) {
-				frame.setSize(image.getWidth(), image.getHeight());
+				frame.setSize(image.getWidth(), image.getHeight() + 20);
 				initialSize = true;
 			}
 			if (!frame.isVisible())
