@@ -1,0 +1,25 @@
+<container>
+
+    <stream
+        id="video"
+        class="stream.io.MJpegImageStream"
+        url="http://download.jwall.org/stuff/KaffeeFilm.mjpeg.gz" />
+
+    <process input="video" >
+
+        <CreateID key="frame:id" />
+        
+        <stream.image.QuantilizedImage output="data" quantilesPerChannel="3" />
+        
+        <stream.image.BorderDetection output="border" tolerance="1"/>
+        
+        <stream.image.DisplayImage key="border" />
+
+        <PrintData />
+        <stream.plotter.Plotter
+            history="1000"
+            keepOpen="true"
+            keys="frame:red:green,frame:red:blue,frame:green:blue" />
+
+    </process>
+</container>

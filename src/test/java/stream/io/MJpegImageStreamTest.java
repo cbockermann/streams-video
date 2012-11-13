@@ -21,7 +21,7 @@ public class MJpegImageStreamTest {
 	@Test
 	public void test() throws Exception {
 		URL url = MJpegImageStreamTest.class
-				.getResource("/test-mjpeg-stream.xml");
+				.getResource("/border-detection-stream.xml");
 		log.info("Starting MJpegImageStream-test from {}", url);
 		stream.run.main(url);
 	}

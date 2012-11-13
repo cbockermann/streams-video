@@ -75,6 +75,24 @@ public class ImageRGB implements Serializable {
 		pixels[idx] = rgba;
 		return pixels[idx];
 	}
+	
+	//TODO bockermann: Why does it have to return the position in the array as a int?
+	/**
+	 * This functions sets the RGB value for the specified pixel.
+	 * @param x
+	 * @param y
+	 * @param red
+	 * @param green
+	 * @param blue
+	 * @return
+	 */
+	public int setRGB(int x, int y, int red, int green, int blue) {
+		int rgba = red;
+		rgba = (rgba << 8) + green;
+		rgba = (rgba << 8) + blue;
+		
+		return setRGB(x, y, rgba);
+	}
 
 	/**
 	 * Returns the value of the red color channel
