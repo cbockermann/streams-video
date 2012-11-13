@@ -18,13 +18,13 @@ import stream.annotations.Parameter;
  */
 public abstract class AbstractImageProcessor extends AbstractProcessor {
 
-	String data = "data";
+	String imageKey = "data";
 
 	/**
 	 * @return the data
 	 */
 	public String getImage() {
-		return data;
+		return imageKey;
 	}
 
 	/**
@@ -33,7 +33,7 @@ public abstract class AbstractImageProcessor extends AbstractProcessor {
 	 */
 	@Parameter(description = "The name of the attribute that contains the byte array data of the image.", required = true)
 	public void setImage(String data) {
-		this.data = data;
+		this.imageKey = data;
 	}
 
 	/**
@@ -42,13 +42,13 @@ public abstract class AbstractImageProcessor extends AbstractProcessor {
 	@Override
 	public Data process(Data input) {
 
-		Serializable value = input.get(data);
+		Serializable value = input.get(imageKey);
 		if (value instanceof ImageRGB) {
 			Data result = process(input, (ImageRGB) value);
 			return result;
 		}
 
-		byte[] bytes = (byte[]) input.get(data);
+		byte[] bytes = (byte[]) input.get(imageKey);
 		if (bytes == null) {
 			return input;
 		}

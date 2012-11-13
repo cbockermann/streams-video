@@ -10,25 +10,31 @@
         url="http://download.jwall.org/stuff/KaffeeFilm.mjpeg.gz" />
      -->
 
-    <process input="video" >
+    <process input="video" output="display" >
 
         <CreateID key="frame:id" />
         <Skip condition="%{date.frame:id} @lt 100"/>
 
         <!-- 
-         -->
         <stream.image.Rectangle x="120" y="20" width="120" height="80" output="data" />
-        <stream.image.DisplayImage key="data" />
+         -->
+        <stream.image.QuantilizedImage output="data" quantilesPerChannel="4" />
         
+        <!-- 
+        <stream.image.DisplayImage key="data" />
         <stream.image.Crop x="120" y="20" width="80" height="80" output="data" />
         <stream.image.DisplayImage key="data" />
-        <!-- 
          -->
         <!-- 
 		<stream.image.DiffImage />
         <stream.flow.Delay time="25ms" />
         
          -->
-
+         <stream.flow.Enqueue queue="display" />
+    </process>
+    
+    
+    <process input="display">
+		<stream.image.DisplayImage key="data" />
     </process>
 </container>

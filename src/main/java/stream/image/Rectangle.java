@@ -14,7 +14,7 @@ import stream.annotations.Parameter;
  */
 public class Rectangle extends AbstractImageProcessor {
 
-	String output = data;
+	String output = imageKey;
 	int x = 0;
 	int y = 0;
 	int width = 10;
