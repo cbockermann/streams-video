@@ -11,10 +11,12 @@
     <process input="video" >
 
         <CreateID key="frame:id" />
+          <FormatTimestamp />
+            <PrintData />
+
         <!--
         <stream.image.DiffImage />
           -->
-
         <stream.image.ChangedPixelRatio />
 
         <stream.image.DisplayImage key="data" />

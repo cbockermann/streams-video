@@ -4,14 +4,18 @@
 package stream.image;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.slf4j.Logger;
@@ -31,10 +35,14 @@ public class DisplayImage extends AbstractProcessor {
 	static Logger log = LoggerFactory.getLogger(DisplayImage.class);
 	final JFrame frame;
 	final ImagePanel imagePanel;
+	final JLabel info = new JLabel();
+	final SimpleDateFormat timeFormat = new SimpleDateFormat(
+			"hh:mm:ss dd-MM-yyyy");
 
 	String key = "frame:data";
 	boolean onTop = true;
 	boolean initialSize = false;
+	String timestamp = "@timestamp";
 
 	public DisplayImage() {
 		frame = new JFrame();
@@ -43,6 +51,7 @@ public class DisplayImage extends AbstractProcessor {
 
 		imagePanel = new ImagePanel();
 		frame.getContentPane().add(imagePanel, BorderLayout.CENTER);
+		frame.getContentPane().add(info, BorderLayout.SOUTH);
 	}
 
 	/**
@@ -75,15 +84,29 @@ public class DisplayImage extends AbstractProcessor {
 		}
 
 		if (image != null) {
-			imagePanel.setFrame(image);
+			Long time = null;
+
+			try {
+				if (timestamp != null)
+					time = new Long(input.get(timestamp).toString());
+			} catch (Exception e) {
+				time = null;
+			}
+
+			imagePanel.setFrame(image, null);
+			if (time != null)
+				info.setText(timeFormat.format(new Date(time)));
 			frame.repaint();
 			frame.validate();
 			if (!initialSize) {
-				frame.setSize(image.getWidth(), image.getHeight() + 20);
+				// frame.setSize(image.getWidth(), image.getHeight() + 20);
+				frame.pack();
 				initialSize = true;
 			}
-			if (!frame.isVisible())
+			if (!frame.isVisible()) {
+
 				frame.setVisible(true);
+			}
 		}
 
 		return input;
@@ -138,7 +161,9 @@ public class DisplayImage extends AbstractProcessor {
 
 		/** The unique class ID */
 		private static final long serialVersionUID = 3182958661267766150L;
-		Image frame = null;
+		final SimpleDateFormat fmt = new SimpleDateFormat("hh:mm:ss dd-MM-yyyy");
+		BufferedImage frame = null;
+		Long timestamp = null;
 
 		public void paint(Graphics g) {
 			super.paint(g);
@@ -146,11 +171,45 @@ public class DisplayImage extends AbstractProcessor {
 				// log.info("Drawing frame {}", frame);
 				g.drawImage(frame, 0, 0, null);
 			}
+
+			if (timestamp != null) {
+				g.setColor(Color.WHITE);
+				g.drawString(fmt.format(new Date(timestamp)), 4, 20);
+			}
 		}
 
-		public void setFrame(Image frame) {
+		public void setFrame(BufferedImage frame, Long timestamp) {
+			this.timestamp = timestamp;
 			this.frame = frame;
 			this.repaint();
 		}
+
+		/**
+		 * @see javax.swing.JComponent#getPreferredSize()
+		 */
+		@Override
+		public Dimension getPreferredSize() {
+			return getMaximumSize();
+		}
+
+		/**
+		 * @see javax.swing.JComponent#getMaximumSize()
+		 */
+		@Override
+		public Dimension getMaximumSize() {
+			if (frame == null) {
+				return new Dimension(320, 240);
+			}
+			return new Dimension(frame.getWidth(), frame.getHeight());
+		}
+
+		/**
+		 * @see javax.swing.JComponent#getMinimumSize()
+		 */
+		@Override
+		public Dimension getMinimumSize() {
+			return getMaximumSize();
+		}
+
 	}
 }

@@ -16,10 +16,11 @@
 
         <stream.image.DisplayImage key="data" />
 
+        
         <stream.image.AverageRGB />
 
         <stream.flow.Skip condition="%{data.frame:blue:avg} == null " />
-
+<!-- 
         <WithKeys keys="frame:*">
         	<stream.plotter.Plotter
        		     history="1000"
@@ -31,8 +32,14 @@
                 keepOpen="true"
                 keys="frame:diff:changeratio" />                
         </WithKeys>
-
+ -->
+        
+        <stream.image.DiffImage output="data" />
+        <stream.image.DisplayImage key="data" />
+        
+        <!-- 
         <stream.io.DataItemWriter file="/Volumes/RamDisk/coffee.obj.stream.gz" />
+         -->
 
         <!--
                 keys="frame:diff:changeratio" />
