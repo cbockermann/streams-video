@@ -62,7 +62,7 @@
 								<Implementation-Revision>${project.version}</Implementation-Revision>
 								<Specification-Title>streams-video</Specification-Title>
 								<Specification-Version>1.0</Specification-Version>
-								<main-class>stream.net.StreamServer</main-class>
+								<main-class>stream.CoffeeCam</main-class>
 							</manifestEntries>
 						</transformer>
 					</transformers>

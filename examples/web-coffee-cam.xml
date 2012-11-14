@@ -17,7 +17,7 @@
           -->
 
         <stream.image.ChangedPixelRatio />
-
+        
         <stream.image.DisplayImage key="data" />
 
         <stream.image.AverageRGB />

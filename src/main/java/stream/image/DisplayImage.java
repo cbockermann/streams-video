@@ -7,6 +7,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
@@ -30,19 +32,21 @@ import stream.annotations.Parameter;
  * @author chris
  * 
  */
-public class DisplayImage extends AbstractProcessor {
+public class DisplayImage extends AbstractProcessor implements WindowListener {
 
 	static Logger log = LoggerFactory.getLogger(DisplayImage.class);
 	final JFrame frame;
 	final ImagePanel imagePanel;
 	final JLabel info = new JLabel();
 	final SimpleDateFormat timeFormat = new SimpleDateFormat(
-			"hh:mm:ss dd-MM-yyyy");
+			"HH:mm:ss dd-MM-yyyy");
 
 	String key = "frame:data";
 	boolean onTop = true;
 	boolean initialSize = false;
 	String timestamp = "@timestamp";
+	String onClose = "";
+	boolean closing = false;
 
 	public DisplayImage() {
 		frame = new JFrame();
@@ -52,6 +56,7 @@ public class DisplayImage extends AbstractProcessor {
 		imagePanel = new ImagePanel();
 		frame.getContentPane().add(imagePanel, BorderLayout.CENTER);
 		frame.getContentPane().add(info, BorderLayout.SOUTH);
+		frame.addWindowListener(this);
 	}
 
 	/**
@@ -59,6 +64,9 @@ public class DisplayImage extends AbstractProcessor {
 	 */
 	@Override
 	public Data process(Data input) {
+
+		if (closing)
+			return input;
 
 		Serializable val = input.get(key);
 		if (val == null)
@@ -157,6 +165,22 @@ public class DisplayImage extends AbstractProcessor {
 		this.onTop = onTop;
 	}
 
+	/**
+	 * @return the onClose
+	 */
+	public String getOnClose() {
+		return onClose;
+	}
+
+	/**
+	 * @param onClose
+	 *            the onClose to set
+	 */
+	@Parameter(description = "If set to `shutdown`, closing the window will shutdown the JVM (ie. the process container).")
+	public void setOnClose(String onClose) {
+		this.onClose = onClose;
+	}
+
 	public static class ImagePanel extends JPanel {
 
 		/** The unique class ID */
@@ -211,5 +235,63 @@ public class DisplayImage extends AbstractProcessor {
 			return getMaximumSize();
 		}
 
+	}
+
+	/**
+	 * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowOpened(WindowEvent e) {
+	}
+
+	/**
+	 * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowClosing(WindowEvent e) {
+		closing = true;
+		log.info("windowClosing: {}", e);
+		if ("shutdown".equalsIgnoreCase(onClose)) {
+			log.info("Shutting down the container...");
+			System.exit(0);
+		} else {
+			log.info("Window closed.");
+		}
+	}
+
+	/**
+	 * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowClosed(WindowEvent e) {
+		log.info("windowClosed: {}", e);
+	}
+
+	/**
+	 * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowIconified(WindowEvent e) {
+	}
+
+	/**
+	 * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+	}
+
+	/**
+	 * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowActivated(WindowEvent e) {
+	}
+
+	/**
+	 * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+	 */
+	@Override
+	public void windowDeactivated(WindowEvent e) {
 	}
 }
