@@ -1,0 +1,49 @@
+<container>
+
+    <stream
+        id="video"
+        class="stream.io.DataObjectStream"
+        url="http://kirmes.cs.uni-dortmund.de/coffee.obj.stream.gz" />
+<!--
+    url="tcp://192.168.10.29:9100/" />
+        url="tcp://192.168.128.96:9100/" />
+  -->
+
+    <process input="video" >
+
+        <CreateID key="frame:id" />
+        <!--
+        <stream.image.DiffImage />
+          -->
+
+        <stream.image.ChangedPixelRatio />
+
+        <stream.image.DisplayImage key="data" />
+
+        <stream.image.AverageRGB />
+
+        <stream.flow.Skip condition="%{data.frame:blue:avg} == null " />
+<!--
+
+        <WithKeys keys="frame:*">
+        	<stream.plotter.Plotter
+       		     history="1000"
+	            keepOpen="true"
+                keys="frame:red:avg,frame:green:avg,frame:blue:avg" />
+
+            <stream.plotter.Plotter
+                 history="1000"
+                keepOpen="true"
+                keys="frame:diff:changeratio" />                
+        </WithKeys>
+-->
+
+
+        <!--
+        <stream.io.DataObjectWriter file="/Volumes/RamDisk/coffee.obj.stream.gz" />
+                keys="frame:diff:changeratio" />
+          -->
+
+    </process>
+
+</container>
