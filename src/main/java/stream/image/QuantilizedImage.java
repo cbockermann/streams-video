@@ -4,17 +4,18 @@ import stream.Data;
 import stream.ProcessContext;
 import stream.annotations.Parameter;
 
+/**
+ * Quantilized Image Operator
+ * @author Matthias
+ *
+ */
 public class QuantilizedImage extends AbstractImageProcessor {
 
-	Boolean overwriteInputImage = false;
-
-	/**
-	 * Output Name gets ignored if overwriteInputImage is true
-	 */
-	String output = "frame:quantilizedImage";
+	String output = "data";
 
 	Integer quantilesPerChannel = 4;
-	Integer[] borders;
+
+	private Integer[] borders;
 
 	/**
 	 * @see stream.AbstractProcessor#init(stream.ProcessContext)
@@ -30,33 +31,19 @@ public class QuantilizedImage extends AbstractImageProcessor {
 	}
 
 	/**
-	 * @param overwriteInputImage
-	 *            Parameter to define whether the original image should be kept
-	 *            or not
-	 */
-	public void setOverwriteInputImage(Boolean overwriteInputImage) {
-		this.overwriteInputImage = overwriteInputImage;
-	}
-
-	/**
-	 * @return Should the original image be kept or not
-	 */
-	public Boolean getOverwriteInputImage() {
-		return overwriteInputImage;
-	}
-
-	/**
-	 * @return name of the output image
+	 * @return name The name/key under which the quantilized image is stored.
 	 */
 	public String getOutput() {
 		return output;
 	}
 
 	/**
-	 * @param output
-	 *            the name of the output image. This parameter gets ignored when
-	 *            overwriteInputImage is true.
+	 * Setter for the Parameter Output
+	 * @param output The name/key under which the quantilized Image is stored. 
+	 * 					If this name equals the name of the input image, the input image
+	 * 					is going to be overwritten.
 	 */
+	@Parameter(description ="The name/key of the output image is stored. If this name equals the name of the input image, the input image is going to be overwritten.")
 	public void setOutput(String output) {
 		this.output = output;
 	}
@@ -142,9 +129,8 @@ public class QuantilizedImage extends AbstractImageProcessor {
 			}
 		}
 
-		if (!overwriteInputImage) {
-			item.put(output, quantilizedImage);
-		}
+		
+		item.put(output, quantilizedImage);
 
 		return item;
 	}
