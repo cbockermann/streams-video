@@ -5,15 +5,16 @@ import stream.ProcessContext;
 import stream.annotations.Parameter;
 
 /**
- * Quantilized Image Operator
+ * The Color Discretization Operator discretizes the color space of the input image.
+ * 
  * @author Matthias
  *
  */
-public class QuantilizedImage extends AbstractImageProcessor {
+public class ColorDiscretization extends AbstractImageProcessor {
 
 	String output = "data";
 
-	Integer quantilesPerChannel = 4;
+	Integer valuesPerChannel = 4;
 
 	private Integer[] borders;
 
@@ -24,9 +25,9 @@ public class QuantilizedImage extends AbstractImageProcessor {
 	public void init(ProcessContext ctx) throws Exception {
 		super.init(ctx);
 
-		borders = new Integer[quantilesPerChannel];
-		for (int i = 0; i < quantilesPerChannel; i++) {
-			borders[i] = (255 / quantilesPerChannel) * i;
+		borders = new Integer[valuesPerChannel];
+		for (int i = 0; i < valuesPerChannel; i++) {
+			borders[i] = (255 / valuesPerChannel) * i;
 		}
 	}
 
@@ -49,88 +50,88 @@ public class QuantilizedImage extends AbstractImageProcessor {
 	}
 
 	/**
-	 * @return Number of Quantiles each channel is divided into
+	 * @return Number of discrete color values, each channel is divided into
 	 */
 	public Integer getQuantilesPerChannel() {
-		return quantilesPerChannel;
+		return valuesPerChannel;
 	}
 
 	/**
 	 * @param quantilesPerChannel
-	 *            Set the number of Quantiles each channel in divided into
+	 *            Set the number of discrete color values, each channel in divided into
 	 */
-	@Parameter(description = "Set the number of Quantiles each channel in divided into.")
+	@Parameter(description = "Set the number of discrete color values, each channel in divided into.")
 	public void setQuantilesPerChannel(Integer quantilesPerChannel) {
-		this.quantilesPerChannel = quantilesPerChannel;
+		this.valuesPerChannel = quantilesPerChannel;
 	}
 
 	@Override
 	public Data process(Data item, ImageRGB img) {
 
-		ImageRGB quantilizedImage = null;
+		ImageRGB discretizedImage = null;
 
 		if (imageKey.equals(output)) {
-			quantilizedImage = img;
+			discretizedImage = img;
 		} else {
-			quantilizedImage = new ImageRGB(img.getWidth(), img.getHeight());
+			discretizedImage = new ImageRGB(img.getWidth(), img.getHeight());
 		}
 
 		for (int x = 0; x < img.getWidth(); x++) {
 			for (int y = 0; y < img.getHeight(); y++) {
 
-				// Quantilize red channel
+				// Discretize red channel
 				int red = img.getRED(x, y);
 
 				int i = 1;
-				while (i < quantilesPerChannel) {
+				while (i < valuesPerChannel) {
 					if (red < borders[i]) {
 						red = borders[i - 1] + (borders[i] - borders[i - 1])
 								/ 2;
-						i = quantilesPerChannel;
+						i = valuesPerChannel;
 					} else {
 						i++;
 					}
 				}
 
-				quantilizedImage.setRED(x, y, red);
+				discretizedImage.setRED(x, y, red);
 
-				// Quantilize green channel
+				// Discretize green channel
 				int green = img.getGREEN(x, y);
 
 				i = 1;
-				while (i < quantilesPerChannel) {
+				while (i < valuesPerChannel) {
 					if (green < borders[i]) {
 						green = borders[i - 1] + (borders[i] - borders[i - 1])
 								/ 2;
-						i = quantilesPerChannel;
+						i = valuesPerChannel;
 					} else {
 						i++;
 					}
 				}
 
-				quantilizedImage.setGREEN(x, y, green);
+				discretizedImage.setGREEN(x, y, green);
 
-				// Quantilize blue channel
+				// Discretize blue channel
 				int blue = img.getBLUE(x, y);
 
 				i = 1;
-				while (i < quantilesPerChannel) {
+				while (i < valuesPerChannel) {
 					if (blue < borders[i]) {
 						blue = borders[i - 1] + (borders[i] - borders[i - 1])
 								/ 2;
-						i = quantilesPerChannel;
+						i = valuesPerChannel;
 					} else {
 						i++;
 					}
 				}
 
-				quantilizedImage.setBLUE(x, y, blue);
+				discretizedImage.setBLUE(x, y, blue);
 
 			}
 		}
 
 		
-		item.put(output, quantilizedImage);
+		item.put(output, discretizedImage);
 
 		return item;
 	}
