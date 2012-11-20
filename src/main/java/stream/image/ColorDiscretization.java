@@ -32,7 +32,7 @@ public class ColorDiscretization extends AbstractImageProcessor {
 	}
 
 	/**
-	 * @return name The name/key under which the quantilized image is stored.
+	 * @return name The name/key under which the discretized image is stored.
 	 */
 	public String getOutput() {
 		return output;
@@ -40,7 +40,7 @@ public class ColorDiscretization extends AbstractImageProcessor {
 
 	/**
 	 * Setter for the Parameter Output
-	 * @param output The name/key under which the quantilized Image is stored. 
+	 * @param output The name/key under which the discretized Image is stored. 
 	 * 					If this name equals the name of the input image, the input image
 	 * 					is going to be overwritten.
 	 */
@@ -68,13 +68,7 @@ public class ColorDiscretization extends AbstractImageProcessor {
 	@Override
 	public Data process(Data item, ImageRGB img) {
 
-		ImageRGB discretizedImage = null;
-
-		if (imageKey.equals(output)) {
-			discretizedImage = img;
-		} else {
-			discretizedImage = new ImageRGB(img.getWidth(), img.getHeight());
-		}
+		ImageRGB discretizedImage = new ImageRGB(img.getWidth(), img.getHeight());
 
 		for (int x = 0; x < img.getWidth(); x++) {
 			for (int y = 0; y < img.getHeight(); y++) {

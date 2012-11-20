@@ -10,9 +10,9 @@
         <CreateID key="frame:id" />
 
         <!-- 
-        <stream.image.QuantilizedImage
+        <stream.image.ColorDiscretization
             output="data"
-            quantilesPerChannel="2" />
+            valuesPerChannel="2" />
 
         <stream.image.BorderDetection
             output="data"

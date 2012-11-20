@@ -11,7 +11,7 @@
 
         <stream.image.DisplayImage key="data" />
 
-
+<!-- 
         <stream.image.AverageRGB />
         
         <stream.io.BinaryWriter key="data" url="file:/Volumes/RamDisk/frame-%{data.@frame:id}.jpg" />
@@ -28,6 +28,6 @@
             history="1000"
             keepOpen="true"
             keys="frame:red:green,frame:red:blue,frame:green:blue" />
-
+-->
     </process>
 </container>
