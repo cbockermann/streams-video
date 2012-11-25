@@ -1,0 +1,24 @@
+<container>
+
+    <stream
+        id="video"
+        class="stream.io.MJpegImageStream"
+        url="http://download.jwall.org/stuff/laserpointer.mjpeg" />
+        <!-- 
+        url="file:/Users/chris/laserpointer.mjpeg" />
+         -->
+
+    <process input="video" >
+
+        <CreateID key="frame:id" />
+        
+        <Skip condition="%{data.frame:id} @lt 60" />
+        
+        <stream.image.LaserTracker laserImage="gesture" />
+
+        <stream.image.DisplayImage key="data" />
+        <stream.image.DisplayImage key="gesture" />
+        
+        <PrintData />
+    </process>
+</container>

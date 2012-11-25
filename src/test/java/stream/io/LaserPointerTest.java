@@ -14,18 +14,18 @@ import org.slf4j.LoggerFactory;
  * @author chris
  * 
  */
-public class FileStreamTest {
+public class LaserPointerTest {
 
-	static Logger log = LoggerFactory.getLogger(FileStreamTest.class);
+	static Logger log = LoggerFactory.getLogger(LaserPointerTest.class);
 
 	@Test
 	public void test() throws Exception {
-		URL url = FileStreamTest.class.getResource("/file-stream.xml");
-		log.info("Starting MJpegImageStream-test from {}", url);
+		URL url = LaserPointerTest.class.getResource("/laser-pointer.xml");
+		log.info("Starting LaserPointerTest from {}", url);
 		stream.run.main(url);
 	}
 
 	public static void main(String[] args) throws Exception {
-		new FileStreamTest().test();
+		new LaserPointerTest().test();
 	}
 }

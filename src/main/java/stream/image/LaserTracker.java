@@ -4,7 +4,11 @@
 package stream.image;
 
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -13,7 +17,14 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 
 /**
- * @author chris
+ * <p>
+ * This processor provides a very simple strategy for detecting laser pointers
+ * in an image. It simply looks for small, very bright areas. If the
+ * <code>laserImage</code> property is set, a track of the identified
+ * laser-points is produced.
+ * </p>
+ * 
+ * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
  * 
  */
 public class LaserTracker extends AbstractImageProcessor {
@@ -55,17 +66,6 @@ public class LaserTracker extends AbstractImageProcessor {
 				int g = (rgb >> 8) & 0xFF;
 				int b = rgb & 0xFF;
 
-				int min = Math.min(r, Math.min(g, b));
-				int max = Math.max(r, Math.max(g, b));
-				double v = max;
-				double delta = max - min;
-				double s = 0;
-
-				if (max != 0)
-					s = delta / max;
-
-				// log.info("s-value at {},{} is: " + s, x, y);
-
 				if (r > 200 && g > 200 && b > 200) {
 					// log.info("Laser-pointer at {},{} ?", x, y);
 					// img.setRGB(x, y, 0, 255, 0);
@@ -75,37 +75,48 @@ public class LaserTracker extends AbstractImageProcessor {
 		}
 
 		if (!points.isEmpty()) {
-			double cx = 0.0;
-			double cy = 0.0;
-			Point center = null;
+			List<Point> laserPoints = new ArrayList<Point>();
+			List<Point> visited = new ArrayList<Point>();
 
 			for (Point p : points) {
-				if (center == null) {
-					center = new Point(p.x, p.y);
-					cx = p.x;
-					cy = p.y;
-				} else {
-					// log.info("distance to current center: {}", dist(center,
-					// p));
-					cx += p.x;
-					cy += p.y;
+
+				if (visited.contains(p))
+					continue;
+
+				Set<Point> neigh = getNeighbors(p, points, 10.0);
+				if (neigh.size() > 5) {
+					Point lp = this.getCenter(neigh);
+					laserPoints.add(lp);
+					visited.addAll(neigh);
 				}
 			}
 
-			center.setLocation(cx / points.size(), cy / points.size());
-			img.setRGB(center.x, center.y, 0, 255, 0);
-			item.put("laser:timestamp", System.currentTimeMillis());
-			item.put("laser:x", center.x);
-			item.put("laser:y", center.y);
+			int i = -1;
+			Point laserPoint = null;
+			for (Point p : laserPoints) {
 
-			if (laserImage != null) {
+				String id = "laser";
+				if (i > -1)
+					id = "laser" + i;
+				else
+					laserPoint = p; // only the first laser-point will be
+									// painted
+
+				img.setRGB(p.x, p.y, 0, 255, 0);
+				item.put(id + ":timestamp", System.currentTimeMillis());
+				item.put(id + ":x", p.x);
+				item.put(id + ":y", p.y);
+				i++;
+			}
+
+			if (laserImage != null && laserPoint != null) {
 				ImageRGB li = lastImage;
 				if (li == null) {
 					log.info("Need to add new laser-image...");
 					li = new ImageRGB(img.getWidth(), img.getHeight());
 					lastImage = li;
 				}
-				li.setRGB(center.x, center.y, 255, 255, 255);
+				li.setRGB(laserPoint.x, laserPoint.y, 255, 255, 255);
 				item.put(laserImage, li);
 			}
 		}
@@ -116,5 +127,33 @@ public class LaserTracker extends AbstractImageProcessor {
 
 	public double dist(Point p, Point q) {
 		return p.distance(q.getX(), q.getY());
+	}
+
+	public Set<Point> getNeighbors(Point p, Set<Point> points, double radius) {
+		Set<Point> neigh = new LinkedHashSet<Point>();
+		for (Point q : points) {
+			if (p != q && p.distance(q) < radius)
+				neigh.add(q);
+		}
+		return neigh;
+	}
+
+	public Point getCenter(Collection<Point> pts) {
+		double cx = 0.0;
+		double cy = 0.0;
+		Point center = new Point(0, 0);
+		double cnt = 0.0;
+
+		for (Point p : pts) {
+			cx += p.x;
+			cy += p.y;
+			cnt += 1.0d;
+		}
+
+		if (cnt == 0)
+			cnt = 1.0;
+
+		center.setLocation(cx / cnt, cy / cnt);
+		return center;
 	}
 }
