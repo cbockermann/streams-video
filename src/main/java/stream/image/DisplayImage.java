@@ -7,6 +7,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
@@ -57,6 +59,31 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 		frame.getContentPane().add(imagePanel, BorderLayout.CENTER);
 		frame.getContentPane().add(info, BorderLayout.SOUTH);
 		frame.addWindowListener(this);
+
+		imagePanel.addMouseMotionListener(new MouseAdapter() {
+			/**
+			 * @see java.awt.event.MouseAdapter#mouseMoved(java.awt.event.MouseEvent)
+			 */
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				super.mouseMoved(e);
+				int x = e.getX();
+				int y = e.getY();
+				if (imagePanel.frame != null) {
+					int rgb = imagePanel.frame.getRGB(x, y);
+
+					int red = (rgb >> 16) & 0xFF;
+					int green = (rgb >> 8) & 0xFF;
+					int blue = rgb & 0xFF;
+
+					info.setText("x: " + x + ", y: " + y + ", RGB = (" + red
+							+ " / " + green + " / " + blue + ")");
+				} else {
+					info.setText("x: " + x + ", y: " + y);
+				}
+			}
+		});
+
 	}
 
 	/**
