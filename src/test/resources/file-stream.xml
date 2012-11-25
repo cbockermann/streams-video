@@ -1,0 +1,38 @@
+<container>
+
+    <stream
+        id="video"
+        class="stream.io.MJpegImageStream"
+        url="file:/Users/chris/laserpointer.mjpeg" />
+
+    <process input="video" >
+
+        <CreateID key="frame:id" />
+        
+        <Skip condition="%{data.frame:id} @lt 60" />
+        
+        <!-- 
+        <stream.image.QuantilizedImage output="data" quantilesPerChannel="3" />
+        <stream.image.BorderDetection output="border" tolerance="1"/>
+        <stream.image.DiffImage image="data" />
+        <stream.image.AverageRGB />
+         -->
+        <stream.image.LaserTracker laserImage="gesture" />
+        <!-- 
+        <stream.image.DisplayImage key="data" />
+         -->
+        <stream.image.DisplayImage key="gesture" />
+        
+        
+        
+        <PrintData />
+<!-- 
+        <stream.io.JPEGWriter file="/Users/chris/frames/frame-%{data.frame:id}.jpg" />
+        <stream.plotter.Plotter
+            history="1000"
+            keepOpen="true"
+            keys="frame:red:avg,frame:blue:avg,frame:green:avg" />
+
+ -->
+    </process>
+</container>
