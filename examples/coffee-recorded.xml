@@ -9,14 +9,11 @@
 
         <CreateID key="frame:id" />
         
+        <stream.image.ColorDiscretization output="data" quantilesPerChannel="3" />
         
-          <stream.image.filters.Smoothing output="smooth" />
+        <stream.image.BorderDetection output="border" tolerance="1"/>
         
-          <!--  <stream.image.ColorDiscretization output="data" quantilesPerChannel="2" /> 
-        
-          <stream.image.BorderDetection output="data" tolerance="1"/>  -->
-        
-          <stream.image.DisplayImage key="smooth" />
+        <stream.image.DisplayImage key="border" />
 
         <PrintData />
         <stream.plotter.Plotter
