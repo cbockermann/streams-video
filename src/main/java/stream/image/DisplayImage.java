@@ -122,8 +122,10 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 			return input;
 
 		Serializable val = input.get(key);
-		if (val == null)
+		if (val == null) {
+			log.error("No image for key '{}' found!", key);
 			return input;
+		}
 
 		BufferedImage image = null;
 
@@ -209,6 +211,10 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 	 *            the key to set
 	 */
 	@Parameter(description = "The name/key of the attribute containing the RGB image object, defaults to `image`.")
+	public void setImage(String img) {
+		this.key = img;
+	}
+
 	public void setKey(String key) {
 		this.key = key;
 	}
