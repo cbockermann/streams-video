@@ -6,7 +6,10 @@ package stream.image;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
@@ -16,8 +19,10 @@ import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,6 +43,7 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 
 	static Logger log = LoggerFactory.getLogger(DisplayImage.class);
 	final JFrame frame;
+	final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	final ImagePanel imagePanel;
 	final JLabel info = new JLabel();
 	final SimpleDateFormat timeFormat = new SimpleDateFormat(
@@ -49,11 +55,31 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 	String timestamp = "@timestamp";
 	String onClose = "";
 	boolean closing = false;
+	AtomicBoolean stopped = new AtomicBoolean(false);
 
 	public DisplayImage() {
 		frame = new JFrame();
 		frame.setSize(640, 384);
 		frame.getContentPane().setLayout(new BorderLayout());
+
+		final JButton play = new JButton("start/stop");
+		play.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				synchronized (stopped) {
+					boolean val = stopped.get();
+					stopped.set(!val);
+					stopped.notifyAll();
+				}
+
+				if (stopped.get())
+					play.setText("Start");
+				else
+					play.setText("Stop");
+			}
+		});
+		buttons.add(play);
+		frame.getContentPane().add(buttons, BorderLayout.NORTH);
 
 		imagePanel = new ImagePanel();
 		frame.getContentPane().add(imagePanel, BorderLayout.CENTER);
@@ -141,6 +167,16 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 			if (!frame.isVisible()) {
 
 				frame.setVisible(true);
+			}
+		}
+
+		while (this.stopped.get()) {
+			synchronized (stopped) {
+				try {
+					stopped.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 

@@ -3,6 +3,9 @@
  */
 package stream.image;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.annotations.Parameter;
 
@@ -12,6 +15,7 @@ import stream.annotations.Parameter;
  */
 public class Crop extends AbstractImageProcessor {
 
+	static Logger log = LoggerFactory.getLogger(Crop.class);
 	String output = "frame:cropped";
 	int x = 0;
 	int y = 0;
@@ -105,18 +109,24 @@ public class Crop extends AbstractImageProcessor {
 	@Override
 	public Data process(Data item, ImageRGB img) {
 
-		int[] orig = img.getPixels();
-		int[] pixels = new int[width * height];
+		ImageRGB cropped = new ImageRGB(width, height);
+		// log.info("Original size is {} x {}", img.getWidth(),
+		// img.getHeight());
+		// log.info("New size is {} x {}", width, height);
 
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				int porig = (i + y) * img.getWidth() + (j + x);
-				int idx = i * width + j;
-				pixels[idx] = orig[porig];
+		try {
+			for (int i = 0; i < width && i + x < img.getWidth(); i++) {
+				for (int j = 0; j < height && j + y < img.getHeight(); j++) {
+					cropped.setRGB(i, j, img.getRGB(i + x, j + y));
+				}
 			}
+		} catch (Exception e) {
+			log.error("Failed to crop image: {}", e.getMessage());
+			if (log.isDebugEnabled())
+				e.printStackTrace();
 		}
-
-		item.put(output, new ImageRGB(width, height, pixels));
+		// log.info("Storing cropped image as '{}'", output);
+		item.put(output, cropped);
 		return item;
 	}
 }
