@@ -8,6 +8,9 @@ import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import stream.AbstractProcessor;
 import stream.Data;
 import stream.annotations.Parameter;
@@ -18,6 +21,7 @@ import stream.annotations.Parameter;
  */
 public abstract class AbstractImageProcessor extends AbstractProcessor {
 
+	static Logger log = LoggerFactory.getLogger(AbstractImageProcessor.class);
 	String imageKey = "data";
 
 	/**
@@ -59,7 +63,8 @@ public abstract class AbstractImageProcessor extends AbstractProcessor {
 			Data result = process(input, img);
 			return result;
 		} catch (Exception e) {
-
+			log.error("Error processing image: {}", e.getMessage());
+			e.printStackTrace();
 		}
 
 		return input;
