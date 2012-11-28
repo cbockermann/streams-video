@@ -14,7 +14,7 @@ import stream.image.ImageRGB;
  */
 public class Smoothing extends AbstractImageProcessor {
 
-	String output = "data";
+	String output = "smooth";
 	
 	Integer windowSize = 3;
 	
@@ -24,7 +24,7 @@ public class Smoothing extends AbstractImageProcessor {
 	int weightsum = 0;
 	
 	/**
-	 * @return name The name/key under which the discretized image is stored.
+	 * @return name The name/key under which the smoothed image is stored.
 	 */
 	public String getOutput() {
 		return output;
@@ -32,7 +32,7 @@ public class Smoothing extends AbstractImageProcessor {
 
 	/**
 	 * Setter for the Parameter Output
-	 * @param output The name/key under which the discretized Image is stored. 
+	 * @param output The name/key under which the smoothed Image is stored. 
 	 * 					If this name equals the name of the input image, the input image
 	 * 					is going to be overwritten.
 	 */
