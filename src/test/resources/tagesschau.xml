@@ -1,0 +1,41 @@
+<container>
+
+    <stream
+        id="video"
+        class="stream.io.MJpegImageStream"
+        url="file:/Volumes/RamDisk/video.mjpeg.raw" />
+    <!-- 
+        url="http://kirmes.cs.uni-dortmund.de/video/video.mjpeg.raw" />
+     -->
+
+    <process input="video" >
+
+        <CreateID key="frame:id" />
+	
+	<!-- 
+		  <Skip condition="%{data.frame:id} @lt 80" />        
+	 -->
+        
+          <stream.image.DisplayImage image="data" />
+          
+          
+          <!--  
+          <stream.image.AverageRGB />
+          <stream.image.filters.Smoothing output="data" windowSize="8" />
+          <stream.image.ColorDiscretization output="data" quantilesPerChannel="2" /> 
+        
+          <stream.image.BorderDetection output="data" tolerance="1"/>  
+          <stream.image.DisplayImage image="data" />
+        
+
+        <PrintData />
+        <stream.plotter.Plotter
+            history="1000"
+            keepOpen="true"
+            keys="frame:red:avg,frame:green:avg,frame:blue:avg" />
+          -->
+        <!-- 
+         -->
+
+    </process>
+</container>

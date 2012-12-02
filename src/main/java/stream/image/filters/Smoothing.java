@@ -30,6 +30,21 @@ public class Smoothing extends AbstractImageProcessor {
 	int weightsum = 0;
 
 	/**
+	 * @return the windowSize
+	 */
+	public Integer getWindowSize() {
+		return windowSize;
+	}
+
+	/**
+	 * @param windowSize
+	 *            the windowSize to set
+	 */
+	public void setWindowSize(Integer windowSize) {
+		this.windowSize = windowSize;
+	}
+
+	/**
 	 * @return name The name/key under which the smoothed image is stored.
 	 */
 	public String getOutput() {
@@ -72,16 +87,17 @@ public class Smoothing extends AbstractImageProcessor {
 	public Data process(Data item, ImageRGB img) {
 
 		ImageRGB smoothedImage = new ImageRGB(img.getWidth(), img.getHeight());
+		int border = (windowSize / 2);
 
 		// TODO: Noch sehr unsch�n durch das von 1/1 bis Width-1/Height-1
-		for (int x = 1; x < smoothedImage.getWidth() - 1; x++) {
-			for (int y = 1; y < smoothedImage.getHeight() - 1; y++) {
+		for (int x = border; x < smoothedImage.getWidth() - border; x++) {
+			for (int y = border; y < smoothedImage.getHeight() - border; y++) {
 
 				int red = 0;
 				for (int i = 0; i < windowSize; i++) {
 					for (int j = 0; j < windowSize; j++) {
 						red = red + weightingMatrix[i][j]
-								* img.getRED(x - 1 + i, y - 1 + j);
+								* img.getRED(x - border + i, y - border + j);
 					}
 				}
 				red = red / weightsum;
@@ -90,7 +106,7 @@ public class Smoothing extends AbstractImageProcessor {
 				for (int i = 0; i < windowSize; i++) {
 					for (int j = 0; j < windowSize; j++) {
 						green = green + weightingMatrix[i][j]
-								* img.getGREEN(x - 1 + i, y - 1 + j);
+								* img.getGREEN(x - border + i, y - border + j);
 					}
 				}
 				green = green / weightsum;
@@ -99,7 +115,7 @@ public class Smoothing extends AbstractImageProcessor {
 				for (int i = 0; i < windowSize; i++) {
 					for (int j = 0; j < windowSize; j++) {
 						blue = blue + weightingMatrix[i][j]
-								* img.getBLUE(x - 1 + i, y - 1 + j);
+								* img.getBLUE(x - border + i, y - border + j);
 					}
 				}
 				blue = blue / weightsum;
