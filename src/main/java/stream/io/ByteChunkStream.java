@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.annotations.Parameter;
+import stream.data.DataFactory;
+import stream.util.ByteSize;
 
 /**
  * <p>
@@ -24,13 +26,16 @@ import stream.annotations.Parameter;
  * @author Christian Bockermann &lt;chris@jwall.org&gt;
  * 
  */
-public abstract class ByteChunkStream extends AbstractDataStream {
+public abstract class ByteChunkStream extends AbstractStream {
 
 	static Logger log = LoggerFactory.getLogger(ByteChunkStream.class);
 	public final static byte[] GIF_SIGNATURE = new byte[] { 0x47, 0x49, 0x46,
 			0x38 };
 	public final static byte[] JPG_SIGNATURE = new byte[] { (byte) 0xff,
 			(byte) 0xd8 };
+
+	// by default, we buffer only 2 MB of data from the input stream...
+	public final static int DEFAULT_BUFFER_SIZE = 32 * 1024;
 
 	SourceURL url;
 	ByteBuffer buffer;
@@ -45,7 +50,7 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	String key = "data";
 
 	// The 'look-ahead' buffer
-	int bufferSize = 2 * 16 * 1024;
+	int bufferSize = 2 * 1024 * 1024;
 
 	// the timestamp of the first read (for debugging/timing-measurement)
 	Long firstRead = 0L;
@@ -70,14 +75,14 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	@Override
 	public void init() throws Exception {
 		super.init();
-		int bufSize = 1024 * 16;
+		int bufSize = DEFAULT_BUFFER_SIZE;
 		try {
 			bufSize = new Integer(System.getProperty(
-					"stream.io.ImageStream.buffer", "" + (2 * 1024 * 16)));
+					"stream.io.ImageStream.buffer", "" + DEFAULT_BUFFER_SIZE));
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			bufSize = 1024 * 16;
+			bufSize = DEFAULT_BUFFER_SIZE;
 		}
 		log.info("Using buffer size of {}k", bufSize / 1024);
 		buffer = ByteBuffer.allocateDirect(bufSize);
@@ -93,15 +98,9 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	 */
 	@Override
 	public void close() throws Exception {
+		super.close();
 		buffer.clear();
 		channel.close();
-	}
-
-	/**
-	 * @see stream.io.AbstractDataStream#readHeader()
-	 */
-	@Override
-	public void readHeader() throws Exception {
 	}
 
 	/**
@@ -116,8 +115,8 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	 *            the bufferSize to set
 	 */
 	@Parameter(description = "The internal buffer size of this stream.")
-	public void setBufferSize(int bufferSize) {
-		this.bufferSize = bufferSize;
+	public void setBufferSize(ByteSize bufferSize) {
+		this.bufferSize = bufferSize.getBytes();
 	}
 
 	/**
@@ -137,6 +136,7 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	 */
 	private int indexOf(byte[] sig, int from) {
 		int pos = from;
+
 		while (pos + sig.length < buffer.limit() && !isSignatureAt(pos, sig)) {
 			pos++;
 		}
@@ -158,7 +158,8 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	private boolean isSignatureAt(int pos, byte[] sig) {
 
 		for (int i = 0; i < sig.length; i++) {
-			if (buffer.get(pos + i) != sig[i]) {
+			byte b = buffer.get(pos + i);
+			if (b != sig[i]) {
 				return false;
 			}
 		}
@@ -170,14 +171,14 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 	 * @see stream.io.AbstractDataStream#readItem(stream.data.Data)
 	 */
 	@Override
-	public synchronized Data readItem(Data instance) throws Exception {
-		// log.debug("Reading FRAME-" + frameId);
+	public synchronized Data readNext() throws Exception {
 
 		int read = channel.read(buffer);
 		while (read == 0) {
 			Thread.yield();
 			read = channel.read(buffer);
 			if (read < 0) {
+				log.info("No more data to read...");
 				return null;
 			}
 		}
@@ -186,8 +187,10 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 			return null;
 		}
 
-		if (read > 0)
+		if (read > 0) {
 			bytesRead += read;
+			log.info("{} bytes read so far...", bytesRead);
+		}
 
 		int start = indexOf(signature);
 		while (start < 0) {
@@ -212,6 +215,7 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 
 			bytesRead += read;
 			start = indexOf(signature);
+			log.info("Found start: {}", start);
 		}
 
 		buffer.mark();
@@ -230,6 +234,7 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 			}
 
 			end = indexOf(signature);
+			log.info("Found end: {}", end);
 		}
 
 		if (end < 0) {
@@ -242,7 +247,7 @@ public abstract class ByteChunkStream extends AbstractDataStream {
 		buffer.get(output, 0, (end - start));
 
 		buffer.compact();
-		instance.put("frame:id", frameId++);
+		Data instance = DataFactory.create();
 		instance.put(key, output);
 
 		if (firstRead == 0L) {

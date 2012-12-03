@@ -1,0 +1,8 @@
+Package: streams
+Version: 0.9.5-0
+Section: admin
+Priority: optional
+Depends: streams (>= 0.9.7)
+Architecture: all
+Maintainer: Christian Bockermann <christian.bockermann@udo.edu>
+Description: This package provides additional libraries for video processing with the streams framework.

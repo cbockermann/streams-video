@@ -2,10 +2,12 @@
 
     <stream
         id="video"
-        class="stream.io.MJpegImageStream"
-        url="http://kirmes.cs.uni-dortmund.de/coffee.obj.stream.gz" />
+        class="stream.io.DataObjectStream" limit="4000"
+        url="file:/Volumes/RamDisk/coffee-2012-12-03.obj.stream.gz" />
     
     <!-- 
+        url="http://kirmes.cs.uni-dortmund.de/data/coffee-2012-12-03.obj.stream.gz" />
+        class="stream.io.MJpegImageStream"
         url="tcp://192.168.128.156:9100/" />
         url="file:/Volumes/RamDisk/coffee.mjpeg" />
         url="http://download.jwall.org/stuff/KaffeeFilm.mjpeg.gz" />
@@ -14,7 +16,7 @@
     <process input="video" >
 
         <CreateID key="frame:id" />
-        <Skip condition="%{date.frame:id} @lt 100"/>
+        <Skip condition="%{date.frame:id} @lt 3000"/>
 
         <!-- 
         <stream.image.Rectangle x="120" y="20" width="120" height="80" output="data" />
@@ -23,16 +25,16 @@
         
         <stream.image.DisplayImage key="data" />
         <!-- 
-        <stream.image.Crop x="120" y="20" width="80" height="80" output="data" />
-        <stream.image.DisplayImage key="data" />
          -->
+        <stream.image.Crop x="40" y="20" width="80" height="80" output="data" />
+        <stream.image.DisplayImage key="data" />
         <!-- 
 		<stream.image.DiffImage />
         
          <FormatTimestamp />
+        <stream.flow.Delay time="500ms" />
          -->
          <PrintData />
-        <stream.flow.Delay time="500ms" />
     </process>
     
 </container>

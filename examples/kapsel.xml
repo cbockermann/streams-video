@@ -1,0 +1,13 @@
+<container>
+    
+    <stream id="kapsel"
+        	class="stream.io.DataObjectStream"
+        	url="file:/Users/chris/kaspel.obj.stream" />
+    
+    <process input="kapsel">
+        <stream.image.Crop output="frame:cropped" image="data" x="60" y="84" width="55" height="23" />
+        <stream.image.DisplayImage image="data"/>
+        <stream.image.DisplayImage image="frame:cropped" />
+    </process>
+    
+</container>

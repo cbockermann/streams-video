@@ -8,21 +8,31 @@
     <process input="video" >
 
         <CreateID key="frame:id" />
+	
+	<!-- 
+		  <Skip condition="%{data.frame:id} @lt 80" />        
+	 -->
         
+          <stream.image.DisplayImage image="data" />
+          
+          <stream.image.AverageRGB />
+          
+          <!--  
+          <stream.image.filters.Smoothing output="data" windowSize="8" />
+          <stream.image.ColorDiscretization output="data" quantilesPerChannel="2" /> 
         
-          <stream.image.filters.Smoothing output="smooth" />
+          <stream.image.BorderDetection output="data" tolerance="1"/>  
+          <stream.image.DisplayImage image="data" />
+          -->
         
-          <!--  <stream.image.ColorDiscretization output="data" quantilesPerChannel="2" /> 
-        
-          <stream.image.BorderDetection output="data" tolerance="1"/>  -->
-        
-          <stream.image.DisplayImage key="smooth" />
 
         <PrintData />
         <stream.plotter.Plotter
             history="1000"
             keepOpen="true"
-            keys="frame:red:green,frame:red:blue,frame:green:blue" />
+            keys="frame:red:avg,frame:green:avg,frame:blue:avg" />
+        <!-- 
+         -->
 
     </process>
 </container>

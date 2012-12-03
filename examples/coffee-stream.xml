@@ -3,7 +3,7 @@
     <stream
         id="video"
         class="stream.io.DataObjectStream"
-        url="http://kirmes.cs.uni-dortmund.de/coffee.obj.stream.gz" />
+        url="file:/Volumes/RamDisk/coffee-2012-12-03.obj.stream.gz" />
         <!-- 
         url="tcp://kirmes.cs.uni-dortmund.de:9100/" />
          -->
@@ -11,11 +11,13 @@
  
      <process input="video" >
  
-         <CreateID key="frame:id" />
-        <Skip condition="%{data.frame:id} @lt 4800" />
-        <Delay time="100ms" />
- 
+        <CreateID key="frame:id" />
+        <Skip condition="%{data.frame:id} @lt 5100" />
+        
         <!-- 
+                    <Delay time="500ms" />
+ 		<PrintData />
+        <Delay time="100ms" />
         <stream.image.QuantilizedImage
             output="data"
             quantilesPerChannel="2" />
@@ -28,55 +30,65 @@
             <stream.logger.Message message = "Skipping broken frame %{data.frame:id}" />
             <Skip/>
         </If>
-        <stream.image.Crop x="15" y="60" width="145" height="60" />
 <!--
+        <stream.image.Crop x="15" y="60" width="145" height="60" />
         <stream.image.DisplayImage key="frame:cropped" onClose="shutdown" />
   -->
-        <stream.image.AverageRGB image="frame:cropped" />
         <Skip condition="%{data.frame:red:avg} @lt ${light.threshold} AND %{data.frame:green:avg} @lt ${light.threshold} AND %{data.frame:blue:avg} @lt ${light.threshold}" />
 <!--
+        <stream.image.Crop x="60" y="80" width="50" height="35" />
+        <stream.image.AverageRGB image="frame:cropped" />
         <stream.plotter.Plotter title="Overall AverageRGB"
             history="1000"
             keepOpen="true"
             keys="frame:red:avg,frame:blue:avg,frame:green:avg" />
   -->
-<!--
-        <Skip condition="%{data.frame:red:avg} @lt ${light.threshold} AND %{data.frame:green:avg} @lt ${light.threshold} AND %{data.frame:blue:avg} @lt ${light.threshold}" />
-          -->
-        <stream.image.Crop x="70" y="95" width="45" height="20" />
         <!--
-          -->
         <stream.image.DisplayImage key="frame:cropped" onClose="shutdown" />
+          -->
+        <stream.image.Crop output="frame:cropped" image="data" x="60" y="84" width="55" height="23" />
         <stream.image.AverageRGB image="frame:cropped" />
  
-        <stream.image.BorderDetection
-            output="data"
-            tolerance="0" />
-         -->
+        <!--
+        -->
+ 
+ 		    
+        <If condition="%{data.frame:red:avg} @lt 50 AND %{data.frame:green:avg} @lt 50 AND %{data.frame:blue:avg} @lt 50}">
+            <SetValue key="kapselStart" value="1" scope="process" />
+ 		</If>
+
+        <If condition="%{process.kapselStart} @eq 1 AND %{data.frame:red:avg} @gt 200 AND %{data.frame:green:avg} @gt 200 AND %{data.frame:blue:avg} @gt 200 ">
+            <!--
+              -->
+            <SetValue key="kapselStart" value="0" scope="process" />
+            <stream.logger.Message message="Capsule insertion ended at frame %{data.frame:id}" />
+ 		</If>
+ 		    
+ 
+        <If condition="%{process.kapselStart} @eq 1">
+            <Delay time="500ms" />
         <stream.plotter.Plotter
             history="1000"
             keepOpen="true"
             keys="frame:red:avg,frame:blue:avg,frame:green:avg" />
-        <!--
-        -->
- 
-        <stream.image.DisplayImage key="data" onClose="shutdown" />
-        <If condition="%{data.frame:red:avg} @lt 50 AND %{data.frame:green:avg} @lt 50 AND %{data.frame:blue:avg} @lt 50}">
-            <SetValue key="kapselStart" value="1" scope="process" />
-        </If>
-
-        <If condition="%{data.frame:red:avg} @gt 200 AND %{data.frame:green:avg} @gt 200 AND %{data.frame:blue:avg} @gt 200 ">
-            <SetValue key="kapselStart" value="0" scope="process" />
-        </If>
- 
-        <If condition="%{process.kapselStart} @eq 1">
             <stream.logger.Message message="recording capsule placement..." />
-            <stream.io.DataObjectWriter file="/Users/chris/kaspel.obj.stream" />
             <stream.io.CsvWriter url="file:/Users/chris/kapsel.csv" keys="@timestamp,frame:red:avg,frame:green:avg,frame:blue:avg" />
+	        <stream.io.JPEGWriter image="data" file="/Volumes/RamDisk/frames/frame-%{data.frame:id}.jpg" />
+<!--
+            <stream.io.DataObjectWriter file="/Users/chris/kaspel.obj.stream" />
+            <Enqueue queue="kapsel" />
+  -->                
         </If>
 <!--
-        <stream.io.JPEGWriter image="data" file="/Volumes/RamDisk/frame-%{data.frame:id}.jpg" />
          -->
      </process>
+     
+     
+    <process input="kapsel">
+        <stream.image.Crop output="frame:cropped" image="data" x="60" y="84" width="55" height="23" />
+        <stream.image.DisplayImage image="data"/>
+        <stream.image.DisplayImage image="frame:cropped" />
+    </process>
+     
 
 </container>
