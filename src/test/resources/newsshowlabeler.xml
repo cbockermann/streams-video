@@ -1,0 +1,16 @@
+<container>
+
+    <stream
+        id="data"
+        class="stream.io.CsvStream"
+        seperator = ";"
+        url="file:///C:/Users/Mattis/workspace/schulte/Diplomarbeit/data/news20120911/features.csv" />
+
+    <process input="data" >
+
+		<stream.news.helper.AddNewsshowLabels />
+		
+		<stream.data.CsvWriter url="file:///C:/Users/Mattis/workspace/schulte/Diplomarbeit/data/news20120911/features_new.csv" seperator=";" />
+
+    </process>
+</container>
