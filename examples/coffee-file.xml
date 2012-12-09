@@ -1,0 +1,34 @@
+<container>
+
+    <stream
+        id="video"
+        class="stream.io.DataObjectStream"
+        url="http://kirmes.cs.uni-dortmund.de/coffee.obj.stream.gz"/>
+        <!-- 
+        url="file:/Volumes/RamDisk/coffee-2012-12-03.obj.stream.gz" />
+        url="tcp://kirmes.cs.uni-dortmund.de:9100/" />
+         -->
+
+ 
+     <process input="video" >
+ 
+        <CreateID key="frame:id" />
+        <!-- 
+        <Skip condition="%{data.frame:id} @lt 5100" />
+         -->
+        
+        <stream.image.DetectBrokenImage />
+        <If condition="%{data.data:broken} @ge 0.5">
+            <stream.logger.Message message = "Skipping broken frame %{data.frame:id}" />
+            <Skip/>
+        </If>
+        
+       <stream.image.Crop output="frame:cropped" image="data" x="60" y="84" width="55" height="23" />
+       <stream.image.DisplayImage image="data"/>
+       <stream.image.DisplayImage image="frame:cropped" />
+       
+     </process>
+     
+     
+
+</container>
