@@ -1,0 +1,28 @@
+<container>
+
+    <stream
+        id="video"
+        class="stream.io.MJpegImageStream"
+        url="file:///C:/Users/Mattis/Dropbox/data/20120911.raw" />
+
+    <process input="video" >
+    
+		<PrintData />
+		
+		
+        <CreateID key="frame:id" />
+        
+        <stream.image.filters.Smoothing />
+
+        <stream.image.DisplayImage key="smooth" />
+
+        
+        <stream.plotter.Plotter
+            history="1000"
+            keepOpen="true"
+            keys="frame:red:green,frame:red:blue,frame:green:blue" />
+		<!-- 
+		 -->
+
+    </process>
+</container>
