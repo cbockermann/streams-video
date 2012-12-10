@@ -64,10 +64,10 @@ public abstract class AbstractImageProcessor extends AbstractProcessor {
 			return result;
 		} catch (Exception e) {
 			log.error("Error processing image: {}", e.getMessage());
-			e.printStackTrace();
+			if (log.isDebugEnabled())
+				e.printStackTrace();
+			return input;
 		}
-
-		return input;
 	}
 
 	public abstract Data process(Data item, ImageRGB img);

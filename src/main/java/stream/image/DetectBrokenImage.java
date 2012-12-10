@@ -62,7 +62,7 @@ public class DetectBrokenImage extends AbstractImageProcessor {
 		}
 
 		double broken = cnt / area;
-		log.debug("Fraction of {} equal pixels!", broken);
+		// log.debug("Fraction of {} equal pixels!", broken);
 		item.put(getImage() + ":broken", broken);
 		return item;
 	}

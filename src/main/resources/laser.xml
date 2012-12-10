@@ -1,0 +1,32 @@
+<container>
+    
+    <stream id="video" class="stream.io.MJpegImageStream" bufferSize="4mb"
+	   url="file:/Volumes/RamDisk/laserpointer.mjpeg" />
+    
+    <process input="video">
+        
+	<CreateID key="id" />
+<!--
+	<Skip condition="%{data.id} @lt 500" />
+  -->
+	<AddTimestamp />
+	<PrintData />
+
+	<stream.image.DisplayImage image="data" />
+	<stream.image.DiffImage image="data" />
+	<stream.image.DisplayImage image="data" />
+	
+	<Delay time="1second" />
+<!--
+	<stream.image.LaserTracker image="data" laserImage="gesture" />
+
+-->
+<!--
+        <stream.net.DataTap address="0.0.0.0" port="9100" />
+  -->
+	<Delay time="40ms" />
+        
+    </process>
+    
+    
+</container>
