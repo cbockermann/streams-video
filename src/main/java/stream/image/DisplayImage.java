@@ -200,6 +200,18 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 	}
 
 	/**
+	 * @see stream.AbstractProcessor#finish()
+	 */
+	@Override
+	public void finish() throws Exception {
+		super.finish();
+		synchronized (stopped) {
+			stopped.set(false);
+			this.frame.setVisible(false);
+		}
+	}
+
+	/**
 	 * @return the key
 	 */
 	public String getKey() {

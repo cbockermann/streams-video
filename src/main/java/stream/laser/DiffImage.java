@@ -1,7 +1,5 @@
 package stream.laser;
 
-import org.omg.PortableInterceptor.INACTIVE;
-
 import stream.Data;
 import stream.image.AbstractImageProcessor;
 import stream.image.ImageRGB;
