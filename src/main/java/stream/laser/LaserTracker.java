@@ -96,10 +96,12 @@ public class LaserTracker extends AbstractImageProcessor {
 			initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
 			markLaserPointer(initialPoint, img, 0, 0, 255);
 			item.put("data", img);
+			item.put("laser:x", initialPoint.x);
+			item.put("laser:y", initialPoint.y);
 			return item;
 		}
 
-		log.info("can't find laserPointer");
+		// log.info("can't find laserPointer");
 		initialPoint = null;
 		initialRGB = -1;
 
