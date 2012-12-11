@@ -6,20 +6,13 @@
     <process input="video">
         
 	<CreateID key="id" />
-<!--
-	<Skip condition="%{data.id} @lt 500" />
-  -->
 	<AddTimestamp />
-	<PrintData />
 	<stream.image.DisplayImage image="data" />
-	<stream.image.laser.DiffImage image="data" threshold="20"/>
-	<!-- <stream.image.laser.ColorMaximizer image="data"/>
-	 -->
-	<stream.image.laser.LaserTracker image="data"/>
+	<stream.laser.DiffImage image="data" threshold="50"/>
+	<stream.laser.LaserTracker image="data"/>
 	<stream.image.DisplayImage image="data" />
 
 
--->
 <!--
         <stream.net.DataTap address="0.0.0.0" port="9100" />
 	<Delay time="30ms" />

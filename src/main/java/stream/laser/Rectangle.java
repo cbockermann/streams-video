@@ -1,7 +1,7 @@
 /**
  * 
  */
-package stream.image.laser;
+package stream.laser;
 
 import java.awt.Color;
 

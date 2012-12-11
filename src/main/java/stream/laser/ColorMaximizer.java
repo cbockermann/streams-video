@@ -1,4 +1,4 @@
-package stream.image.laser;
+package stream.laser;
 
 import stream.Data;
 import stream.image.AbstractImageProcessor;

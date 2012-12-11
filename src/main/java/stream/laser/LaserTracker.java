@@ -1,7 +1,7 @@
 /**
  * 
  */
-package stream.image.laser;
+package stream.laser;
 
 import java.awt.Point;
 import java.util.ArrayList;
@@ -82,7 +82,7 @@ public class LaserTracker extends AbstractImageProcessor {
 			initialPoint = getInitialPoint(img);
 			if (initialPoint != null) {
 				initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
-				markLaserPointer(initialPoint, img,0,255,0);
+				markLaserPointer(initialPoint, img, 0, 255, 0);
 				log.info(
 						"********************* found initial point {} ***************************",
 						initialPoint);
@@ -95,7 +95,7 @@ public class LaserTracker extends AbstractImageProcessor {
 			log.info("Found laserPointer");
 			initialPoint = evalPoint;
 			initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
-			markLaserPointer(initialPoint, img, 0,0,255);
+			markLaserPointer(initialPoint, img, 0, 0, 255);
 			item.put("data", img);
 			return item;
 		}
@@ -110,40 +110,50 @@ public class LaserTracker extends AbstractImageProcessor {
 
 	private Point evaluateLaserPointer(Point p, int oldRGB, ImageRGB img) {
 		int size = searchSize;
-		Point ep = null;
+
+		int count = 3;
+		Point[] points = new Point[count];
+
 		int minThreshold = threshold;
-		
-		int minx=(p.x - size>0)?p.x - size:0;
-		int maxx=(p.x + size>img.getWidth()-1)?img.getWidth()-1:(p.x + size);
-		int miny=(p.y - size>0)?p.y - size:0;
-		int maxy=(p.y + size>img.getHeight()-1)?img.getHeight()-1:(p.y + size);
-		
-		for (int x =minx ; x < maxx; x++) {
-			for (int y = miny; y <maxy; y++) {
+
+		int minx = (p.x - size > 0) ? p.x - size : 0;
+		int maxx = (p.x + size > img.getWidth() - 1) ? img.getWidth() - 1
+				: (p.x + size);
+		int miny = (p.y - size > 0) ? p.y - size : 0;
+		int maxy = (p.y + size > img.getHeight() - 1) ? img.getHeight() - 1
+				: (p.y + size);
+
+		for (int x = minx; x < maxx; x++) {
+			for (int y = miny; y < maxy; y++) {
 				int rgbnew = img.getRGB(x, y);
-
 				int rnew = (rgbnew >> 16) & 0xFF;
+
 				if (rnew > 20) {
-//					int gnew = (rgbnew >> 8) & 0xFF;
-//					int bnew = rgbnew & 0xFF;
-
 					int rold = (oldRGB >> 16) & 0xFF;
-//					int gold = (oldRGB >> 8) & 0xFF;
-//					int bold = oldRGB & 0xFF;
-
 					int rdiff = Math.abs(rold - rnew);
-//					int gdiff = Math.abs(gold - gnew);
-//					int bdiff = Math.abs(bold - bnew);
-
-//					int rgbdiff = rdiff;
-//					rgbdiff = (rgbdiff << 8) + gdiff;
-//					rgbdiff = (rgbdiff << 8) + bdiff;
-					if (rdiff < minThreshold)
-						ep = new Point(x, y);
+					if (rdiff < minThreshold) {
+						for (int i = count - 1; i > 0; i--) {
+							points[i] = points[i - 1];
+						}
+						minThreshold = rdiff;
+						points[0] = new Point(x, y);
+					}
 				}
 			}
 		}
-		return ep;
+		int minp = count;
+		double minDist =Double.MAX_VALUE;
+		for(int i = 0; i<points.length;i++){
+			Point ep = points[i];
+			if(ep==null)
+				continue;
+			double dist = dist(p,ep);
+			if(dist<minDist){
+				minp = i;
+				minDist=dist;
+			}
+		}
+		return (minp==count)?null:points[minp];
 	}
 
 	private Point getInitialPoint(ImageRGB img) {
@@ -170,7 +180,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		img.setRGB(x - 5, y - 5, r, g, b);
 		img.setRGB(x + 5, y - 5, r, g, b);
 		img.setRGB(x - 5, y + 5, r, g, b);
-		img.setRGB(x + 5, y + 5,r, g, b);
+		img.setRGB(x + 5, y + 5, r, g, b);
 	}
 
 	public double dist(Point p, Point q) {
