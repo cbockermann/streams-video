@@ -63,14 +63,14 @@ public class LaserTracker extends AbstractImageProcessor {
 
 				int rgb = img.getRGB(x, y);
 				int r = (rgb >> 16) & 0xFF;
-				int g = (rgb >> 8) & 0xFF;
-				int b = rgb & 0xFF;
+//				int g = (rgb >> 8) & 0xFF;
+//				int b = rgb & 0xFF;
 
-				if (r > 200 && g > 200 && b > 200) {
+//				if (r > 200 && g > 200 && b > 200) {
 					// log.info("Laser-pointer at {},{} ?", x, y);
 					// img.setRGB(x, y, 0, 255, 0);
-					points.add(new Point(x, y));
-				}
+//					points.add(new Point(x, y));
+//				}
 			}
 		}
 

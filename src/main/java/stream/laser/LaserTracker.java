@@ -4,12 +4,6 @@
 package stream.laser;
 
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +33,7 @@ public class LaserTracker extends AbstractImageProcessor {
 	protected int initialRGB;
 	protected int searchSize;
 	protected int threshold;
+	protected int frame = 0;
 
 	public LaserTracker() {
 		laserImage = null;
@@ -78,6 +73,10 @@ public class LaserTracker extends AbstractImageProcessor {
 	@Override
 	public Data process(Data item, ImageRGB img) {
 
+		if (frame > 0 && frame % 2 == 0) {
+			return item;
+		}
+
 		if (initialPoint == null) {
 			initialPoint = getInitialPoint(img);
 			if (initialPoint != null) {
@@ -92,7 +91,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		}
 		Point evalPoint = evaluateLaserPointer(initialPoint, initialRGB, img);
 		if (evalPoint != null) {
-			log.info("Found laserPointer");
+			// log.info("Found laserPointer");
 			initialPoint = evalPoint;
 			initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
 			markLaserPointer(initialPoint, img, 0, 0, 255);
@@ -117,15 +116,16 @@ public class LaserTracker extends AbstractImageProcessor {
 		int minThreshold = threshold;
 
 		int minx = (p.x - size > 0) ? p.x - size : 0;
-		int maxx = (p.x + size > img.getWidth() - 1) ? img.getWidth() - 1
-				: (p.x + size);
+		int maxx = (p.x + size > img.width - 1) ? img.width - 1 : (p.x + size);
 		int miny = (p.y - size > 0) ? p.y - size : 0;
-		int maxy = (p.y + size > img.getHeight() - 1) ? img.getHeight() - 1
+		int maxy = (p.y + size > img.height - 1) ? img.height - 1
 				: (p.y + size);
 
+		int[] pixels = img.pixels;
 		for (int x = minx; x < maxx; x++) {
 			for (int y = miny; y < maxy; y++) {
-				int rgbnew = img.getRGB(x, y);
+				int idx = y * img.width + x;
+				int rgbnew = pixels[idx]; // img.getRGB(x, y);
 				int rnew = (rgbnew >> 16) & 0xFF;
 
 				if (rnew > 20) {
@@ -142,76 +142,65 @@ public class LaserTracker extends AbstractImageProcessor {
 			}
 		}
 		int minp = count;
-		double minDist =Double.MAX_VALUE;
-		for(int i = 0; i<points.length;i++){
+		double dist = 0.0d;
+		double minDist = Double.MAX_VALUE;
+		for (int i = 0; i < points.length; i++) {
 			Point ep = points[i];
-			if(ep==null)
+			if (ep == null)
 				continue;
-			double dist = dist(p,ep);
-			if(dist<minDist){
+			dist = dist(p, ep);
+			// dist = Math.abs(p.x - p.x) + Math.abs(p.y - p.y);
+			if (dist < minDist) {
 				minp = i;
-				minDist=dist;
+				minDist = dist;
 			}
 		}
-		return (minp==count)?null:points[minp];
+		return (minp == count) ? null : points[minp];
 	}
 
 	private Point getInitialPoint(ImageRGB img) {
 
-		Point p = null;
+		int px = -1;
+		int py = -1;
 		int maxR = 50;
-		for (int x = 0; x < img.getWidth(); x++) {
-			for (int y = 0; y < img.getHeight(); y++) {
+		int[] pixels = img.getPixels();
+		for (int x = 0; x < img.width; x++) {
+			for (int y = 0; y < img.height; y++) {
 
-				int rgb = img.getRGB(x, y);
+				int idx = y * img.getWidth() + x;
+				int rgb = pixels[idx];
+				// int rgb = img.getRGB(x, y);
 				int r = (rgb >> 16) & 0xFF;
 				if (r >= maxR) {
-					p = new Point(x, y);
+					px = x;
+					py = y;
+					// p = new Point(x, y);
 				}
 			}
 		}
-		return p;
+		if (px >= 0 && py >= 0)
+			return new Point(px, py);
+
+		return null;
 	}
 
 	private void markLaserPointer(Point p, ImageRGB img, int r, int g, int b) {
 		int x = p.x;
 		int y = p.y;
 
-		img.setRGB(x - 5, y - 5, r, g, b);
-		img.setRGB(x + 5, y - 5, r, g, b);
-		img.setRGB(x - 5, y + 5, r, g, b);
-		img.setRGB(x + 5, y + 5, r, g, b);
+		int color = 0xffffffff;
+
+		int idx = (y - 5) * img.width + x - 5;
+		img.pixels[idx] = color;
+		idx = (y + 5) * img.width + x - 5;
+		img.pixels[idx] = color;
+		idx = (y - 5) * img.width + x + 5;
+		img.pixels[idx] = color;
+		idx = (y + 5) * img.width + x + 5;
+		img.pixels[idx] = color;
 	}
 
 	public double dist(Point p, Point q) {
 		return p.distance(q.getX(), q.getY());
-	}
-
-	public Set<Point> getNeighbors(Point p, Set<Point> points, double radius) {
-		Set<Point> neigh = new LinkedHashSet<Point>();
-		for (Point q : points) {
-			if (p != q && p.distance(q) < radius)
-				neigh.add(q);
-		}
-		return neigh;
-	}
-
-	public Point getCenter(Collection<Point> pts) {
-		double cx = 0.0;
-		double cy = 0.0;
-		Point center = new Point(0, 0);
-		double cnt = 0.0;
-
-		for (Point p : pts) {
-			cx += p.x;
-			cy += p.y;
-			cnt += 1.0d;
-		}
-
-		if (cnt == 0)
-			cnt = 1.0;
-
-		center.setLocation(cx / cnt, cy / cnt);
-		return center;
 	}
 }
