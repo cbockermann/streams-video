@@ -85,12 +85,18 @@ public class PeakCount implements Processor {
 			return input;
 		}
 
-		if (below == keys.length && state == STATE_ABOVE) {
-			// log.info("State was STATE_ABOVE, but value fell below threshold, counting and switching state..");
-			count++;
-			state = STATE_BELOW;
+		if (state == STATE_BELOW) {
 			input.put("peak", 50.0d);
-			input.put("peak:count", count);
+		}
+
+		if (below == keys.length) {
+			// log.info("State was STATE_ABOVE, but value fell below threshold, counting and switching state..");
+			input.put("peak", 50.0d);
+			if (state == STATE_ABOVE) {
+				count++;
+				input.put("peak:count", count);
+			}
+			state = STATE_BELOW;
 			return input;
 		}
 
