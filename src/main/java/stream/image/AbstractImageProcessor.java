@@ -22,7 +22,7 @@ import stream.annotations.Parameter;
 public abstract class AbstractImageProcessor extends AbstractProcessor {
 
 	static Logger log = LoggerFactory.getLogger(AbstractImageProcessor.class);
-	String imageKey = "data";
+	protected String imageKey = "data";
 
 	/**
 	 * @return the data
