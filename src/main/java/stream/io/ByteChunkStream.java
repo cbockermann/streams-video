@@ -174,10 +174,6 @@ public abstract class ByteChunkStream extends AbstractStream {
 			}
 		}
 
-		if (read < 0) {
-			return null;
-		}
-
 		if (read > 0) {
 			bytesRead += read;
 			log.debug("{} bytes read so far...", bytesRead);
@@ -200,13 +196,13 @@ public abstract class ByteChunkStream extends AbstractStream {
 				read = channel.read(buffer);
 			}
 
-			if (read < 0) {
-				return null;
-			}
-
 			bytesRead += read;
 			start = indexOf(signature);
 			log.debug("Found start: {}", start);
+
+			if (start < 0 && read < 0) {
+				return null;
+			}
 		}
 
 		buffer.mark();
