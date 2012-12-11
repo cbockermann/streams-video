@@ -75,17 +75,8 @@ public abstract class ByteChunkStream extends AbstractStream {
 	@Override
 	public void init() throws Exception {
 		super.init();
-		int bufSize = DEFAULT_BUFFER_SIZE;
-		try {
-			bufSize = new Integer(System.getProperty(
-					"stream.io.ImageStream.buffer", "" + DEFAULT_BUFFER_SIZE));
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			bufSize = DEFAULT_BUFFER_SIZE;
-		}
-		log.info("Using buffer size of {}k", bufSize / 1024);
-		buffer = ByteBuffer.allocateDirect(bufSize);
+		log.info("Using buffer size of {}k", this.bufferSize / 1024);
+		buffer = ByteBuffer.allocateDirect(bufferSize);
 		if (buffer.isDirect()) {
 			log.info("ByteBuffer is using direct memory.");
 		} else {
@@ -178,7 +169,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 			Thread.yield();
 			read = channel.read(buffer);
 			if (read < 0) {
-				log.info("No more data to read...");
+				log.debug("No more data to read...");
 				return null;
 			}
 		}
@@ -189,7 +180,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 
 		if (read > 0) {
 			bytesRead += read;
-			log.info("{} bytes read so far...", bytesRead);
+			log.debug("{} bytes read so far...", bytesRead);
 		}
 
 		int start = indexOf(signature);
@@ -215,7 +206,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 
 			bytesRead += read;
 			start = indexOf(signature);
-			log.info("Found start: {}", start);
+			log.debug("Found start: {}", start);
 		}
 
 		buffer.mark();
@@ -234,7 +225,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 			}
 
 			end = indexOf(signature);
-			log.info("Found end: {}", end);
+			log.debug("Found end: {}", end);
 		}
 
 		if (end < 0) {

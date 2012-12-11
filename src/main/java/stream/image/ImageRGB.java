@@ -18,9 +18,9 @@ public class ImageRGB implements Serializable {
 
 	/** The unique class ID */
 	private static final long serialVersionUID = -2042395350522979787L;
-	final int height;
-	final int width;
-	final int[] pixels;
+	public final int height;
+	public final int width;
+	public final int[] pixels;
 
 	/**
 	 * Creates an empty image with the specified height and width.
@@ -75,10 +75,14 @@ public class ImageRGB implements Serializable {
 		pixels[idx] = rgba;
 		return pixels[idx];
 	}
-	
-	//TODO bockermann: Why does it have to return the position in the array as a int?
+
+	// TODO bockermann: Why does it have to return the position in the array as
+	// a int?
+	// Answer (from bockermann): It doesn't. The value returned is the RGB-value
+	// of that pixel as 32-bit integer. NOT the index of the pixel.
 	/**
 	 * This functions sets the RGB value for the specified pixel.
+	 * 
 	 * @param x
 	 * @param y
 	 * @param red
@@ -90,7 +94,7 @@ public class ImageRGB implements Serializable {
 		int rgba = red;
 		rgba = (rgba << 8) + green;
 		rgba = (rgba << 8) + blue;
-		
+
 		return setRGB(x, y, rgba);
 	}
 
