@@ -20,25 +20,27 @@
         <If condition="%{data.data:broken} @gt 0.5">
             <Skip/>
         </If>
+		<stream.image.DisplayImage image="data" />
         
     	<stream.PeakCount keys="frame:blue:avg" />
-    	<If condition="%{data.peak:count} != null">
-	        <PrintData />
-    	</If>
-
     	<SetValue key="dummy" value="0.0" />
     	<stream.parser.ParseDouble keys="dummy" />
+    	
+    	<Enqueue queue="capsules" condition="%{data.peak} @gt 0.0" />
     
         <stream.plotter.Plotter
             history="1000"
             keepOpen="true"
             keys="frame:red:avg,frame:blue:avg,frame:green:avg,dummy,peak" />
 		 
-		<stream.image.DisplayImage image="data" />
 		<!-- 
 		<stream.io.DataObjectWriter file="/Volumes/RamDisk/bwinf-stream.obj" />
-		 -->
 		 <Delay time="35ms" />
+		 -->
     </process>
     
+	<process input="capsules">
+	    <PrintData />
+	</process>
+
 </container>
