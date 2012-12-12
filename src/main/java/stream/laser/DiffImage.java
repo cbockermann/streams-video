@@ -1,11 +1,19 @@
 package stream.laser;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
+
+import org.omg.PortableInterceptor.INACTIVE;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import stream.Data;
 import stream.image.AbstractImageProcessor;
 import stream.image.ImageRGB;
 
 public class DiffImage extends AbstractImageProcessor {
 
+	static Logger log = LoggerFactory.getLogger(DiffImage.class);
 	protected ImageRGB lastImage = new ImageRGB(0, 0);
 
 	int threshold;
@@ -24,11 +32,14 @@ public class DiffImage extends AbstractImageProcessor {
 
 	@Override
 	public Data process(Data item, ImageRGB img) {
-
+//		long start = getCpuTime();
 		ImageRGB diffImage = copy(img);
-
+//		long stop = getCpuTime();
+//		log.info("copy diffimage: {}", (stop-start));
 		if (diffImage.getHeight() == lastImage.getHeight()
 				&& diffImage.getWidth() == lastImage.getWidth()) {
+//			start = getCpuTime();
+		
 			for (int i = 0; i < diffImage.getWidth(); i++) {
 				for (int j = 0; j < diffImage.getHeight(); j++) {
 
@@ -67,18 +78,26 @@ public class DiffImage extends AbstractImageProcessor {
 
 		item.remove("data");
 		item.put("data", diffImage);
-
+//		 stop = getCpuTime();
+//		log.info("diffimage: {}", (stop-start));
 		return item;
 	}
 
 	private ImageRGB copy(ImageRGB img) {
-		ImageRGB copy = new ImageRGB(img.getWidth(), img.getHeight());
-		for (int i = 0; i < copy.getWidth(); i++) {
-			for (int j = 0; j < copy.getHeight(); j++) {
-				copy.setRGB(i, j, img.getRGB(i, j));
-			}
-		}
+		    ImageRGB copy = new ImageRGB(img.getWidth(), img.getHeight());
+		System.arraycopy(img.pixels, 0, copy.pixels, 0, img.pixels.length);
+		
+		
+//		for (int i = 0; i < copy.getWidth(); i++) {
+//			for (int j = 0; j < copy.getHeight(); j++) {
+//				copy.setRGB(i, j, img.getRGB(i, j));
+//			}
+//		}
 		return copy;
 	}
-
+	private long getCpuTime( ) {
+	    ThreadMXBean bean = ManagementFactory.getThreadMXBean( );
+	    return bean.isCurrentThreadCpuTimeSupported( ) ?
+	        bean.getCurrentThreadCpuTime( ) : 0L;
+	}
 }
