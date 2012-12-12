@@ -20,7 +20,8 @@ import stream.image.ImageRGB;
  * laser-points is produced.
  * </p>
  * 
- * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt; Hendrik Blom
+ * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt; Hendrik
+ *         Blom
  * 
  */
 public class LaserTracker extends AbstractImageProcessor {
@@ -109,7 +110,7 @@ public class LaserTracker extends AbstractImageProcessor {
 			// log.info("Found laserPointer");
 			initialPoint = evalPoint;
 			initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
-			markLaserPointer(initialPoint, img, 0, 0, 255);
+			markLaserPointer(initialPoint, img, 255, 0, 0);
 			item.put("data", img);
 			item.put("laser:x", initialPoint.x);
 			item.put("laser:y", initialPoint.y);
@@ -205,20 +206,26 @@ public class LaserTracker extends AbstractImageProcessor {
 		int x = p.x;
 		int y = p.y;
 
-//		int color = 0xffffffff;
-		int color= r;
+		// int color = 0xffffffff;
+		int color = r;
 		color = (color << 8) + g;
-		color= (color << 8) + b; 
-		
-		
+		color = (color << 8) + b;
+
 		int idx = (y - 5) * img.width + x - 5;
-		img.pixels[idx] = color;
+		if (idx < img.pixels.length)
+			img.pixels[idx] = color;
+
 		idx = (y + 5) * img.width + x - 5;
-		img.pixels[idx] = color;
+		if (idx < img.pixels.length)
+			img.pixels[idx] = color;
+
 		idx = (y - 5) * img.width + x + 5;
-		img.pixels[idx] = color;
+		if (idx < img.pixels.length)
+			img.pixels[idx] = color;
+
 		idx = (y + 5) * img.width + x + 5;
-		img.pixels[idx] = color;
+		if (idx < img.pixels.length)
+			img.pixels[idx] = color;
 	}
 
 	public double dist(Point p, Point q) {
