@@ -43,6 +43,21 @@ public class LaserTracker extends AbstractImageProcessor {
 		threshold = 20;
 	}
 
+	/**
+	 * @return the threshold
+	 */
+	public int getThreshold() {
+		return threshold;
+	}
+
+	/**
+	 * @param threshold
+	 *            the threshold to set
+	 */
+	public void setThreshold(int threshold) {
+		this.threshold = threshold;
+	}
+
 	public int getSearchSize() {
 		return searchSize;
 	}
