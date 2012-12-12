@@ -31,8 +31,8 @@ public class TurboRedDiffImage extends AbstractImageProcessor {
 
 	@Override
 	public Data process(Data item, ImageRGB img) {
-		 ImageRGB diffImage = new ImageRGB(img.width, img.height, new
-		 int[img.width*img.height]);
+		ImageRGB diffImage = new ImageRGB(img.width, img.height,
+				new int[img.width * img.height]);
 
 		if (diffImage.height == lastImage.height
 				&& diffImage.width == lastImage.width) {
@@ -46,11 +46,10 @@ public class TurboRedDiffImage extends AbstractImageProcessor {
 				int rnew = (rgbnew >> 16) & 0xFF;
 				int rdiff = Math.abs(rold - rnew);
 
-				if (threshold > 0) {
-					if (rdiff < threshold)
-						rdiff = 0;
+				if (rdiff > threshold) {
+					diffImage.pixels[idx] = 16711680;
 				}
-				diffImage.pixels[idx] = rdiff<<16;
+
 			}
 		}
 

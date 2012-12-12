@@ -20,7 +20,7 @@ import stream.image.ImageRGB;
  * laser-points is produced.
  * </p>
  * 
- * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt;
+ * @author Christian Bockermann &lt;christian.bockermann@udo.edu&gt; Hendrik Blom
  * 
  */
 public class LaserTracker extends AbstractImageProcessor {
@@ -205,8 +205,12 @@ public class LaserTracker extends AbstractImageProcessor {
 		int x = p.x;
 		int y = p.y;
 
-		int color = 0xffffffff;
-
+//		int color = 0xffffffff;
+		int color= r;
+		color = (color << 8) + g;
+		color= (color << 8) + b; 
+		
+		
 		int idx = (y - 5) * img.width + x - 5;
 		img.pixels[idx] = color;
 		idx = (y + 5) * img.width + x - 5;

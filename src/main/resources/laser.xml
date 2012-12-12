@@ -19,7 +19,7 @@
 			-->
 		<stream.laser.TurboRedDiffImage image="data"
 			threshold="50" />
-		<stream.laser.LaserTracker image="data" />
+		<stream.laser.LaserTracker image="data" threshold="50" searchSize="50"/>
 		<stream.laser.FrameRate />
 		<stream.image.DisplayImage image="data" />
 		<!--
