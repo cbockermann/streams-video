@@ -15,10 +15,12 @@ public class TurboRedDiffImage extends AbstractImageProcessor {
 
 	protected ImageRGB lastImage = new ImageRGB(0, 0);
 
-	private int threshold;
-
+	protected int threshold;
+	protected int maxRedPixels; 
+		
 	public TurboRedDiffImage() {
 		threshold = -1;
+		maxRedPixels=500;
 	}
 
 	public int getThreshold() {
@@ -29,11 +31,19 @@ public class TurboRedDiffImage extends AbstractImageProcessor {
 		this.threshold = threshold;
 	}
 
+	public int getMaxRedPixels() {
+		return maxRedPixels;
+	}
+
+	public void setMaxRedPixels(int maxRedPixels) {
+		this.maxRedPixels = maxRedPixels;
+	}
+
 	@Override
 	public Data process(Data item, ImageRGB img) {
 		ImageRGB diffImage = new ImageRGB(img.width, img.height,
 				new int[img.width * img.height]);
-
+		int count=0;
 		if (diffImage.height == lastImage.height
 				&& diffImage.width == lastImage.width) {
 
@@ -48,8 +58,10 @@ public class TurboRedDiffImage extends AbstractImageProcessor {
 
 				if (rdiff > threshold) {
 					diffImage.pixels[idx] = 16711680;
+					count++;
 				}
-
+			if(count>maxRedPixels)
+				return null;
 			}
 		}
 

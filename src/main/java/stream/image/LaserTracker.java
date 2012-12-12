@@ -31,8 +31,8 @@ public class LaserTracker extends AbstractImageProcessor {
 
 	static Logger log = LoggerFactory.getLogger(LaserTracker.class);
 
-	String laserImage = null;
-	ImageRGB lastImage = null;
+	protected String laserImage = null;
+	protected ImageRGB lastImage = null;
 
 	/**
 	 * @return the laserImage
