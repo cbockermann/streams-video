@@ -40,7 +40,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		lastImage = null;
 		initialPoint = null;
 		searchSize = 20;
-		threshold = 100;
+		threshold = 20;
 	}
 
 	public int getSearchSize() {
