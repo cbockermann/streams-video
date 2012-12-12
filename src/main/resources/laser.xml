@@ -1,41 +1,34 @@
 <container>
-    
-    <stream id="video" class="stream.io.MJpegImageStream" bufferSize="4mb" limit="500"
-        url="file:/Volumes/RamDisk/laser.mjpeg" />
-    <!-- 
-	   url="file:/Users/hendrik/Documents/Arbeit/FB40/laser.mjpeg.jpeg" />
-     -->
-    
-    <process input="video">
-        
-	<CreateID key="id" />
-	<!-- 
-	<AddTimestamp />
-	<stream.image.DisplayImage image="data" />
-	 <stream.image.ParseImageRGB />
-	 -->
-	<stream.laser.TurboDiffImageMultithread image="data" threshold="50"/>
-		 <!-- 
-	<stream.laser.TurboDiffImage image="data" threshold="50"/>
-	<stream.laser.DiffImage image="data" threshold="50"/>
-	  <stream.flow.Enqueue queue="frames"/>
-	<stream.image.DisplayImage image="data" />
-	  -->
-	  
-	<stream.laser.LaserTracker image="data"/>
-	<stream.laser.FrameRate />
 
-<!--
-        <stream.net.DataTap address="0.0.0.0" port="9100" />
-	<Delay time="30ms" />
-  -->
-        
-    </process>
-    <!-- 
-    <process input="frames">
-        
-    </process>
-     -->
-    
-    
+	<stream id="video" class="stream.io.MJpegImageStream"
+		bufferSize="1mb" limit="500"
+		url="file:/Users/hendrik/Documents/Arbeit/FB40/laser.mjpeg.jpeg" />
+	<!-- url="file:/Volumes/RamDisk/laser.mjpeg" /> -->
+
+
+	<process input="video">
+
+		<CreateID key="id" />
+		<!-- <AddTimestamp /> <stream.image.ParseImageRGB /> -->
+		<stream.image.DisplayImage image="data" />
+		<!--
+		 <stream.laser.TurboDiffImageMultithread image="data" threshold="50"/> 
+			<stream.laser.DiffImage image="data" threshold="50"/> <stream.flow.Enqueue 
+			queue="frames"/>
+			 
+			-->
+		<stream.laser.TurboRedDiffImage image="data"
+			threshold="50" />
+		<stream.laser.LaserTracker image="data" />
+		<stream.laser.FrameRate />
+		<stream.image.DisplayImage image="data" />
+		<!--
+
+		 <stream.net.DataTap address="0.0.0.0" port="9100" /> <Delay time="30ms" 
+			/> -->
+
+	</process>
+	<!-- <process input="frames"> </process> -->
+
+
 </container>

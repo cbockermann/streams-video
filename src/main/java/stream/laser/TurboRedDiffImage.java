@@ -10,14 +10,14 @@ import stream.Data;
 import stream.image.AbstractImageProcessor;
 import stream.image.ImageRGB;
 
-public class TurboDiffImage extends AbstractImageProcessor {
-	static Logger log = LoggerFactory.getLogger(TurboDiffImage.class);
+public class TurboRedDiffImage extends AbstractImageProcessor {
+	static Logger log = LoggerFactory.getLogger(TurboRedDiffImage.class);
 
 	protected ImageRGB lastImage = new ImageRGB(0, 0);
 
 	private int threshold;
 
-	public TurboDiffImage() {
+	public TurboRedDiffImage() {
 		threshold = -1;
 	}
 
@@ -37,40 +37,20 @@ public class TurboDiffImage extends AbstractImageProcessor {
 		if (diffImage.height == lastImage.height
 				&& diffImage.width == lastImage.width) {
 
-			int off = 0;
 			int max = diffImage.width * diffImage.height;
-			for (int idx = off; idx + 1 < max; idx++) {
+			for (int idx = 0; idx + 1 < max; idx++) {
 				int rgbold = lastImage.pixels[idx];
 				int rgbnew = img.pixels[idx];
 
-				int p =rgbold >> 8;
-				int gold = (p) & 0xFF;
-				p =p >> 8;
-				int rold = (p) & 0xFF;
-				int bold = rgbold & 0xFF;
-
-				p=rgbnew >> 8;
-				int gnew = (p) & 0xFF;
-				p =p >> 8;
-				int rnew = (p) & 0xFF;
-				int bnew = rgbnew & 0xFF;
-
+				int rold = (rgbold >> 16) & 0xFF;
+				int rnew = (rgbnew >> 16) & 0xFF;
 				int rdiff = Math.abs(rold - rnew);
-				int gdiff = Math.abs(gold - gnew);
-				int bdiff = Math.abs(bold - bnew);
 
 				if (threshold > 0) {
 					if (rdiff < threshold)
 						rdiff = 0;
-					if (gdiff < threshold)
-						gdiff = 0;
-					if (bdiff < threshold)
-						bdiff = 0;
 				}
-				int rgbdiff = rdiff;
-				rgbdiff = (rgbdiff << 8) + gdiff;
-				rgbdiff = (rgbdiff << 8) + bdiff;
-				diffImage.pixels[idx] = rgbdiff;
+				diffImage.pixels[idx] = rdiff<<16;
 			}
 		}
 
