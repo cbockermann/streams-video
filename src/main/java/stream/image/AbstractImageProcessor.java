@@ -3,6 +3,7 @@
  */
 package stream.image;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 
@@ -58,8 +59,13 @@ public abstract class AbstractImageProcessor extends AbstractProcessor {
 		}
 
 		try {
-			ImageRGB img = new ImageRGB(ImageIO.read(new ByteArrayInputStream(
-					bytes)));
+			BufferedImage bufferedImage = ImageIO
+					.read(new ByteArrayInputStream(bytes));
+			if (bufferedImage == null) {
+				log.debug("No valid JPEG image!");
+				return null;
+			}
+			ImageRGB img = new ImageRGB(bufferedImage);
 			Data result = process(input, img);
 			return result;
 		} catch (Exception e) {

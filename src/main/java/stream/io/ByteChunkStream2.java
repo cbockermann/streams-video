@@ -25,11 +25,15 @@ import stream.util.ByteSize;
  * </p>
  * 
  * @author Christian Bockermann &lt;chris@jwall.org&gt;
+ * @deprecated Should not be used directly anymore. Instead the new
+ *             ByteBufferStream is intended to serve as internal implementation
+ *             for wrapping DataStreams that already define the signature to
+ *             check for.
  * 
  */
-public abstract class ByteChunkStream extends AbstractStream {
+public abstract class ByteChunkStream2 extends AbstractStream {
 
-	static Logger log = LoggerFactory.getLogger(ByteChunkStream.class);
+	static Logger log = LoggerFactory.getLogger(ByteChunkStream2.class);
 	public final static byte[] GIF_SIGNATURE = new byte[] { 0x47, 0x49, 0x46,
 			0x38 };
 	public final static byte[] JPG_SIGNATURE = new byte[] { (byte) 0xff,
@@ -38,10 +42,12 @@ public abstract class ByteChunkStream extends AbstractStream {
 	// by default, we buffer only 2 MB of data from the input stream...
 	public final static int DEFAULT_BUFFER_SIZE = 32 * 1024;
 
+	byte[] readBuffer = new byte[1024];
+
 	SourceURL url;
 	ByteBuffer buffer;
 
-	InputStream input;
+	InputStream inputStream;
 
 	/* The byte-channel which is being read from using NIO */
 	final ReadableByteChannel channel;
@@ -60,16 +66,15 @@ public abstract class ByteChunkStream extends AbstractStream {
 
 	// the number of bytes read so fare
 	Long bytesRead = 0L;
-	Long chunks = 0L;
 
-	public ByteChunkStream(SourceURL url, byte[] signature) throws Exception {
+	public ByteChunkStream2(SourceURL url, byte[] signature) throws Exception {
 		this(url.openStream(), signature);
 		this.url = url;
 	}
 
-	public ByteChunkStream(InputStream in, byte[] signature) throws Exception {
+	public ByteChunkStream2(InputStream in, byte[] signature) throws Exception {
 		// this.input = new BufferedInputStream(in);
-		input = in;
+		this.inputStream = in;
 		channel = Channels.newChannel(in);
 		this.signature = signature;
 	}
@@ -130,7 +135,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 	 * @param from
 	 * @return
 	 */
-	protected int indexOf(byte[] sig, int from) {
+	private int indexOf(byte[] sig, int from) {
 		int pos = from;
 
 		while (pos + sig.length < buffer.limit() && !isSignatureAt(pos, sig)) {
@@ -151,7 +156,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 	 * @param sig
 	 * @return
 	 */
-	protected boolean isSignatureAt(int pos, byte[] sig) {
+	private boolean isSignatureAt(int pos, byte[] sig) {
 
 		for (int i = 0; i < sig.length; i++) {
 			byte b = buffer.get(pos + i);
@@ -164,18 +169,19 @@ public abstract class ByteChunkStream extends AbstractStream {
 	}
 
 	private int readBytes() throws IOException {
-		// int bytes = 0;
-		//
-		// int b = -1;
-		// do {
-		// b = input.read();
-		// if (b >= 0) {
-		// buffer.put((byte) b);
-		// bytes++;
-		// }
-		// } while (b >= 0);
-		// return bytes;
 		return channel.read(buffer);
+
+		// int read = 0;
+		// int total = 0;
+		// do {
+		// read = inputStream.read(readBuffer, 0,
+		// Math.min(readBuffer.length, buffer.remaining()));
+		// buffer.put(readBuffer);
+		// if (read > 0)
+		// total += read;
+		// } while (read > 0 && buffer.hasRemaining());
+		//
+		// return total;
 	}
 
 	/**
@@ -184,12 +190,23 @@ public abstract class ByteChunkStream extends AbstractStream {
 	@Override
 	public synchronized Data readNext() throws Exception {
 
-		int read = readBytes();
+		int read = readBytes(); // channel.read(buffer);
 		while (read == 0) {
-			Thread.yield();
-			read = readBytes();
+
+			if (buffer.hasRemaining()) {
+				// log.debug(
+				// "Waiting for new data to arrive, buffer has {} bytes left",
+				// buffer.remaining());
+				// Thread.yield();
+				read = readBytes(); // channel.read(buffer);
+			} else {
+				// log.debug("Buffer full, starting with blank buffer...");
+				buffer.clear();
+				read = readBytes(); // channel.read(buffer);
+				// log.debug("{} bytes read into new buffer.", read);
+			}
 			if (read < 0) {
-				// log.debug("No more data to read...");
+				// log.debug("No more data could be read - stream closed!");
 				return null;
 			}
 		}
@@ -204,37 +221,44 @@ public abstract class ByteChunkStream extends AbstractStream {
 			//
 			// skip to the end of the buffer and clear it
 			//
-			// log.info("No start found, skipping to buffer end, compacting the buffer and reading new data...");
+			// log.debug("No start found, skipping to buffer end, compacting the buffer and reading new data...");
 			buffer.position(buffer.limit() - signature.length);
 			buffer.compact();
 
 			// read new data into the buffer
 			//
-			read = readBytes();
+			read = readBytes(); // channel.read(buffer);
 
 			while (read == 0 && buffer.hasRemaining()) {
-				Thread.yield();
-				read = readBytes();
+				// log.debug("No data available, waiting for new data to arrive...");
+				// Thread.yield();
+				read = readBytes(); // channel.read(buffer);
+			}
+
+			if (!buffer.hasRemaining()) {
+				// log.debug("Buffer overrun, clearing buffer and starting a-new...");
+				buffer.clear();
+				continue;
 			}
 
 			bytesRead += read;
 			start = indexOf(signature);
-			// log.debug("Found start: {}", start);
 
 			if (start < 0 && read < 0) {
+				// log.debug("No more data could be read and no start signature found!? This must be the end-of-stream!");
 				return null;
 			}
 		}
-
+		// log.info("Found start at: {}", start);
 		buffer.mark();
 
 		int end = indexOf(signature, start + signature.length);
 		while (end < 0 && buffer.capacity() > 0) {
-			read = channel.read(buffer);
+			read = readBytes(); // channel.read(buffer);
 
-			while (read == 0) {
-				Thread.yield();
-				read = readBytes();
+			while (read == 0 && buffer.hasRemaining()) {
+				// Thread.yield();
+				read = readBytes(); // channel.read(buffer);
 			}
 
 			if (read < 0) {
@@ -242,7 +266,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 			}
 
 			end = indexOf(signature);
-			// log.debug("Found end: {}", end);
+			log.debug("Found end: {}", end);
 		}
 
 		if (end < 0) {
@@ -257,20 +281,21 @@ public abstract class ByteChunkStream extends AbstractStream {
 		buffer.compact();
 		Data instance = DataFactory.create();
 		instance.put(key, output);
-		chunks++;
 
 		if (firstRead == 0L) {
 			firstRead = System.currentTimeMillis();
 		} else {
-			if (chunks % 100 == 0) {
-				Long seconds = (System.currentTimeMillis() - firstRead);
-				log.debug("Reading rate after {} chunks is {} chunks/second",
-						chunks,
-						(1000 * (chunks.doubleValue() / seconds.doubleValue())));
-				log.debug("{} bytes read", bytesRead);
+			if (log.isDebugEnabled()) {
+				if (frameId % 100 == 0) {
+					Long seconds = (System.currentTimeMillis() - firstRead);
+					log.debug("Reading rate after {} frames is {} fps",
+							frameId, (1000 * (frameId.doubleValue() / seconds
+									.doubleValue())));
+					log.debug("{} bytes read", bytesRead);
+				}
 			}
 		}
-
+		frameId++;
 		return instance;
 	}
 }

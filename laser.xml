@@ -1,0 +1,48 @@
+<container>
+    
+    <stream id="video" class="stream.io.MJpegImageStream" bufferSize="16mb"
+	   url="stdin://ramdisk/laser" />
+    
+    <process input="video">
+        
+	<CreateID key="id" />
+<!--
+	<Skip condition="%{data.id} @lt 500" />
+	<Delay time="25ms"/>
+  -->
+<!--
+	<AddTimestamp />
+	<PrintData />
+
+	<stream.image.DisplayImage image="data" />
+  -->
+
+<!--
+	<stream.laser.TurboRedDiffImage image="data" threshold="30" maxRedPixels="300000" />
+	<stream.laser.LaserTracker image="data" threshold="30" searchSize="100"/>
+
+
+	<stream.image.DisplayImage image="data" />
+  -->
+<!--
+
+	<stream.image.DetectBrokenImage />
+	<If condition="%{data.data:broken} @gt 0.25">
+		<PrintData />
+		<Skip />
+	</If>
+
+  -->
+<!--
+	<If condition="%{data.laser:x} != null">
+		<stream.logger.Message message="LaserPoint: %{data.laser:x},%{data.laser:y}" />
+	</If>
+   -->
+        
+	<stream.laser.FrameRate />
+<!--
+  -->
+    </process>
+    
+    
+</container>
