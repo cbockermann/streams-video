@@ -4,11 +4,15 @@
 package stream.laser;
 
 import java.awt.Point;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
+import stream.ProcessContext;
 import stream.image.AbstractImageProcessor;
 import stream.image.ImageRGB;
 
@@ -35,6 +39,13 @@ public class LaserTracker extends AbstractImageProcessor {
 	protected int searchSize;
 	protected int threshold;
 	protected int frame = 0;
+	protected String output;
+	protected boolean skipWithoutPoint = false;
+	DatagramSocket socket;
+	String address;
+	int port = 9105;
+	InetAddress addr;
+	DatagramPacket packet;
 
 	public LaserTracker() {
 		laserImage = null;
@@ -42,6 +53,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		initialPoint = null;
 		searchSize = 20;
 		threshold = 20;
+		output = imageKey;
 	}
 
 	/**
@@ -83,6 +95,81 @@ public class LaserTracker extends AbstractImageProcessor {
 	}
 
 	/**
+	 * @return the output
+	 */
+	public String getOutput() {
+		return output;
+	}
+
+	/**
+	 * @param output
+	 *            the output to set
+	 */
+	public void setOutput(String output) {
+		this.output = output;
+	}
+
+	/**
+	 * @return the skipWithoutPoint
+	 */
+	public boolean isSkipWithoutPoint() {
+		return skipWithoutPoint;
+	}
+
+	/**
+	 * @param skipWithoutPoint
+	 *            the skipWithoutPoint to set
+	 */
+	public void setSkipWithoutPoint(boolean skipWithoutPoint) {
+		this.skipWithoutPoint = skipWithoutPoint;
+	}
+
+	/**
+	 * @return the address
+	 */
+	public String getAddress() {
+		return address;
+	}
+
+	/**
+	 * @param address
+	 *            the address to set
+	 */
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	/**
+	 * @return the port
+	 */
+	public int getPort() {
+		return port;
+	}
+
+	/**
+	 * @param port
+	 *            the port to set
+	 */
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	/**
+	 * @see stream.AbstractProcessor#init(stream.ProcessContext)
+	 */
+	@Override
+	public void init(ProcessContext ctx) throws Exception {
+		super.init(ctx);
+
+		if (address != null) {
+			socket = new DatagramSocket();
+			addr = InetAddress.getByName(address);
+
+			packet = new DatagramPacket(new byte[0], 0, addr, port);
+		}
+	}
+
+	/**
 	 * @see stream.image.AbstractImageProcessor#process(stream.Data,
 	 *      stream.image.ImageRGB)
 	 */
@@ -102,7 +189,7 @@ public class LaserTracker extends AbstractImageProcessor {
 						"********************* found initial point {} ***************************",
 						initialPoint);
 			}
-			item.put("data", img);
+			item.put(output, img);
 			return item;
 		}
 		Point evalPoint = evaluateLaserPointer(initialPoint, initialRGB, img);
@@ -111,17 +198,28 @@ public class LaserTracker extends AbstractImageProcessor {
 			initialPoint = evalPoint;
 			initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
 			markLaserPointer(initialPoint, img, 255, 0, 0);
-			item.put("data", img);
+			item.put(output, img);
 			item.put("laser:x", initialPoint.x);
 			item.put("laser:y", initialPoint.y);
+			byte[] buf = ("(" + initialPoint.x + "," + initialPoint.y + ")")
+					.getBytes();
+
+			try {
+				if (socket != null) {
+					packet.setData(buf);
+					socket.send(packet);
+				}
+			} catch (Exception e) {
+			}
 			return item;
 		}
+
+		if (skipWithoutPoint)
+			return null;
 
 		// log.info("can't find laserPointer");
 		initialPoint = null;
 		initialRGB = -1;
-
-		item.put("data", img);
 		return item;
 	}
 

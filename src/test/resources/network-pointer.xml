@@ -1,0 +1,15 @@
+<container>
+
+    <stream
+        id="pointer"
+        class="stream.io.DataObjectStream"
+        url="tcp://192.168.128.140:9105" />
+
+    <process input="pointer" >
+        <!-- 
+        <stream.image.DisplayImage image="data" />
+        <stream.image.DisplayImage image="diff" />
+         -->
+        <PrintData />
+    </process>
+</container>

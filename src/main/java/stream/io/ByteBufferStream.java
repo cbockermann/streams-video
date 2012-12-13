@@ -30,39 +30,24 @@ public class ByteBufferStream {
 	final ByteBuffer current;
 	final byte[] startSignature;
 
-	boolean continuous = true;
+	final boolean continuous;
 	boolean verbose = false;
 	Long frames = 0L;
 	long begin = 0L;
 	long total = 0L;
 
 	public ByteBufferStream(InputStream in, int readBufferSize,
-			int maxResultBuffer, byte[] startSig) {
+			int maxResultBuffer, byte[] startSig, boolean continuous) {
 		this.in = in;
 		this.readBufferSize = readBufferSize;
 		this.buf = new byte[readBufferSize];
 		this.startSignature = startSig;
 
 		this.current = ByteBuffer.allocateDirect(maxResultBuffer);
-
 		if (readBufferSize > maxResultBuffer)
 			throw new RuntimeException(
 					"Result buffer cannot be smaller than read-buffer!");
-	}
-
-	/**
-	 * @return the tail
-	 */
-	public boolean isContinuous() {
-		return continuous;
-	}
-
-	/**
-	 * @param tail
-	 *            the tail to set
-	 */
-	public void setContinuous(boolean tail) {
-		this.continuous = tail;
+		this.continuous = continuous;
 	}
 
 	public byte[] readNextChunk() throws IOException {
@@ -72,7 +57,7 @@ public class ByteBufferStream {
 		int read = 0;
 		do {
 
-			while (continuous && in.available() == 0) {
+			while (in.available() == 0) {
 				try {
 					Thread.sleep(5);
 				} catch (Exception e) {

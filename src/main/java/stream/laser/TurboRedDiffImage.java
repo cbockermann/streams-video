@@ -1,8 +1,5 @@
 package stream.laser;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +14,12 @@ public class TurboRedDiffImage extends AbstractImageProcessor {
 
 	protected int threshold;
 	protected int maxRedPixels;
+	protected String output;
 
 	public TurboRedDiffImage() {
 		threshold = -1;
 		maxRedPixels = 500;
+		output = this.imageKey;
 	}
 
 	public int getThreshold() {
@@ -37,6 +36,21 @@ public class TurboRedDiffImage extends AbstractImageProcessor {
 
 	public void setMaxRedPixels(int maxRedPixels) {
 		this.maxRedPixels = maxRedPixels;
+	}
+
+	/**
+	 * @return the output
+	 */
+	public String getOutput() {
+		return output;
+	}
+
+	/**
+	 * @param output
+	 *            the output to set
+	 */
+	public void setOutput(String output) {
+		this.output = output;
 	}
 
 	@Override
@@ -67,22 +81,7 @@ public class TurboRedDiffImage extends AbstractImageProcessor {
 
 		lastImage = img;
 
-		item.remove("data");
-		item.put("data", diffImage);
+		item.put(output, diffImage);
 		return item;
-	}
-
-	private ImageRGB copy(ImageRGB img) {
-
-		int[] pixels = new int[img.pixels.length];
-		for (int i = 0; i < img.pixels.length; i++)
-			pixels[i] = img.pixels[i];
-		return new ImageRGB(img.width, img.height, pixels);
-	}
-
-	private long getCpuTime() {
-		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-		return bean.isCurrentThreadCpuTimeSupported() ? bean
-				.getCurrentThreadCpuTime() : 0L;
 	}
 }

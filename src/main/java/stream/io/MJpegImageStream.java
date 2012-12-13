@@ -90,9 +90,7 @@ public class MJpegImageStream extends AbstractStream {
 
 		stream = new ByteBufferStream(getInputStream(),
 				readBufferSize.getBytes(), bufferSize.getBytes(),
-				ByteBufferStream.JPEG_SOI);
-
-		stream.setContinuous(isContinuous());
+				ByteBufferStream.JPEG_SOI, isContinuous());
 	}
 
 	/**
@@ -100,9 +98,6 @@ public class MJpegImageStream extends AbstractStream {
 	 */
 	@Override
 	public Data readNext() throws Exception {
-
-		if (stream == null)
-			init();
 
 		Data item = DataFactory.create();
 		byte[] data = stream.readNextChunk();
@@ -118,5 +113,24 @@ public class MJpegImageStream extends AbstractStream {
 		}
 
 		return item;
+	}
+
+	public static void main(String[] args) throws Exception {
+
+		SourceURL url = new SourceURL("file:/Volumes/RamDisk/laser.mjpeg");
+		MJpegImageStream stream = new MJpegImageStream(url);
+		stream.setReadBufferSize(new ByteSize("1k"));
+		stream.setBufferSize(new ByteSize("8mb"));
+		stream.init();
+
+		int frames = 0;
+		Data item = null;
+		do {
+			item = stream.read();
+			if (item != null)
+				frames++;
+		} while (item != null);
+
+		log.info("{} frames read.", frames);
 	}
 }
