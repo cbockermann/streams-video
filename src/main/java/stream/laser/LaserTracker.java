@@ -48,6 +48,9 @@ public class LaserTracker extends AbstractImageProcessor {
 	protected DatagramPacket packet;
 	protected int evalMagic;
 	protected int initialMagic;
+	protected Point[] fPoints;
+	private int c = 0;
+	private int fSize;
 
 	public LaserTracker() {
 		laserImage = null;
@@ -56,8 +59,10 @@ public class LaserTracker extends AbstractImageProcessor {
 		searchSize = 20;
 		threshold = 20;
 		output = imageKey;
-		evalMagic=0;
-		initialMagic=0;
+		evalMagic = 0;
+		initialMagic = 0;
+		fSize=30;
+		fPoints = new Point[fSize];
 	}
 
 	/**
@@ -191,34 +196,55 @@ public class LaserTracker extends AbstractImageProcessor {
 				log.info(
 						"********************* found initial point {} ***************************",
 						initialPoint);
+				if (c < fPoints.length) {
+					fPoints[c++] = initialPoint;
+					for (Point fp : fPoints) {
+						if(fp==null)
+							break;
+						markLaserPointer2(fp, img, 0, 255, 0);
+					}
+				} else {
+					fPoints = new Point[fSize];
+					c=0;
+				}
 			}
 			item.put(output, img);
 			return item;
 		}
-		if(initialMagic<3){
+		if (initialMagic < 1) {
 			Point cp = getInitialPoint(img);
-			if(cp==null){
-			}else{
-			double magicDist = dist(initialPoint, cp);
-			
-			if(magicDist<100)
-				initialMagic++;
-			else{
-				initialMagic=0;
-				initialPoint=null;
-			}
+			if (cp == null) {
+			} else {
+				double magicDist = dist(initialPoint, cp);
+
+				if (magicDist < 100)
+					initialMagic++;
+				else {
+					initialMagic = 0;
+					initialPoint = null;
+				}
 			}
 			item.put(output, img);
 			return item;
 		}
-		
-		
+
 		Point evalPoint = evaluateLaserPointer(initialPoint, initialRGB, img);
 		if (evalPoint != null) {
 			// log.info("Found laserPointer");
 			initialPoint = evalPoint;
 			initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
 			markLaserPointer(initialPoint, img, 255, 0, 0);
+			if (c < fPoints.length) {
+				fPoints[c++] = initialPoint;
+				for (Point fp : fPoints) {
+					if(fp==null)
+						break;
+					markLaserPointer2(fp, img, 0, 255, 0);
+				}
+			} else {
+				fPoints = new Point[fSize];
+				c=0;
+			}
 			item.put(output, img);
 			item.put("laser:x", initialPoint.x);
 			item.put("laser:y", initialPoint.y);
@@ -234,14 +260,14 @@ public class LaserTracker extends AbstractImageProcessor {
 			}
 			return item;
 		}
-//
-//		if (skipWithoutPoint)
-//			return null;
+		//
+		// if (skipWithoutPoint)
+		// return null;
 
 		// log.info("can't find laserPointer");
 		initialPoint = null;
 		initialRGB = -1;
-		initialMagic=0;
+		initialMagic = 0;
 		return item;
 	}
 
@@ -285,12 +311,12 @@ public class LaserTracker extends AbstractImageProcessor {
 		// return average(p,points);
 		Point p = weightedAverage(ep, points);
 		if (p == null) {
-			if (evalMagic < 3) {
+			if (evalMagic < 1) {
 				evalMagic++;
 				return ep;
 			}
 		}
-		evalMagic=0;
+		evalMagic = 0;
 		return p;
 	}
 
@@ -342,6 +368,32 @@ public class LaserTracker extends AbstractImageProcessor {
 			img.pixels[idx] = color;
 
 		idx = (y + 5) * img.width + x + 5;
+		if (idx < img.pixels.length && idx >= 0)
+			img.pixels[idx] = color;
+	}
+	
+	private void markLaserPointer2(Point p, ImageRGB img, int r, int g, int b) {
+		int x = p.x;
+		int y = p.y;
+
+		// int color = 0xffffffff;
+		int color = r;
+		color = (color << 8) + g;
+		color = (color << 8) + b;
+
+		int idx = (y - 1) * img.width + x - 1;
+		if (idx < img.pixels.length && idx >= 0)
+			img.pixels[idx] = color;
+
+		idx = (y + 1) * img.width + x - 1;
+		if (idx < img.pixels.length && idx >= 0)
+			img.pixels[idx] = color;
+
+		idx = (y - 1) * img.width + x + 1;
+		if (idx < img.pixels.length && idx >= 0)
+			img.pixels[idx] = color;
+
+		idx = (y + 1) * img.width + x + 1;
 		if (idx < img.pixels.length && idx >= 0)
 			img.pixels[idx] = color;
 	}
