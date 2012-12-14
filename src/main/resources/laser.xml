@@ -11,21 +11,17 @@
 		<CreateID key="id" />
 		<!-- <AddTimestamp /> <stream.image.ParseImageRGB /> -->
 		<stream.image.DisplayImage image="data" />
-		<!--
-		 <stream.laser.TurboDiffImageMultithread image="data" threshold="50"/> 
+		<!-- <stream.laser.TurboDiffImageMultithread image="data" threshold="50"/> 
 			<stream.laser.DiffImage image="data" threshold="50"/> <stream.flow.Enqueue 
-			queue="frames"/>
-			 
-			-->
+			queue="frames"/> -->
 		<stream.laser.TurboRedDiffImage image="data"
-			threshold="50" />
-		<stream.laser.LaserTracker image="data" threshold="50" searchSize="50"/>
+			threshold="20" />
+		<stream.laser.LaserTracker image="data"
+			threshold="50" searchSize="50" />
 		<stream.laser.FrameRate />
 		<stream.image.DisplayImage image="data" />
-		<!--
-
-		 <stream.net.DataTap address="0.0.0.0" port="9100" /> <Delay time="30ms" 
-			/> -->
+		<Delay time="15ms" />
+		<!-- <stream.net.DataTap address="0.0.0.0" port="9100" /> -->
 
 	</process>
 	<!-- <process input="frames"> </process> -->
