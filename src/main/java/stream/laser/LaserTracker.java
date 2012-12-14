@@ -164,6 +164,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		double minDist = Double.MAX_VALUE;
 		for (int i = 0; i < points.length; i++) {
 			Point ep = points[i];
+			markLaserPointer(ep, img, 0, 255, 0);
 			if (ep == null)
 				continue;
 			dist = dist(p, ep);
