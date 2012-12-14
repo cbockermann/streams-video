@@ -188,6 +188,7 @@ public class LaserTracker extends AbstractImageProcessor {
 				log.info(
 						"********************* found initial point {} ***************************",
 						initialPoint);
+				this.sendUDP();
 			}
 			item.put(output, img);
 			return item;
@@ -201,16 +202,7 @@ public class LaserTracker extends AbstractImageProcessor {
 			item.put(output, img);
 			item.put("laser:x", initialPoint.x);
 			item.put("laser:y", initialPoint.y);
-			byte[] buf = ("(" + initialPoint.x + "," + initialPoint.y + ")")
-					.getBytes();
-
-			try {
-				if (socket != null) {
-					packet.setData(buf);
-					socket.send(packet);
-				}
-			} catch (Exception e) {
-			}
+			this.sendUDP();
 			return item;
 		}
 
@@ -221,6 +213,22 @@ public class LaserTracker extends AbstractImageProcessor {
 		initialPoint = null;
 		initialRGB = -1;
 		return item;
+	}
+
+	private void sendUDP() {
+		if (socket != null && packet != null && initialPoint != null) {
+
+			try {
+				byte[] buf = ("(" + initialPoint.x + "," + initialPoint.y + ")")
+						.getBytes();
+
+				if (socket != null) {
+					packet.setData(buf);
+					socket.send(packet);
+				}
+			} catch (Exception e) {
+			}
+		}
 	}
 
 	private Point evaluateLaserPointer(Point p, int oldRGB, ImageRGB img) {
