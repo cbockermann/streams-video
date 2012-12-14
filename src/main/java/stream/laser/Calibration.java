@@ -36,6 +36,11 @@ public class Calibration implements PointerListener, Runnable {
 	public void pointingAt(int x, int y) {
 		PointT marker = new PointT(mark.x.intValue(), mark.y.intValue());
 		PointT point = new PointT(x, y);
+		panel.cut.add(point);
+		if (panel.cut.size() > 30) {
+			// panel.cut.remove(0);
+		}
+		panel.drawableChanged();
 		log.info("------------------------------------------------------------");
 		log.info("   mark at {},{}", marker.x, marker.y);
 		log.info("   laser at {},{}", x, y);
@@ -60,16 +65,15 @@ public class Calibration implements PointerListener, Runnable {
 
 		while (running) {
 
-			if (++i % 2 == 0) {
-				mark.setColor(panel.getBackground());
-				sleep = 100;
-			} else {
-				mark.setColor(Color.RED);
-				sleep = 200;
-			}
+			// if (++i % 2 == 0) {
+			// mark.setColor(panel.getBackground());
+			// } else {
+			// mark.setColor(Color.RED);
+			// }
+			mark.setColor(Color.RED);
 
-			int dx = rnd.nextInt(10);
-			int dy = rnd.nextInt(10);
+			int dx = rnd.nextInt(5);
+			int dy = rnd.nextInt(5);
 			if (mark.x < 10)
 				dirx = 1;
 
@@ -84,7 +88,7 @@ public class Calibration implements PointerListener, Runnable {
 			mark.translate(dirx * dx, diry * dy);
 			// log.info("Painting mark at {},{}", mark.x, mark.y);
 			panel.drawableChanged();
-			sleep(100);
+			sleep(10);
 		}
 		panel.remove(mark);
 		panel.drawableChanged();
