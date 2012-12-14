@@ -99,9 +99,12 @@ public class MJpegImageStream extends AbstractStream {
 	@Override
 	public Data readNext() throws Exception {
 
-		Data item = DataFactory.create();
 		byte[] data = stream.readNextChunk();
-		item.put("data", data);
+		if (data == null)
+			return null;
+
+		Data item = DataFactory.create();
+		// item.put("data", data);
 
 		try {
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
@@ -113,6 +116,14 @@ public class MJpegImageStream extends AbstractStream {
 		}
 
 		return item;
+	}
+
+	/**
+	 * @see stream.io.AbstractStream#close()
+	 */
+	@Override
+	public void close() throws Exception {
+		super.close();
 	}
 
 	public static void main(String[] args) throws Exception {

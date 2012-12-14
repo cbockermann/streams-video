@@ -1,8 +1,5 @@
 package stream.laser;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +28,8 @@ public class TurboDiffImage extends AbstractImageProcessor {
 
 	@Override
 	public Data process(Data item, ImageRGB img) {
-		 ImageRGB diffImage = new ImageRGB(img.width, img.height, new
-		 int[img.width*img.height]);
+		ImageRGB diffImage = new ImageRGB(img.width, img.height,
+				new int[img.width * img.height]);
 
 		if (diffImage.height == lastImage.height
 				&& diffImage.width == lastImage.width) {
@@ -43,15 +40,15 @@ public class TurboDiffImage extends AbstractImageProcessor {
 				int rgbold = lastImage.pixels[idx];
 				int rgbnew = img.pixels[idx];
 
-				int p =rgbold >> 8;
+				int p = rgbold >> 8;
 				int gold = (p) & 0xFF;
-				p =p >> 8;
+				p = p >> 8;
 				int rold = (p) & 0xFF;
 				int bold = rgbold & 0xFF;
 
-				p=rgbnew >> 8;
+				p = rgbnew >> 8;
 				int gnew = (p) & 0xFF;
-				p =p >> 8;
+				p = p >> 8;
 				int rnew = (p) & 0xFF;
 				int bnew = rgbnew & 0xFF;
 
@@ -79,19 +76,5 @@ public class TurboDiffImage extends AbstractImageProcessor {
 		item.remove("data");
 		item.put("data", diffImage);
 		return item;
-	}
-
-	private ImageRGB copy(ImageRGB img) {
-
-		int[] pixels = new int[img.pixels.length];
-		for (int i = 0; i < img.pixels.length; i++)
-			pixels[i] = img.pixels[i];
-		return new ImageRGB(img.width, img.height, pixels);
-	}
-
-	private long getCpuTime() {
-		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-		return bean.isCurrentThreadCpuTimeSupported() ? bean
-				.getCurrentThreadCpuTime() : 0L;
 	}
 }

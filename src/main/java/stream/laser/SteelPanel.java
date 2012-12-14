@@ -148,6 +148,8 @@ public class SteelPanel extends JPanel implements PointerListener {
 
 		lastPoint = new PointT(x, y);
 		this.cut.add(lastPoint);
+		if (cut.size() > 20)
+			cut.remove(0);
 		this.repaint();
 		this.validate();
 	}

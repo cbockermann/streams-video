@@ -35,6 +35,7 @@ public class ByteBufferStream {
 	Long frames = 0L;
 	long begin = 0L;
 	long total = 0L;
+	boolean closed = false;
 
 	public ByteBufferStream(InputStream in, int readBufferSize,
 			int maxResultBuffer, byte[] startSig, boolean continuous) {
@@ -59,6 +60,9 @@ public class ByteBufferStream {
 
 			while (in.available() == 0) {
 				try {
+					if (closed)
+						return null;
+
 					Thread.sleep(5);
 				} catch (Exception e) {
 				}
@@ -67,6 +71,10 @@ public class ByteBufferStream {
 			read = in.read(buf);
 			if (read > 0) {
 				total += read;
+			}
+
+			if (read < 0 && !continuous) {
+				return null;
 			}
 
 			// if (verbose)
@@ -119,6 +127,10 @@ public class ByteBufferStream {
 		current.get(img);
 		return img;
 
+	}
+
+	public void close() {
+		closed = true;
 	}
 
 	/**

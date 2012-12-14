@@ -33,17 +33,17 @@ public class ColorMaximizer extends AbstractImageProcessor {
 				int bnew = rgbnew & 0xFF;
 
 				int color = rnew + gnew + bnew;
-				if (color < 100){
+				if (color < 100) {
 					img.setRGB(i, j, 0);
 					continue;
 				}
-				if(rnew > gnew && rnew > bnew){
+				if (rnew > gnew && rnew > bnew) {
 					int rgbdiff = 255;
 					rgbdiff = (rgbdiff << 8);
 					rgbdiff = (rgbdiff << 8);
 					img.setRGB(i, j, rgbdiff);
 				}
-				
+
 			}
 		}
 
@@ -52,15 +52,4 @@ public class ColorMaximizer extends AbstractImageProcessor {
 
 		return item;
 	}
-
-	private ImageRGB copy(ImageRGB img) {
-		ImageRGB copy = new ImageRGB(img.getWidth(), img.getHeight());
-		for (int i = 0; i < copy.getWidth(); i++) {
-			for (int j = 0; j < copy.getHeight(); j++) {
-				copy.setRGB(i, j, img.getRGB(i, j));
-			}
-		}
-		return copy;
-	}
-
 }
