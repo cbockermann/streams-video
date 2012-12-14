@@ -42,10 +42,10 @@ public class LaserTracker extends AbstractImageProcessor {
 	protected String output;
 	protected boolean skipWithoutPoint = false;
 	DatagramSocket socket;
-	String address;
-	int port = 9105;
-	InetAddress addr;
-	DatagramPacket packet;
+	protected  String address;
+	protected int port = 9105;
+	protected  InetAddress addr;
+	protected  DatagramPacket packet;
 
 	public LaserTracker() {
 		laserImage = null;
@@ -265,21 +265,11 @@ public class LaserTracker extends AbstractImageProcessor {
 				}
 			}
 		}
-		int minp = count;
-		double dist = 0.0d;
-		double minDist = Double.MAX_VALUE;
-		for (int i = 0; i < points.length; i++) {
-			Point ep = points[i];
-			if (ep == null)
-				continue;
-			dist = dist(p, ep);
-			// dist = Math.abs(p.x - p.x) + Math.abs(p.y - p.y);
-			if (dist < minDist) {
-				minp = i;
-				minDist = dist;
-			}
-		}
-		return (minp == count) ? null : points[minp];
+		
+
+//		return findMinDist(p,points);
+//		return average(p,points);
+		return weightedAverage(p,points);		
 	}
 
 	private Point getInitialPoint(ImageRGB img) {
@@ -318,23 +308,87 @@ public class LaserTracker extends AbstractImageProcessor {
 		color = (color << 8) + b;
 
 		int idx = (y - 5) * img.width + x - 5;
-		if (idx < img.pixels.length)
+		if (idx < img.pixels.length && idx>=0)
 			img.pixels[idx] = color;
 
 		idx = (y + 5) * img.width + x - 5;
-		if (idx < img.pixels.length)
+		if (idx < img.pixels.length && idx>=0)
 			img.pixels[idx] = color;
 
 		idx = (y - 5) * img.width + x + 5;
-		if (idx < img.pixels.length)
+		if (idx < img.pixels.length && idx>=0)
 			img.pixels[idx] = color;
 
 		idx = (y + 5) * img.width + x + 5;
-		if (idx < img.pixels.length)
+		if (idx < img.pixels.length && idx>=0)
 			img.pixels[idx] = color;
 	}
 
 	public double dist(Point p, Point q) {
 		return p.distance(q.getX(), q.getY());
 	}
+	
+	
+	
+	private Point findMinDist(Point p,Point[] points){
+		int minp = points.length;
+		double dist = 0.0d;
+		double minDist = Double.MAX_VALUE;
+		for (int i = 0; i < points.length; i++) {
+			Point ep = points[i];
+			if (ep == null)
+				continue;
+			dist = dist(p, ep);
+			// dist = Math.abs(p.x - p.x) + Math.abs(p.y - p.y);
+			if (dist < minDist) {
+				minp = i;
+				minDist = dist;
+			}
+		}
+		return (minp==points.length)?null:points[minp];
+	}
+	
+	private Point average(Point ep,Point[] points){
+		int x=0;
+		int y=0;
+		int count =0;
+		for(Point p: points){
+			if(p!=null){
+			x+=p.x;
+			y+=p.y;
+			}else
+				count++;
+		}
+		if(count==points.length)
+			return null;
+		x/=points.length;
+		y/=points.length;
+		Point r = new Point(x,y);
+		log.info("found point {}",r);
+		return r;
+	}
+	
+	private Point weightedAverage(Point ep,Point[] points){
+		int x=0;
+		int y=0;
+		int count =0;
+		double dist=0;
+		for(Point p: points){
+			if(p!=null){
+			double d=dist(ep, p);
+			dist+=(searchSize-d);
+			x+=  p.x * (searchSize-d);
+			y+= p.y * (searchSize-d);
+			}else
+				count++;
+		}
+		if(count==points.length)
+			return null;
+		x/=dist;
+		y/=dist;
+		Point r = new Point(x,y);
+		log.info("found point {}",r);
+		return r;
+	}
+	
 }

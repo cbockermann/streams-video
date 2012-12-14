@@ -74,8 +74,8 @@ public class TurboRedDiffImage extends AbstractImageProcessor {
 					diffImage.pixels[idx] = (rdiff << 16);
 					count++;
 				}
-				if (count > maxRedPixels)
-					return null;
+//				if (count > maxRedPixels)
+//					return null;
 			}
 		}
 
