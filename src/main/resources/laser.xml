@@ -2,7 +2,7 @@
 
 	<stream id="video" class="stream.io.MJpegImageStream"
 		bufferSize="1mb" limit="500"
-		url="file:/Users/hendrik/Documents/Arbeit/FB40/laser1.mjpeg" />
+		url="http://download.jwall.org/streams/laser-whiteboard.mjpeg" />
 	<!-- 
 	    url="file:/Volumes/RamDisk/laser.mjpeg" />
 		url="http://download.jwall.org/streams/laser1.mjpeg" />

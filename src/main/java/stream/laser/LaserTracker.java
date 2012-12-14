@@ -41,11 +41,13 @@ public class LaserTracker extends AbstractImageProcessor {
 	protected int frame = 0;
 	protected String output;
 	protected boolean skipWithoutPoint = false;
-	DatagramSocket socket;
+	protected DatagramSocket socket;
 	protected String address;
 	protected int port = 9105;
 	protected InetAddress addr;
 	protected DatagramPacket packet;
+	protected int evalMagic;
+	protected int initialMagic;
 
 	public LaserTracker() {
 		laserImage = null;
@@ -54,6 +56,8 @@ public class LaserTracker extends AbstractImageProcessor {
 		searchSize = 20;
 		threshold = 20;
 		output = imageKey;
+		evalMagic = 0;
+		initialMagic = 0;
 	}
 
 	/**
@@ -184,7 +188,6 @@ public class LaserTracker extends AbstractImageProcessor {
 			initialPoint = getInitialPoint(img);
 			if (initialPoint != null) {
 				initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
-				markLaserPointer(initialPoint, img, 0, 255, 0);
 				log.info(
 						"********************* found initial point {} ***************************",
 						initialPoint);
@@ -193,6 +196,23 @@ public class LaserTracker extends AbstractImageProcessor {
 			item.put(output, img);
 			return item;
 		}
+		if (initialMagic < 3) {
+			Point cp = getInitialPoint(img);
+			if (cp == null) {
+			} else {
+				double magicDist = dist(initialPoint, cp);
+
+				if (magicDist < 100)
+					initialMagic++;
+				else {
+					initialMagic = 0;
+					initialPoint = null;
+				}
+			}
+			item.put(output, img);
+			return item;
+		}
+
 		Point evalPoint = evaluateLaserPointer(initialPoint, initialRGB, img);
 		if (evalPoint != null) {
 			// log.info("Found laserPointer");
@@ -205,13 +225,14 @@ public class LaserTracker extends AbstractImageProcessor {
 			this.sendUDP();
 			return item;
 		}
-
-		if (skipWithoutPoint)
-			return null;
+		//
+		// if (skipWithoutPoint)
+		// return null;
 
 		// log.info("can't find laserPointer");
 		initialPoint = null;
 		initialRGB = -1;
+		initialMagic = 0;
 		return item;
 	}
 
@@ -233,19 +254,20 @@ public class LaserTracker extends AbstractImageProcessor {
 		}
 	}
 
-	private Point evaluateLaserPointer(Point p, int oldRGB, ImageRGB img) {
+	private Point evaluateLaserPointer(Point ep, int oldRGB, ImageRGB img) {
 		int size = searchSize;
 
-		int count = 3;
+		int count = 10;
 		Point[] points = new Point[count];
 
 		int minThreshold = threshold;
 
-		int minx = (p.x - size > 0) ? p.x - size : 0;
-		int maxx = (p.x + size > img.width - 1) ? img.width - 1 : (p.x + size);
-		int miny = (p.y - size > 0) ? p.y - size : 0;
-		int maxy = (p.y + size > img.height - 1) ? img.height - 1
-				: (p.y + size);
+		int minx = (ep.x - size > 0) ? ep.x - size : 0;
+		int maxx = (ep.x + size > img.width - 1) ? img.width - 1
+				: (ep.x + size);
+		int miny = (ep.y - size > 0) ? ep.y - size : 0;
+		int maxy = (ep.y + size > img.height - 1) ? img.height - 1
+				: (ep.y + size);
 
 		int[] pixels = img.pixels;
 		for (int x = minx; x < maxx; x++) {
@@ -270,7 +292,15 @@ public class LaserTracker extends AbstractImageProcessor {
 
 		// return findMinDist(p,points);
 		// return average(p,points);
-		return weightedAverage(p, points);
+		Point p = weightedAverage(ep, points);
+		if (p == null) {
+			if (evalMagic < 3) {
+				evalMagic++;
+				return ep;
+			}
+		}
+		evalMagic = 0;
+		return p;
 	}
 
 	private Point getInitialPoint(ImageRGB img) {
