@@ -51,7 +51,8 @@ public class SteelPanel extends JPanel implements PointerListener {
 		this.addMouseListener(sword);
 		icon = sword.getFlame();
 		icon = null;
-		this.setBackground(Color.BLUE);
+
+		this.setBackground(Color.BLACK);
 	}
 
 	public void paint(Graphics g) {

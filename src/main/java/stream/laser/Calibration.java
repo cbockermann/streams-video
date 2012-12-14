@@ -82,7 +82,7 @@ public class Calibration implements PointerListener, Runnable {
 				diry = -1;
 
 			mark.translate(dirx * dx, diry * dy);
-			log.info("Painting mark at {},{}", mark.x, mark.y);
+			// log.info("Painting mark at {},{}", mark.x, mark.y);
 			panel.drawableChanged();
 			sleep(100);
 		}

@@ -19,11 +19,12 @@ public class FocusMark extends ADrawable {
 	@Override
 	public void draw(Graphics2D g) {
 		g.setColor(Color.BLACK);
+		g.setColor(Color.WHITE);
 
 		int x = 512;
 		int y = 384;
 		g.setStroke(new BasicStroke(4.0f));
-		drawCross(g, x, y, 20);
+		drawCross(g, x, y, 60);
 	}
 
 	protected void drawCross(Graphics2D g, int x, int y, int size) {
