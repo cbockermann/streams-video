@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
-import stream.io.MJpegImageStream;
+import stream.io.MJpegImageStreamOld;
 import stream.io.SourceURL;
 
 /**
@@ -47,7 +47,7 @@ public class StreamServer {
 
 			public void run() {
 				try {
-					MJpegImageStream stream = new MJpegImageStream(input);
+					MJpegImageStreamOld stream = new MJpegImageStreamOld(input);
 					stream.init();
 
 					int frame = 0;

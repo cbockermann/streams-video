@@ -3,6 +3,7 @@
  */
 package stream.io;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -40,6 +41,8 @@ public abstract class ByteChunkStream extends AbstractStream {
 	SourceURL url;
 	ByteBuffer buffer;
 
+	InputStream input;
+
 	/* The byte-channel which is being read from using NIO */
 	final ReadableByteChannel channel;
 
@@ -57,6 +60,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 
 	// the number of bytes read so fare
 	Long bytesRead = 0L;
+	Long chunks = 0L;
 
 	public ByteChunkStream(SourceURL url, byte[] signature) throws Exception {
 		this(url.openStream(), signature);
@@ -65,6 +69,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 
 	public ByteChunkStream(InputStream in, byte[] signature) throws Exception {
 		// this.input = new BufferedInputStream(in);
+		input = in;
 		channel = Channels.newChannel(in);
 		this.signature = signature;
 	}
@@ -125,7 +130,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 	 * @param from
 	 * @return
 	 */
-	private int indexOf(byte[] sig, int from) {
+	protected int indexOf(byte[] sig, int from) {
 		int pos = from;
 
 		while (pos + sig.length < buffer.limit() && !isSignatureAt(pos, sig)) {
@@ -146,7 +151,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 	 * @param sig
 	 * @return
 	 */
-	private boolean isSignatureAt(int pos, byte[] sig) {
+	protected boolean isSignatureAt(int pos, byte[] sig) {
 
 		for (int i = 0; i < sig.length; i++) {
 			byte b = buffer.get(pos + i);
@@ -158,25 +163,40 @@ public abstract class ByteChunkStream extends AbstractStream {
 		return true;
 	}
 
+	private int readBytes() throws IOException {
+		// int bytes = 0;
+		//
+		// int b = -1;
+		// do {
+		// b = input.read();
+		// if (b >= 0) {
+		// buffer.put((byte) b);
+		// bytes++;
+		// }
+		// } while (b >= 0);
+		// return bytes;
+		return channel.read(buffer);
+	}
+
 	/**
 	 * @see stream.io.AbstractDataStream#readItem(stream.data.Data)
 	 */
 	@Override
 	public synchronized Data readNext() throws Exception {
 
-		int read = channel.read(buffer);
+		int read = readBytes();
 		while (read == 0) {
 			Thread.yield();
-			read = channel.read(buffer);
+			read = readBytes();
 			if (read < 0) {
-				log.debug("No more data to read...");
+				// log.debug("No more data to read...");
 				return null;
 			}
 		}
 
 		if (read > 0) {
 			bytesRead += read;
-			log.debug("{} bytes read so far...", bytesRead);
+			// log.debug("{} bytes read so far...", bytesRead);
 		}
 
 		int start = indexOf(signature);
@@ -184,21 +204,22 @@ public abstract class ByteChunkStream extends AbstractStream {
 			//
 			// skip to the end of the buffer and clear it
 			//
+			// log.info("No start found, skipping to buffer end, compacting the buffer and reading new data...");
 			buffer.position(buffer.limit() - signature.length);
 			buffer.compact();
 
 			// read new data into the buffer
 			//
-			read = channel.read(buffer);
+			read = readBytes();
 
-			while (read == 0) {
+			while (read == 0 && buffer.hasRemaining()) {
 				Thread.yield();
-				read = channel.read(buffer);
+				read = readBytes();
 			}
 
 			bytesRead += read;
 			start = indexOf(signature);
-			log.debug("Found start: {}", start);
+			// log.debug("Found start: {}", start);
 
 			if (start < 0 && read < 0) {
 				return null;
@@ -213,7 +234,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 
 			while (read == 0) {
 				Thread.yield();
-				read = channel.read(buffer);
+				read = readBytes();
 			}
 
 			if (read < 0) {
@@ -221,7 +242,7 @@ public abstract class ByteChunkStream extends AbstractStream {
 			}
 
 			end = indexOf(signature);
-			log.debug("Found end: {}", end);
+			// log.debug("Found end: {}", end);
 		}
 
 		if (end < 0) {
@@ -236,18 +257,17 @@ public abstract class ByteChunkStream extends AbstractStream {
 		buffer.compact();
 		Data instance = DataFactory.create();
 		instance.put(key, output);
+		chunks++;
 
 		if (firstRead == 0L) {
 			firstRead = System.currentTimeMillis();
 		} else {
-			if (log.isDebugEnabled()) {
-				if (frameId % 100 == 0) {
-					Long seconds = (System.currentTimeMillis() - firstRead);
-					log.debug("Reading rate after {} frames is {} fps",
-							frameId, (1000 * (frameId.doubleValue() / seconds
-									.doubleValue())));
-					log.debug("{} bytes read", bytesRead);
-				}
+			if (chunks % 100 == 0) {
+				Long seconds = (System.currentTimeMillis() - firstRead);
+				log.debug("Reading rate after {} chunks is {} chunks/second",
+						chunks,
+						(1000 * (chunks.doubleValue() / seconds.doubleValue())));
+				log.debug("{} bytes read", bytesRead);
 			}
 		}
 
