@@ -294,7 +294,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		// return average(p,points);
 		Point p = weightedAverage(ep, points);
 		if (p == null) {
-			if (evalMagic < 3) {
+			if (evalMagic < 10) {
 				evalMagic++;
 				return ep;
 			}

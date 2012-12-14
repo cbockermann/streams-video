@@ -35,7 +35,7 @@ public class Calibration implements PointerListener, Runnable {
 	@Override
 	public void pointingAt(int x, int y) {
 		PointT marker = new PointT(mark.x.intValue(), mark.y.intValue());
-		PointT point = new PointT(x, y);
+		PointT point = new PointT(2 * x, 2 * y);
 		panel.cut.add(point);
 		if (panel.cut.size() > 30) {
 			// panel.cut.remove(0);
