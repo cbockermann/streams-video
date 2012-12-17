@@ -1,8 +1,10 @@
 <container>
     
     <stream id="video" class="stream.io.MJpegImageStream" bufferSize="16mb"
-	   url="stdin://ramdisk/laser" />
-    
+	   url="/Users/hendrik/Documents/Arbeit/FB40/laser.mjpeg.jpeg" />
+	   <!-- 
+	   url="http://download.jwall.org/streams/laser-whiteboard.mjpeg" />
+     -->
     <process input="video">
         
 	<CreateID key="id" />
@@ -14,15 +16,15 @@
 	<AddTimestamp />
 	<PrintData />
 
-	<stream.image.DisplayImage image="data" />
   -->
+	<stream.image.DisplayImage image="data" />
 
-<!--
-	<stream.laser.TurboRedDiffImage image="data" threshold="30" maxRedPixels="300000" />
-	<stream.laser.LaserTracker image="data" threshold="30" searchSize="100"/>
+	<stream.laser.TurboRedDiffImage image="data" threshold="30" />
+	<stream.laser.LaserTracker image="data" threshold="30" searchSize="30"/>
 
 
 	<stream.image.DisplayImage image="data" />
+<!--
   -->
 <!--
 

@@ -5,6 +5,7 @@ package stream.laser;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -12,6 +13,7 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,13 +44,15 @@ public class SteelPanel extends JPanel implements PointerListener {
 	int flameWidth = 20;
 	int flameHeight = 20;
 	PointT lastPoint = null;
+	final List<Drawable> drawables = new ArrayList<Drawable>();
 
 	public SteelPanel() {
 		this.addMouseMotionListener(sword);
 		this.addMouseListener(sword);
 		icon = sword.getFlame();
 		icon = null;
-		this.setBackground(Color.BLUE);
+
+		this.setBackground(Color.BLACK);
 	}
 
 	public void paint(Graphics g) {
@@ -60,7 +64,9 @@ public class SteelPanel extends JPanel implements PointerListener {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setStroke(new BasicStroke(2.75f));
-		g.setColor(Color.GREEN);
+		// g.setColor(Color.GREEN);
+		g.setColor(new Color(0, 174, 162));
+		g.setColor(Color.DARK_GRAY);
 		ArrayList<PointT> points = this.cut; // sword.getTrace();
 		for (int i = 0; i < points.size(); i++) {
 			PointT p = points.get(i);
@@ -70,8 +76,6 @@ public class SteelPanel extends JPanel implements PointerListener {
 			g.drawLine(last.x, last.y, p.x, p.y);
 			last = p;
 			if (i + 1 >= points.size()) {
-				System.out
-						.println("icon=" + icon + ", sword=" + sword.active());
 				if (icon != null && sword.active()) {
 					System.out.println("Drawing flame...");
 					g.drawImage(icon.getImage(), p.x - (flameWidth / 2), p.y
@@ -83,6 +87,10 @@ public class SteelPanel extends JPanel implements PointerListener {
 				cut.add(p);
 		}
 
+		for (Drawable d : drawables) {
+			if (d.isVisible())
+				d.draw(g2);
+		}
 	}
 
 	public static class PointT extends Point {
@@ -111,12 +119,17 @@ public class SteelPanel extends JPanel implements PointerListener {
 		final SteelPanel panel = new SteelPanel();
 
 		NetworkPointer pointer = new NetworkPointer(9100);
-		pointer.addListener(panel);
+		// pointer.addListener(panel);
 		pointer.setDaemon(true);
 		pointer.start();
 
+		final Calibration c = new Calibration(panel);
+		pointer.addListener(c);
+
 		frame.getContentPane().add(panel);
 		frame.setSize(1024, 768);
+		frame.addComponentListener(new WindowInfo(frame));
+		frame.setLocation(1400, 0);
 		frame.setVisible(true);
 
 		JDialog control = new JDialog();
@@ -129,10 +142,49 @@ public class SteelPanel extends JPanel implements PointerListener {
 				panel.validate();
 			}
 		});
-		control.getContentPane().add(clear);
+
+		final JButton cal = new JButton("Start Calibration");
+		cal.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (c.running) {
+					c.stop();
+				} else {
+					Thread t = new Thread(c);
+					t.setDaemon(true);
+					t.start();
+					cal.setText("Stop Calibration");
+				}
+			}
+		});
+
+		final FocusMark fm = new FocusMark();
+		final JButton focus = new JButton("Add Focus Mark");
+		focus.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (panel.drawables.contains(fm)) {
+					panel.remove(fm);
+					focus.setText("Add Focus Mark");
+				} else {
+					panel.add(fm);
+					focus.setText("Remove Focus Mark");
+				}
+				panel.drawableChanged();
+			}
+		});
+
+		JPanel buttons = new JPanel(new FlowLayout());
+		buttons.add(clear);
+		buttons.add(cal);
+		buttons.add(focus);
+
+		control.getContentPane().add(buttons);
 		control.setModal(false);
 		control.pack();
 		control.setVisible(true);
+
 	}
 
 	/**
@@ -152,5 +204,18 @@ public class SteelPanel extends JPanel implements PointerListener {
 			cut.remove(0);
 		this.repaint();
 		this.validate();
+	}
+
+	public void add(Drawable d) {
+		drawables.add(d);
+	}
+
+	public void remove(Drawable d) {
+		drawables.remove(d);
+	}
+
+	public void drawableChanged() {
+		repaint();
+		validate();
 	}
 }

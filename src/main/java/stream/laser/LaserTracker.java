@@ -41,7 +41,7 @@ public class LaserTracker extends AbstractImageProcessor {
 	protected int frame = 0;
 	protected String output;
 	protected boolean skipWithoutPoint = false;
-	DatagramSocket socket;
+	protected DatagramSocket socket;
 	protected String address;
 	protected int port = 9105;
 	protected InetAddress addr;
@@ -207,6 +207,7 @@ public class LaserTracker extends AbstractImageProcessor {
 					fPoints = new Point[fSize];
 					c=0;
 				}
+				this.sendUDP();
 			}
 			item.put(output, img);
 			return item;
@@ -248,17 +249,35 @@ public class LaserTracker extends AbstractImageProcessor {
 			item.put(output, img);
 			item.put("laser:x", initialPoint.x);
 			item.put("laser:y", initialPoint.y);
-			byte[] buf = ("(" + initialPoint.x + "," + initialPoint.y + ")")
-					.getBytes();
+			this.sendUDP();
+			return item;
+		}
+		//
+		// if (skipWithoutPoint)
+		// return null;
+
+		// log.info("can't find laserPointer");
+		initialPoint = null;
+		initialRGB = -1;
+		initialMagic = 0;
+		return item;
+	}
+
+	private void sendUDP() {
+		if (socket != null && packet != null && initialPoint != null) {
 
 			try {
+				byte[] buf = ("(" + initialPoint.x + "," + initialPoint.y + ")")
+						.getBytes();
+
 				if (socket != null) {
 					packet.setData(buf);
 					socket.send(packet);
 				}
 			} catch (Exception e) {
+				if (log.isDebugEnabled())
+					e.printStackTrace();
 			}
-			return item;
 		}
 		//
 		// if (skipWithoutPoint)
