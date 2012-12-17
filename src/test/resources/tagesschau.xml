@@ -3,8 +3,9 @@
     <stream
         id="video"
         class="stream.io.MJpegImageStream"
-        url="file:/Volumes/RamDisk/video.mjpeg.raw" />
+        url="http://kirmes.csuni-dortmund.de/video/20120911-small.raw" />
     <!-- 
+        url="file:/Volumes/RamDisk/video.mjpeg.raw" />
         url="http://kirmes.cs.uni-dortmund.de/video/video.mjpeg.raw" />
      -->
 

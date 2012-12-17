@@ -67,6 +67,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 		// g.setColor(Color.GREEN);
 		g.setColor(new Color(0, 174, 162));
 		g.setColor(Color.DARK_GRAY);
+		g.setColor(Color.GREEN);
 		ArrayList<PointT> points = this.cut; // sword.getTrace();
 		for (int i = 0; i < points.size(); i++) {
 			PointT p = points.get(i);

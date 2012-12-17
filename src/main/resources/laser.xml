@@ -2,10 +2,10 @@
 
 	<stream id="video" class="stream.io.MJpegImageStream"
 		bufferSize="1mb" limit="500"
-		url="http://download.jwall.org/streams/laser-whiteboard.mjpeg" />
-	<!-- 
-	    url="file:/Volumes/RamDisk/laser.mjpeg" />
 		url="http://download.jwall.org/streams/laser1.mjpeg" />
+	<!-- 
+		url="file:/Volumes/RamDisk/laser-whiteboard.mjpeg" />
+	    url="file:/Volumes/RamDisk/laser.mjpeg" />
 	 -->
 	<!-- 
 	 -->
@@ -15,6 +15,8 @@
 
 		<CreateID key="id" />
 		<!-- <AddTimestamp /> <stream.image.ParseImageRGB /> -->
+		<!-- 
+		 -->
 		<stream.image.DisplayImage image="data" />
 		<!-- <stream.laser.TurboDiffImageMultithread image="data" threshold="50"/> 
 			<stream.laser.DiffImage image="data" threshold="50"/> <stream.flow.Enqueue 
@@ -25,7 +27,9 @@
 			threshold="30" searchSize="50" />
 		<stream.laser.FrameRate />
 		<stream.image.DisplayImage image="data" />
+		<!-- 
 		<Delay time="15ms" />
+		 -->
 		<!-- <stream.net.DataTap address="0.0.0.0" port="9100" /> -->
 
 	</process>
