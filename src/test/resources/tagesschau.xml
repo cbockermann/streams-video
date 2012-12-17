@@ -1,42 +1,54 @@
 <container>
 
     <stream
-        id="video"
+        id="video" limit="2000"
         class="stream.io.MJpegImageStream"
         url="http://kirmes.csuni-dortmund.de/video/20120911-small.raw" />
     <!-- 
         url="file:/Volumes/RamDisk/video.mjpeg.raw" />
         url="http://kirmes.cs.uni-dortmund.de/video/video.mjpeg.raw" />
      -->
+<!-- 
+        url="file:/Volumes/RamDisk/video.mjpeg.raw" />
+-->
 
     <process input="video" >
-
+    <!-- 
+        <stream.image.DisplayImage image="data" />
+     -->
+        
         <CreateID key="frame:id" />
-	
-	<!-- 
-		  <Skip condition="%{data.frame:id} @lt 80" />        
-	 -->
+		<stream.news.helper.AddNewsshowLabels /> 
+        <stream.laser.DiffImage />
+        <stream.image.ColorToGrayscale />
+        <stream.image.AverageRGB />
+        <stream.news.learner.sbdetection.GrayThreshold t="50" />
+    
+    	<stream.learner.evaluation.PredictionError label="@label:shotboundary" />
+    	<stream.statistics.Sum keys="@error:shotboundary" />
         
-          <stream.image.DisplayImage image="data" />
-          
-          
-          <!--  
-          <stream.image.AverageRGB />
-          <stream.image.filters.Smoothing output="data" windowSize="8" />
-          <stream.image.ColorDiscretization output="data" quantilesPerChannel="2" /> 
-        
-          <stream.image.BorderDetection output="data" tolerance="1"/>  
-          <stream.image.DisplayImage image="data" />
-        
-
+		<!--  
+    	<PrintData />
         <PrintData />
+		<Skip condition="%{data.frame:id} @lt 2" />        
+          
         <stream.plotter.Plotter
             history="1000"
             keepOpen="true"
-            keys="frame:red:avg,frame:green:avg,frame:blue:avg" />
-          -->
-        <!-- 
-         -->
+            keys="frame:red:avg" />
+		-->
+          
+<!-- 
+-->
+<!--  
+        <stream.image.filters.Smoothing output="data" windowSize="8" />
+        <stream.image.ColorDiscretization output="data" quantilesPerChannel="2" /> 
+       
+        <stream.image.BorderDetection output="data" tolerance="1"/>  
+        <stream.image.DisplayImage image="data" />
+        
 
+        <PrintData />
+-->
     </process>
 </container>
