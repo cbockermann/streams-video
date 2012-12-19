@@ -106,7 +106,6 @@ public class MJpegImageStream extends AbstractStream {
 			return null;
 
 		Data item = DataFactory.create();
-
 		try {
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
 			ImageRGB rgb = new ImageRGB(img);

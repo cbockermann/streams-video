@@ -26,9 +26,11 @@ public class MJpegStreamTest {
 		try {
 			SourceURL url = new SourceURL(
 					"http://kirmes.cs.uni-dortmund.de/video/20120911-micro.raw");
-			// url = new SourceURL("file:/Volumes/RamDisk/20120911-micro.raw");
+			url = new SourceURL("file:/Volumes/RamDisk/20120911-micro.raw");
+			// url = new SourceURL(
+			// "http://kirmes.cs.uni-dortmund.de/video/20120911-small-1000f.raw");
 			MJpegImageStream stream = new MJpegImageStream(url);
-			stream.setReadBufferSize(new ByteSize("1m"));
+			stream.setReadBufferSize(new ByteSize("16"));
 			stream.setBufferSize(new ByteSize("16M"));
 			stream.init();
 			int frames = 0;
@@ -41,6 +43,11 @@ public class MJpegStreamTest {
 					dump((byte[]) item.get("error:data"), "frame-" + frames
 							+ ".jpg");
 				}
+				//
+				// if (frames > 998) {
+				// dump((byte[]) item.get("data"), "frame-" + frames + ".jpg");
+				// }
+
 				frames++;
 				item = stream.read();
 			}
