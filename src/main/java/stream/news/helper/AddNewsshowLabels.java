@@ -18,12 +18,16 @@ public class AddNewsshowLabels extends AbstractProcessor {
 
 	@Override
 	public void init(ProcessContext ctx) throws Exception {
+		
+		Integer counterCuts = 0;
+		Integer counterGT = 0;
 
 		//file = "file:/Volumes/RamDisk/transitions.csv";
 
-//		CsvStream stream = new CsvStream(new SourceURL(file));
-		CsvStream stream = new CsvStream(new SourceURL("classpath:/transitions.csv"));
+		CsvStream stream = new CsvStream(new SourceURL(file));
+//		CsvStream stream = new CsvStream(new SourceURL("classpath:/transitions.csv"));
 		stream.init();
+		labels.put(1L, "Intro");
 
 		Data item = stream.read();
 
@@ -33,8 +37,13 @@ public class AddNewsshowLabels extends AbstractProcessor {
 			String label = (String) item.get("label");
 
 			
-			if (frame != null && transition != null) {
-					labels.put(Long.parseLong(frame)-2, label);
+			if (frame != null && transition.equals("C")) {
+					labels.put(Long.parseLong(frame), label);
+					counterCuts++;
+			} else {
+				if (transition.equals("GT")) {
+					counterGT++;
+				}
 			}
 
 			item = stream.read();
@@ -44,7 +53,7 @@ public class AddNewsshowLabels extends AbstractProcessor {
 
 		super.init(ctx);
 		
-		System.out.println("Initalization of AddNewsshowLabels completed. labels contains " + labels.size() + " elements.");
+		System.out.println("Initalization of AddNewsshowLabels completed. " + labels.size() + " elements found (" + counterCuts + " Cuts and " + counterGT + " Gradual Transitions)");
 	}
 
 	@Override

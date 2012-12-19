@@ -115,9 +115,9 @@ public class JpegStream {
 			end = -1;
 
 			frames++;
-			if (frames % 100 == 0) {
+			if (log.isDebugEnabled() && frames % 100 == 0) {
 				Long time = System.currentTimeMillis() - begin;
-				log.info("Read {} frames, frame rate is {} fps", frames,
+				log.debug("Read {} frames, frame rate is {} fps", frames,
 						(100.0d / (time.doubleValue() / 1000.0d)));
 				begin = System.currentTimeMillis();
 			}
