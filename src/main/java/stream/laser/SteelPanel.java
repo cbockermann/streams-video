@@ -52,7 +52,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 		icon = sword.getFlame();
 		icon = null;
 
-		this.setBackground(Color.BLACK);
+		this.setBackground(Color.BLUE);
 	}
 
 	public void paint(Graphics g) {
@@ -115,7 +115,9 @@ public class SteelPanel extends JPanel implements PointerListener {
 	}
 
 	public static void main(String[] args) throws Exception {
+
 		JFrame frame = new JFrame();
+		frame.setUndecorated(true);
 
 		final SteelPanel panel = new SteelPanel();
 
@@ -130,7 +132,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 		frame.getContentPane().add(panel);
 		frame.setSize(1024, 768);
 		frame.addComponentListener(new WindowInfo(frame));
-		frame.setLocation(1400, 0);
+		frame.setLocation(-1024, 0);
 		frame.setVisible(true);
 
 		JDialog control = new JDialog();
