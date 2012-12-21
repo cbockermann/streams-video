@@ -11,6 +11,8 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.util.ByteSize;
@@ -20,6 +22,8 @@ import stream.util.ByteSize;
  * 
  */
 public class MJpegStreamTest {
+
+	static Logger log = LoggerFactory.getLogger(MJpegStreamTest.class);
 
 	@Test
 	public void test() {
@@ -32,6 +36,7 @@ public class MJpegStreamTest {
 			MJpegImageStream stream = new MJpegImageStream(url);
 			stream.setReadBufferSize(new ByteSize("16"));
 			stream.setBufferSize(new ByteSize("16M"));
+			stream.setLimit(1000L);
 			stream.init();
 			int frames = 0;
 			Data item = stream.read();
@@ -47,6 +52,7 @@ public class MJpegStreamTest {
 				// if (frames > 998) {
 				// dump((byte[]) item.get("data"), "frame-" + frames + ".jpg");
 				// }
+				log.info("frame:size_raw is: {}", item.get("frame:size_raw"));
 
 				frames++;
 				item = stream.read();

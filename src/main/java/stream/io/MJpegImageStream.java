@@ -106,10 +106,15 @@ public class MJpegImageStream extends AbstractStream {
 			return null;
 
 		Data item = DataFactory.create();
+		// item.put("frame:data", data);
+		item.put("frame:size_raw", data.length);
+
 		try {
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
 			ImageRGB rgb = new ImageRGB(img);
 			item.put("data", rgb);
+			item.put("frame:width", rgb.width);
+			item.put("frame:height", rgb.height);
 			ok++;
 			log.debug("Successfully parsed JPEG image...");
 		} catch (Exception e) {
