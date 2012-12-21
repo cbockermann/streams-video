@@ -18,28 +18,31 @@ public class AverageRGB extends AbstractImageProcessor {
 	@Override
 	public Data process(Data item, ImageRGB img) {
 
-		int width = img.getWidth();
-		int height = img.getHeight();
 		double r = 0.0;
 		double g = 0.0;
 		double b = 0.0;
+		double px = img.pixels.length;
+		int skipped = 0;
 
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
+		for (int i = 0; i < img.pixels.length; i++) {
+			int argb = img.pixels[i];
 
-				int rgb = img.getRGB(x, y);
-				// int alpha = (rgb >> 24) & 0xFF;
-				int red = (rgb >> 16) & 0xFF;
-				int green = (rgb >> 8) & 0xFF;
-				int blue = rgb & 0xFF;
-
-				r += red;
-				g += green;
-				b += blue;
+			int alpha = (argb >> 24) & 0xff;
+			if (alpha == 0) {
+				skipped++;
+				continue;
 			}
-		}
 
-		int px = width * height;
+			int red = (argb >> 16) & 0xFF;
+			int green = (argb >> 8) & 0xFF;
+			int blue = argb & 0xFF;
+
+			r += red;
+			g += green;
+			b += blue;
+		}
+		px -= skipped;
+		log.info("Skipped {} fully transparent pixels", skipped);
 		r = r / px;
 		g = g / px;
 		b = b / px;
