@@ -1,38 +1,47 @@
 <container>
 
     <stream
-        id="video" limit="2000"
+        id="video"
         class="stream.io.MJpegImageStream"
         url="http://kirmes.cs.uni-dortmund.de/video/20120911-small.raw" />
 <!-- 
         url="file:/Volumes/RamDisk/video.mjpeg.raw" />
+        url="http://kirmes.cs.uni-dortmund.de/video/video.mjpeg.raw" />
+        url="file:/Volumes/RamDisk/video.mjpeg.raw" />
 -->
 
     <process input="video" >
-    <!-- 
+ <!--        
         <stream.image.DisplayImage image="data" />
-     -->
-        
+-->        
         <CreateID key="frame:id" />
 		<stream.news.helper.AddNewsshowLabels /> 
-        <stream.laser.DiffImage />
+        <stream.laser.DiffImage threshold="0"/>
         <stream.image.ColorToGrayscale />
         <stream.image.AverageRGB />
-        <stream.news.learner.sbdetection.GrayThreshold t="50" />
-    
-    	<stream.learner.evaluation.PredictionError label="@label:shotboundary" />
-    	<stream.statistics.Sum keys="@error:shotboundary" />
+        <stream.news.learner.sbdetection.GrayThreshold t="35" />
+        <stream.news.helper.ErrorOutput />
         
-		<!--  
-    	<PrintData />
-        <PrintData />
-		<Skip condition="%{data.frame:id} @lt 2" />        
-          
+    	
+<!--     	
         <stream.plotter.Plotter
             history="1000"
             keepOpen="true"
             keys="frame:red:avg" />
-		-->
+            
+        <stream.image.DisplayImage image="data" />
+-->            
+    	<stream.learner.evaluation.PredictionError label="@label:shotboundary" />
+    	<stream.statistics.Sum keys="@error:shotboundary" />
+
+
+<!--  
+    
+        
+        <PrintData />
+		<Skip condition="%{data.frame:id} @lt 2" />        
+          
+-->
           
 <!-- 
 -->
@@ -41,7 +50,6 @@
         <stream.image.ColorDiscretization output="data" quantilesPerChannel="2" /> 
        
         <stream.image.BorderDetection output="data" tolerance="1"/>  
-        <stream.image.DisplayImage image="data" />
         
 
         <PrintData />

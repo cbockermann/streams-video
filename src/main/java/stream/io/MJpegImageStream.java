@@ -23,10 +23,13 @@ public class MJpegImageStream extends AbstractStream {
 	public final static int DEFAULT_READ_BUFFER = 1 * 1024;
 	public final static int DEFAULT_FRAME_BUFFER = 16 * 1024 * 1024;
 
-	protected ByteBufferStream stream;
+	protected JpegStream stream;
 	protected ByteSize readBufferSize = new ByteSize("1k");
-	protected ByteSize bufferSize = new ByteSize("8mb");
+	protected ByteSize bufferSize = new ByteSize("16mb");
 	protected boolean continuous = false;
+	int ok = 0;
+	int errors = 0;
+	long frame = 0;
 
 	public MJpegImageStream(SourceURL url) throws Exception {
 		super(url);
@@ -88,9 +91,8 @@ public class MJpegImageStream extends AbstractStream {
 	public void init() throws Exception {
 		super.init();
 
-		stream = new ByteBufferStream(getInputStream(),
-				readBufferSize.getBytes(), bufferSize.getBytes(),
-				ByteBufferStream.JPEG_SOI, isContinuous());
+		stream = new JpegStream(getInputStream(), readBufferSize.getBytes(),
+				bufferSize.getBytes(), isContinuous());
 	}
 
 	/**
@@ -104,15 +106,23 @@ public class MJpegImageStream extends AbstractStream {
 			return null;
 
 		Data item = DataFactory.create();
-		// item.put("data", data);
+		// item.put("frame:data", data);
+		item.put("frame:size_raw", data.length);
 
 		try {
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
 			ImageRGB rgb = new ImageRGB(img);
 			item.put("data", rgb);
-			// log.debug("Successfully parsed JPEG image...");
+			item.put("frame:width", rgb.width);
+			item.put("frame:height", rgb.height);
+			ok++;
+			log.debug("Successfully parsed JPEG image...");
 		} catch (Exception e) {
-			// e.printStackTrace();
+			log.error("Failed to read from image: {}", e.getMessage());
+			errors++;
+			if (log.isDebugEnabled())
+				e.printStackTrace();
+			item.put("error:data", data);
 		}
 
 		return item;
@@ -124,6 +134,12 @@ public class MJpegImageStream extends AbstractStream {
 	@Override
 	public void close() throws Exception {
 		super.close();
+	}
+
+	public void info() {
+		log.info("{} frames were read without problems.", ok);
+		log.info("{} frames could not be read", errors);
+		log.info("{} frames read in total.", ok + errors);
 	}
 
 	public static void main(String[] args) throws Exception {

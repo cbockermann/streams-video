@@ -233,6 +233,12 @@ public class LaserTracker extends AbstractImageProcessor {
 		if (evalPoint != null) {
 			// log.info("Found laserPointer");
 			initialPoint = evalPoint;
+			if (initialPoint.x < 0 || initialPoint.y < 0) {
+				log.info("Weird initial point: {}", initialPoint);
+				initialPoint = null;
+				initialMagic = 0;
+				return item;
+			}
 			initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
 			markLaserPointer(initialPoint, img, 255, 0, 0);
 			if (c < fPoints.length) {

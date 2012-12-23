@@ -1,46 +1,108 @@
 <container>
     
-    <stream id="video" class="stream.io.DataObjectStream"
-    		url="file:/Volumes/RamDisk/bwinf-stream.obj" />
+    <stream id="video"
+            class="stream.io.MJpegImageStream"
+            url="http://kirmes.cs.uni-dortmund.de/kapseln.mjpeg"/>
     		<!-- 
-    		url="tcp://192.168.129.98:9100" />
+    		url="file:/Volumes/RamDisk/bwinf-stream.obj" class="stream.io.DataObjectStream" />
+         limit="500"
     		url="file:/Volumes/RamDisk/webcam.mjpeg" />
+    		url="tcp://192.168.129.98:9100" />
     		 -->
     
     <process input="video">
 		<CreateID key="frame:id" />
-		<!-- 
-		<PrintData />
-		 -->
 		 
-		<stream.image.AverageRGB />
+		<stream.image.DisplayImage image="data" />
+		<stream.laser.UberDiffImage image="data" threshold="15"/>
+		<stream.image.DisplayImage image="data" />
+		<!-- 
+		<Delay time="15ms" />
+		 -->
+				
+		<!-- 
+		<stream.image.filters.SetTransparent image="data"/>
+		 -->
+		<stream.image.AverageRGB image="data"/>
+		
         
         <stream.flow.Skip condition="%{data.frame:blue:avg} == null " />
-        <stream.image.DetectBrokenImage />
-        <If condition="%{data.data:broken} @gt 0.5">
-            <Skip/>
-        </If>
-		<stream.image.DisplayImage image="data" />
         
-    	<stream.PeakCount keys="frame:blue:avg" />
-    	<SetValue key="dummy" value="0.0" />
-    	<stream.parser.ParseDouble keys="dummy" />
+    	<stream.MarkPeak keys="frame:green:avg" threshold="35" />
     	
-    	<Enqueue queue="capsules" condition="%{data.peak} @gt 0.0" />
-    
+		<OnChange key="%{data.peak}" from="0.0" to="255.0">
+			<SetValue key="kalk" scope="process" value="1" />		   
+		</OnChange>    	
+    			
+		<If condition="%{process.kalk} @eq 1">
+		    <!-- 
+		    <stream.logger.Message message="Computing minima!" />
+		     -->
+			<Delay time="1s" />
+		    <stream.statistics.Average id="avg" keys="frame:red:avg,frame:green:avg,frame:blue:avg" prefix="avg:" />
+		    <stream.statistics.Maxima id="min" keys="frame:red:avg,frame:green:avg,frame:blue:avg" />
+		</If>
+    	
+    	<OnChange key="%{data.peak}" from="255.0" to="0.0">
+			<SetValue key="kalk" scope="process" value="0" />
+			
+			<!-- 
+			<PrintData />
+		    <stream.image.DisplayImage image="data" />
+			 -->
+			
+			<!-- 
+			<stream.image.ShowColor key="color" />
+		    <stream.image.DisplayImage image="color" />
+			 -->
+			
+		    <SetValue key="count" value="1.0" />
+		    <stream.service.Reset service="min" />
+		    <!-- 
+		     -->
+		    <stream.service.Reset service="avg" />
+		    <!-- 
+		    <RemoveKeys keys="data" />
+		     -->
+	    	<Enqueue queue="capsules" />
+		</OnChange>
+    	
         <stream.plotter.Plotter
             history="1000"
             keepOpen="true"
-            keys="frame:red:avg,frame:blue:avg,frame:green:avg,dummy,peak" />
+            keys="frame:red:avg,frame:blue:avg,frame:green:avg,peak" />
+    	<!-- 
+		<PrintData />
+    	 -->
+    
+		<!-- 
+        <stream.plotter.Plotter
+            history="1000"
+            keepOpen="true"
+            keys="frame:red:avg,frame:blue:avg,frame:green:avg" />
+		 <Delay time="50ms"/>
+		 -->
+		 
 		 
 		<!-- 
 		<stream.io.DataObjectWriter file="/Volumes/RamDisk/bwinf-stream.obj" />
-		 <Delay time="35ms" />
 		 -->
+		    <!-- 
+		 <If condition="%{data.peak} @gt 0">
+		    <stream.image.ShowColor key="color" />
+		    <stream.image.DisplayImage image="color" />
+			 <Delay time="5s" />
+		 </If>
+		     -->
     </process>
     
 	<process input="capsules">
+
 	    <PrintData />
+	    <stream.io.CsvWriter url="file:/Volumes/RamDisk/kapseln.csv" />
+	    <stream.statistics.Sum keys="count" />
 	</process>
+    <!-- 
+     -->
 
 </container>

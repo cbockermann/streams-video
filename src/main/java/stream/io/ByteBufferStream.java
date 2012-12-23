@@ -51,6 +51,10 @@ public class ByteBufferStream {
 		this.continuous = continuous;
 	}
 
+	public long getBytesRead() {
+		return total;
+	}
+
 	public byte[] readNextChunk() throws IOException {
 
 		if (begin == 0L)
@@ -58,7 +62,7 @@ public class ByteBufferStream {
 		int read = 0;
 		do {
 
-			while (in.available() == 0) {
+			while (in.available() == 0 && continuous) {
 				try {
 					if (closed)
 						return null;
@@ -69,22 +73,20 @@ public class ByteBufferStream {
 			}
 
 			read = in.read(buf);
-			if (read > 0) {
-				total += read;
-			}
 
 			if (read < 0 && !continuous) {
 				return null;
 			}
+			total += read;
 
 			// if (verbose)
 			// System.out.println(read + " bytes read.");
 
-			int idx = indexOf(buf, startSignature, 0);
+			int idx = indexOf(buf, JPEG_EOI, 0);
 			int offset = 0;
 			if (idx >= 0) {
-				// System.err.println("Found starting byte-signature at "
-				// + (total + idx));
+				System.err.println("Found EOI byte-signature at "
+						+ (total + idx));
 				offset = idx;
 				if (offset > 0)
 					current.put(buf, 0, offset);
@@ -96,14 +98,14 @@ public class ByteBufferStream {
 
 				frames++;
 
-				if (verbose || frames % 50 == 0) {
-					Long time = System.currentTimeMillis() - begin;
-					Double seconds = time.doubleValue() / 1000.0d;
-
-					System.err.println(frames + " frames read ("
-							+ (frames.doubleValue() / seconds) + " fps, "
-							+ (total / seconds) + " bytes/second)");
-				}
+				// if (verbose || frames % 50 == 0) {
+				// Long time = System.currentTimeMillis() - begin;
+				// Double seconds = time.doubleValue() / 1000.0d;
+				//
+				// System.err.println(frames + " frames read ("
+				// + (frames.doubleValue() / seconds) + " fps, "
+				// + (total / seconds) + " bytes/second)");
+				// }
 
 				current.clear();
 				current.put(buf, offset, read - offset);

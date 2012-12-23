@@ -3,8 +3,10 @@
     <stream
         id="video"
         class="stream.io.MJpegImageStream"
-        url="file:/Users/chris/laser.mjpeg" />
+        url="file:/Volumes/RamDisk/test.mjpeg" />
         <!-- 
+	    url="http://kirmes.cs.uni-dortmund.de/vista.mjpeg" />
+        url="file:/Users/chris/laser.mjpeg" />
         url="http://download.jwall.org/stuff/laserpointer.mjpeg" />
         url="file:/Users/chris/laserpointer.mjpeg" />
          -->
@@ -18,9 +20,10 @@
         <stream.image.LaserTracker laserImage="gesture" />
         <stream.image.DisplayImage key="gesture" />
  -->
-
+        <!-- 
+		<stream.laser.TurboDiffImage image="data" />
         <stream.image.DisplayImage key="data" />
-        <Delay time="100ms" />
         <PrintData />
+         -->
     </process>
 </container>
