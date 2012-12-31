@@ -1,0 +1,10 @@
+<container>
+
+	<stream id="video" class="stream.io.MJpegImageStream"
+		   url="http://download.jwall.org/streams/laser-test-jonas.mjpeg" />
+		        
+ 	<process input="video">
+ 		<stream.image.DisplayImage image="data"/>
+ 	</process>
+
+</container>
