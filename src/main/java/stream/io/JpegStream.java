@@ -55,6 +55,7 @@ public class JpegStream {
 			throw new RuntimeException(
 					"Result buffer cannot be smaller than read-buffer!");
 		this.continuous = continuous;
+		log.debug("Stream created.");
 	}
 
 	public long getBytesRead() {

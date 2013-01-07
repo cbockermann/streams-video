@@ -1,0 +1,34 @@
+<container>
+
+<!-- 
+ -->
+	<stream id="video" class="stream.io.MJpegImageStream" 
+		   url="file:/Volumes/RamDisk/rtl.mjpeg" />
+		   <!-- 
+		   url="file:/Users/chris/tagesschau.mjpeg.stream.gz" />
+		    -->
+		   
+	<stream id="audio" class="stream.io.WavStream" blockSize="1200"
+		   url="file:/Volumes/RamDisk/rtl.wav"  />
+		   <!-- 
+		   url="file:/Users/chris/tagesschau.wav" />
+		    -->
+		   
+	<process input="video">
+	
+		<stream.video.Framerate fps="25" />		
+		<stream.image.DisplayImage image="data" />
+	</process>
+<!-- 
+ -->
+
+	<process input="audio">
+	
+		<stream.audio.PlayWavData />
+		
+		<!-- 
+		<PrintData />
+		 -->
+		<stream.plotter.Plotter keys="wav:min,wav:max,wav:avg,wav:variance" />
+	</process>
+</container>

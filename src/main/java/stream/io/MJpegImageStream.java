@@ -91,8 +91,10 @@ public class MJpegImageStream extends AbstractStream {
 	public void init() throws Exception {
 		super.init();
 
+		log.debug("Initializing stream...");
 		stream = new JpegStream(getInputStream(), readBufferSize.getBytes(),
 				bufferSize.getBytes(), isContinuous());
+		log.debug("Stream initialized.");
 	}
 
 	/**
