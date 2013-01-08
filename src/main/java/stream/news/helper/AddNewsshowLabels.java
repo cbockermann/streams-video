@@ -40,7 +40,8 @@ public class AddNewsshowLabels extends AbstractProcessor {
 					labels.put(Long.parseLong(frame), label);
 					counterCuts++;
 			} else {
-				if (transition.equals("GT")) {
+				if (frame != null && transition.equals("GT")) {
+					labels.put(Long.parseLong(frame), label);
 					counterGT++;
 				}
 			}
@@ -64,6 +65,8 @@ public class AddNewsshowLabels extends AbstractProcessor {
 			input.put("@label:shotboundary", true);
 			if (labels.get(frame) != null) {
 				lastlabel = labels.get(frame);
+			} else {
+				lastlabel="not definined";
 			}
 		} else {
 			input.put("@label:shotboundary", false);
@@ -75,8 +78,10 @@ public class AddNewsshowLabels extends AbstractProcessor {
 			input.put("@label:anchorshot", false);
 		}
 		
+		System.out.println(lastlabel + "  " + lastlabel.equalsIgnoreCase("AS"));
 		input.put("@label:shottype", lastlabel);
-
+		
+		
 		return input;
 	}
 

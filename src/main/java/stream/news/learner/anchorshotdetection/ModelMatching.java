@@ -2,7 +2,6 @@ package stream.news.learner.anchorshotdetection;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
@@ -29,7 +28,7 @@ public class ModelMatching extends AbstractImageProcessor {
 	 */
 	Integer t = 50;
 	ImageRGB modelImage = new ImageRGB(0, 0);
-	String model = "C:/Users/Matthias/Documents/SchulteSVN/Diplomarbeit/data/anchorshots/model.jpg";
+	String model = "C:/Users/Matthias/Documents/SchulteSVN/Diplomarbeit/data/anchorshots/2-scaled.jpg";
 	String predictionkey = "@prediction:anchorshot";
 	
 	/**
@@ -94,38 +93,52 @@ public class ModelMatching extends AbstractImageProcessor {
 	public Data process(Data item, ImageRGB img) {
 		
 		int pixels = 0;
+		
+		//int normalpixel = 0;
+		//int blackpixel = 0;
+		
+		
 		double similar = 0.0;
 
 		for (int i = 0; i < modelImage.getWidth(); i++) {
 			for (int j = 0; j < modelImage.getHeight(); j++) {
 
 				int rgbmodel = modelImage.getRGB(i, j);
-				int rgboriginal = img.getRGB(i, j);
-
+				
 				int rold = (rgbmodel >> 16) & 0xFF;
 				int gold = (rgbmodel >> 8) & 0xFF;
 				int bold = rgbmodel & 0xFF;
-
-				int rnew = (rgboriginal >> 16) & 0xFF;
-				int gnew = (rgboriginal >> 8) & 0xFF;
-				int bnew = rgboriginal & 0xFF;
 				
-				int rdiff = Math.abs(rold - rnew);
-				int gdiff = Math.abs(gold - gnew);
-				int bdiff = Math.abs(bold - bnew);
+				if (rold < 250 && gold <250 && bold < 250) {
 				
-				pixels++;
-				if ((rdiff < 20) && (gdiff < 20) && (bdiff < 20)) {
-					similar++;
-				}
+					//normalpixel++;
 					
+					int rgboriginal = img.getRGB(i, j);
+
+					int rnew = (rgboriginal >> 16) & 0xFF;
+					int gnew = (rgboriginal >> 8) & 0xFF;
+					int bnew = rgboriginal & 0xFF;
+				
+					int rdiff = Math.abs(rold - rnew);
+					int gdiff = Math.abs(gold - gnew);
+					int bdiff = Math.abs(bold - bnew);
+				
+					pixels++;
+					if ((rdiff < 55) && (gdiff < 55) && (bdiff < 55)) {
+						similar++;
+					}
+				} else {
+					//blackpixel++;
+				}
 			}
 		}
 
+		//System.out.println("Blackpixels " + blackpixel + " ,others: " + normalpixel);
+		
 		double similarityratio = (similar/pixels);
 		item.put("frame:similaritytoanchorshotmodel", similarityratio);
 		
-		if (similarityratio > 0.9) {
+		if (similarityratio > 0.5) {
 			item.put(predictionkey, true);
 		} else {
 			item.put(predictionkey, false);
