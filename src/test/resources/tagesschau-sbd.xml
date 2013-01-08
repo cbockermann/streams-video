@@ -3,7 +3,7 @@
     <stream
         id="video"
         class="stream.io.MJpegImageStream"
-        url="http://kirmes.cs.uni-dortmund.de/video/20120911.raw" />
+        url="http://kirmes.cs.uni-dortmund.de/video/20120911-small.raw" />
 <!-- 
         url="file:/Volumes/RamDisk/video.mjpeg.raw" />
         url="http://kirmes.cs.uni-dortmund.de/video/video.mjpeg.raw" />
@@ -12,27 +12,22 @@
 
     <process input="video" >
  <!--        
--->        
         <stream.image.DisplayImage image="data" />
-        
+-->        
         <CreateID key="frame:id" />
-		<stream.news.helper.AddNewsshowLabels />
-		 
-		<stream.news.learner.anchorshotdetection.ModelMatching />
-		
-        
-        <stream.plotter.Plotter
-            history="1000"
-            keepOpen="true"
-            keys="frame:similaritytoanchorshotmodel" />
-    	
-<!--     	
+		<stream.news.helper.AddNewsshowLabels /> 
         <stream.laser.DiffImage threshold="0"/>
         <stream.image.ColorToGrayscale />
         <stream.image.AverageRGB />
         <stream.news.learner.sbdetection.GrayThreshold t="35" />
         <stream.news.helper.ErrorOutput />
         
+    	
+<!--     	
+        <stream.plotter.Plotter
+            history="1000"
+            keepOpen="true"
+            keys="frame:red:avg" />
         <stream.image.DisplayImage image="data" />
             
 -->            

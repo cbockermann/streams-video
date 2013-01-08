@@ -22,11 +22,10 @@ public class AddNewsshowLabels extends AbstractProcessor {
 		Integer counterCuts = 0;
 		Integer counterGT = 0;
 
-		//file = "file:/Volumes/RamDisk/transitions.csv";
-
 		CsvStream stream = new CsvStream(new SourceURL(file));
-//		CsvStream stream = new CsvStream(new SourceURL("classpath:/transitions.csv"));
+		
 		stream.init();
+		
 		labels.put(1L, "Intro");
 
 		Data item = stream.read();
@@ -70,7 +69,13 @@ public class AddNewsshowLabels extends AbstractProcessor {
 			input.put("@label:shotboundary", false);
 		}
 
-		input.put("ShotType", lastlabel);
+		if (lastlabel.equalsIgnoreCase("AS")) {
+			input.put("@label:anchorshot", true);
+		} else {
+			input.put("@label:anchorshot", false);
+		}
+		
+		input.put("@label:shottype", lastlabel);
 
 		return input;
 	}

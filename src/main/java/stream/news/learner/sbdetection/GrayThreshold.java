@@ -4,7 +4,7 @@ import stream.AbstractProcessor;
 import stream.Data;
 
 /**
- * This processor predicts shot boundaries based on the DiffImages of two successive frames. It can only
+ * This processor is a classifier, predicting shot boundaries based on the DiffImages of two successive frames. It can only
  * be applied, after the DiffImage has already been calculated.
  * If the average gray value of the DiffImages exceeds a given threshold t, the frame is labeled as a shot boundary. 
  * 
@@ -18,6 +18,7 @@ public class GrayThreshold extends AbstractProcessor {
 	 */
 	Integer t = 50;
 	String graykey = "frame:red:avg";
+	String predictionkey = "@prediction:shotboundary";
 	
 	/**
 	 * Sets the threshold t to a new value.
@@ -51,6 +52,22 @@ public class GrayThreshold extends AbstractProcessor {
 		return graykey;
 	}
 	
+	/**
+	 * Sets the key under which the classifier shall store the predicted label.
+	 * @param predictionkey
+	 */
+	public void setPredictionkey(String predictionkey) {
+		this.predictionkey = predictionkey;
+	}
+	
+	/**
+	 * Delivers the key under which the classifier currently stores the predicted label.
+	 * @return
+	 */
+	public String getPredictionkey() {
+		return predictionkey;
+	}
+	
 	@Override
 	public Data process(Data input) {
 		
@@ -64,14 +81,7 @@ public class GrayThreshold extends AbstractProcessor {
 			prediction = true;
 		}
 		
-		input.put("@prediction:shotboundary", prediction);
-		
-		//For debugging only
-		//Boolean sb = (Boolean) input.get("ShotBoundary");
-		//Integer frame = (Integer) input.get("frame:id");
-		//if (prediction != sb) {
-		//	System.out.println("Prediction error at frame: " + frame + " Prediction: " + prediction + ". Real label: " + sb +".");
-		//}
+		input.put(predictionkey, prediction);
 		
 		return input;
 	}
