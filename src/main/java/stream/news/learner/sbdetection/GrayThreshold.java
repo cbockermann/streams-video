@@ -4,8 +4,9 @@ import stream.AbstractProcessor;
 import stream.Data;
 
 /**
- * This operator predicts shot boundaries based on the DiffImages of two successive frames.
- * If the average gray value of the images exceeds a given threshold t, the frame is labeled as a shot boundary. 
+ * This processor predicts shot boundaries based on the DiffImages of two successive frames. It can only
+ * be applied, after the DiffImage has already been calculated.
+ * If the average gray value of the DiffImages exceeds a given threshold t, the frame is labeled as a shot boundary. 
  * 
  * @author Matthias
  *
@@ -19,7 +20,7 @@ public class GrayThreshold extends AbstractProcessor {
 	String graykey = "frame:red:avg";
 	
 	/**
-	 * Sets the threshold t
+	 * Sets the threshold t to a new value.
 	 * @param t Threshold
 	 */
 	public void setT(Integer t) {
@@ -27,13 +28,28 @@ public class GrayThreshold extends AbstractProcessor {
 	}
 	
 	/**
-	 * 
+	 * Returns the current threshold the processor is working with.
 	 * @return Threshold
 	 */
 	public Integer getT() {
 		return t;
 	}
 	
+	/**
+	 * Tells the GrayThreshold processor, where to find the gray value of the pixels.
+	 * @param graykey
+	 */
+	public void setGraykey(String graykey) {
+		this.graykey = graykey;
+	}
+	
+	/**
+	 * Delivers the string, under which the processor expects the gray value of the input image to be found.
+	 * @return the current key, the processor expects the gray value to be stored under.
+	 */
+	public String getGraykey() {
+		return graykey;
+	}
 	
 	@Override
 	public Data process(Data input) {
