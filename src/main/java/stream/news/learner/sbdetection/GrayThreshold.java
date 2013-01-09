@@ -4,8 +4,9 @@ import stream.AbstractProcessor;
 import stream.Data;
 
 /**
- * This operator predicts shot boundaries based on the DiffImages of two successive frames.
- * If the average gray value of the images exceeds a given threshold t, the frame is labeled as a shot boundary. 
+ * This processor is a classifier, predicting shot boundaries based on the DiffImages of two successive frames. It can only
+ * be applied, after the DiffImage has already been calculated.
+ * If the average gray value of the DiffImages exceeds a given threshold t, the frame is labeled as a shot boundary. 
  * 
  * @author Matthias
  *
@@ -17,9 +18,10 @@ public class GrayThreshold extends AbstractProcessor {
 	 */
 	Integer t = 50;
 	String graykey = "frame:red:avg";
+	String predictionkey = "@prediction:shotboundary";
 	
 	/**
-	 * Sets the threshold t
+	 * Sets the threshold t to a new value.
 	 * @param t Threshold
 	 */
 	public void setT(Integer t) {
@@ -27,13 +29,44 @@ public class GrayThreshold extends AbstractProcessor {
 	}
 	
 	/**
-	 * 
+	 * Returns the current threshold the processor is working with.
 	 * @return Threshold
 	 */
 	public Integer getT() {
 		return t;
 	}
 	
+	/**
+	 * Tells the GrayThreshold processor, where to find the gray value of the pixels.
+	 * @param graykey
+	 */
+	public void setGraykey(String graykey) {
+		this.graykey = graykey;
+	}
+	
+	/**
+	 * Delivers the string, under which the processor expects the gray value of the input image to be found.
+	 * @return the current key, the processor expects the gray value to be stored under.
+	 */
+	public String getGraykey() {
+		return graykey;
+	}
+	
+	/**
+	 * Sets the key under which the classifier shall store the predicted label.
+	 * @param predictionkey
+	 */
+	public void setPredictionkey(String predictionkey) {
+		this.predictionkey = predictionkey;
+	}
+	
+	/**
+	 * Delivers the key under which the classifier currently stores the predicted label.
+	 * @return
+	 */
+	public String getPredictionkey() {
+		return predictionkey;
+	}
 	
 	@Override
 	public Data process(Data input) {
@@ -48,14 +81,7 @@ public class GrayThreshold extends AbstractProcessor {
 			prediction = true;
 		}
 		
-		input.put("@prediction:shotboundary", prediction);
-		
-		//For debugging only
-		//Boolean sb = (Boolean) input.get("ShotBoundary");
-		//Integer frame = (Integer) input.get("frame:id");
-		//if (prediction != sb) {
-		//	System.out.println("Prediction error at frame: " + frame + " Prediction: " + prediction + ". Real label: " + sb +".");
-		//}
+		input.put(predictionkey, prediction);
 		
 		return input;
 	}

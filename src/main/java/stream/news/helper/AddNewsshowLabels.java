@@ -22,11 +22,10 @@ public class AddNewsshowLabels extends AbstractProcessor {
 		Integer counterCuts = 0;
 		Integer counterGT = 0;
 
-		//file = "file:/Volumes/RamDisk/transitions.csv";
-
 		CsvStream stream = new CsvStream(new SourceURL(file));
-//		CsvStream stream = new CsvStream(new SourceURL("classpath:/transitions.csv"));
+		
 		stream.init();
+		
 		labels.put(1L, "Intro");
 
 		Data item = stream.read();
@@ -41,7 +40,8 @@ public class AddNewsshowLabels extends AbstractProcessor {
 					labels.put(Long.parseLong(frame), label);
 					counterCuts++;
 			} else {
-				if (transition.equals("GT")) {
+				if (frame != null && transition.equals("GT")) {
+					labels.put(Long.parseLong(frame), label);
 					counterGT++;
 				}
 			}
@@ -65,13 +65,23 @@ public class AddNewsshowLabels extends AbstractProcessor {
 			input.put("@label:shotboundary", true);
 			if (labels.get(frame) != null) {
 				lastlabel = labels.get(frame);
+			} else {
+				lastlabel="not definined";
 			}
 		} else {
 			input.put("@label:shotboundary", false);
 		}
 
-		input.put("ShotType", lastlabel);
-
+		if (lastlabel.equalsIgnoreCase("AS")) {
+			input.put("@label:anchorshot", true);
+		} else {
+			input.put("@label:anchorshot", false);
+		}
+		
+		System.out.println(lastlabel + "  " + lastlabel.equalsIgnoreCase("AS"));
+		input.put("@label:shottype", lastlabel);
+		
+		
 		return input;
 	}
 
