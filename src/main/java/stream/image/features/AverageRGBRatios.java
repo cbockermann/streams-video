@@ -1,9 +1,11 @@
 /**
  * 
  */
-package stream.image;
+package stream.image.features;
 
 import stream.Data;
+import stream.image.AbstractImageProcessor;
+import stream.image.ImageRGB;
 
 /**
  * @author chris

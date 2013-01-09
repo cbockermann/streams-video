@@ -1,13 +1,16 @@
 /**
  * 
  */
-package stream.image;
+package stream.image.features;
 
 import stream.Data;
+import stream.image.AbstractImageProcessor;
+import stream.image.ImageRGB;
 
 /**
- * @author chris
+ * This processor computes the average color value for all three RGB channels
  * 
+ * @author chris, Matthias
  */
 public class AverageRGB extends AbstractImageProcessor {
 
@@ -41,8 +44,9 @@ public class AverageRGB extends AbstractImageProcessor {
 			g += green;
 			b += blue;
 		}
+		
 		px -= skipped;
-		log.info("Skipped {} fully transparent pixels", skipped);
+		//log.info("Skipped {} fully transparent pixels", skipped);
 		r = r / px;
 		g = g / px;
 		b = b / px;
