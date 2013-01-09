@@ -2,9 +2,9 @@
 
 	<stream id="video" class="stream.io.MJpegImageStream"
 		bufferSize="1mb" limit="500"
-
-	url="file:/Users/hendrik/Documents/Arbeit/FB40/laser1.mjpeg"/>
+url="http://download.jwall.org/streams/laser-with-filter.mjpeg" />
 	<!-- 
+	url="file:/Users/hendrik/Documents/Arbeit/FB40/laser1.mjpeg"/>
 		url="http://download.jwall.org/streams/laser-whiteboard.mjpeg" />
 	    url="file:/Volumes/RamDisk/laser.mjpeg" />
 		 -->
@@ -16,20 +16,17 @@
 		<!-- 
 		 -->
 		<stream.image.DisplayImage image="data" />
-		<!-- <stream.laser.TurboDiffImageMultithread image="data" threshold="50"/> 
-			<stream.laser.DiffImage image="data" threshold="50"/> <stream.flow.Enqueue 
-			queue="frames"/> -->
-		<stream.laser.TurboRedDiffImage image="data"
-			threshold="30" />
-		<stream.laser.LaserTracker image="data"
-			threshold="40" searchSize="50" />
-			<!-- 
+		<stream.laser.TurboGreenDiffImage image="data"
+			threshold="10" />
+			
+		<stream.laser.LaserTrackerGreen image="data"
+			threshold="10" searchSize="50" />
 		<stream.laser.FrameRate />
-		 -->
+
 		<stream.image.DisplayImage image="data" />
-		<!-- 
-		<Delay time="15ms" />
+ 
 		 -->
+		<Delay time="15ms" />
 		<!-- <stream.net.DataTap address="0.0.0.0" port="9100" /> -->
 
 	</process>

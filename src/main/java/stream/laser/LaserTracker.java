@@ -293,7 +293,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		initialPoint = null;
 		initialRGB = -1;
 		initialMagic = 0;
-		return item;
+//		return item;
 	}
 
 	private Point evaluateLaserPointer(Point ep, int oldRGB, ImageRGB img) {
