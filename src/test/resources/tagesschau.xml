@@ -16,18 +16,34 @@
 -->        
         
         <CreateID key="frame:id" />
+        
 		<stream.news.helper.AddNewsshowLabels />
 		
-		<stream.news.learner.anchorshotdetection.ModelMatching />
-		 
+		<stream.image.features.CenterOfMass colorchannel="red" normalized="true" />
+		<stream.image.features.CenterOfMass colorchannel="black_and_white" normalized="true" />
+		
+		
+		<stream.image.features.MedianRGB />
+		<stream.image.features.AverageRGB /> 
             
-		<!-- 
-		<stream.news.learner.anchorshotdetection.AnchorshotModelCreator />
-		 
         <stream.plotter.Plotter
             history="1000"
             keepOpen="true"
-            keys="frame:similaritytoanchorshotmodel" />
+            keys="frame:black_and_white:CenterOfMass:normalizedY,frame:black_and_white:CenterOfMass:normalizedX" />
+        
+        <stream.io.CsvWriter url="file:///C:/Users/Matthias/Documents/SchulteSVN/Diplomarbeit/data/news20120911/stream_features.csv" 
+          separator=";" keys="frame:id,frame:red:CenterOfMass:normalizedY,frame:blue:median,frame:black_and_white:CenterOfMass:normalizedX,@label:anchorshot"/>
+		
+		
+		<!--
+		 
+		<stream.image.features.CenterOfMass colorchannel="green" normalized="true" />
+		<stream.image.features.CenterOfMass colorchannel="blue" normalized="true" />
+        <stream.image.DisplayImage image="data" />
+
+		<stream.news.learner.anchorshotdetection.ModelMatching />
+		<stream.news.learner.anchorshotdetection.AnchorshotModelCreator />
+		 
 		 -->
 		
         
@@ -39,10 +55,9 @@
         <stream.news.learner.sbdetection.GrayThreshold t="35" />
         <stream.news.helper.ErrorOutput />
         
-        <stream.image.DisplayImage image="data" />
             
--->            
     	<stream.learner.evaluation.PredictionError label="@label:anchorshot" />
+-->            
 
 
 <!--  
