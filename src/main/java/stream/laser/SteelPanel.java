@@ -5,13 +5,16 @@ package stream.laser;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +74,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 		ArrayList<PointT> points = this.cut; // sword.getTrace();
 		for (int i = 0; i < points.size(); i++) {
 			PointT p = points.get(i);
-			if (last == null)
+			if (last == null || p.timestamp - last.timestamp > 200)
 				last = p;
 
 			g.drawLine(last.x, last.y, p.x, p.y);
@@ -109,8 +112,16 @@ public class SteelPanel extends JPanel implements PointerListener {
 			timestamp = System.currentTimeMillis();
 		}
 
+		public PointT(java.lang.Double x, java.lang.Double y) {
+			this(x.intValue(), y.intValue());
+		}
+
 		public long age() {
 			return System.currentTimeMillis() - timestamp;
+		}
+
+		public String toString() {
+			return "PointT(" + this.x + "," + this.y + ")@" + timestamp;
 		}
 	}
 
@@ -119,21 +130,42 @@ public class SteelPanel extends JPanel implements PointerListener {
 		JFrame frame = new JFrame();
 		frame.setUndecorated(true);
 
+		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+
 		final SteelPanel panel = new SteelPanel();
 
-		NetworkPointer pointer = new NetworkPointer(9100);
-		// pointer.addListener(panel);
-		pointer.setDaemon(true);
-		pointer.start();
+		InetSocketAddress addr = null;
+		if (args.length > 1) {
+			addr = new InetSocketAddress(args[0], new Integer(args[1]));
+		}
 
-		final Calibration c = new Calibration(panel);
-		pointer.addListener(c);
+		if (args.length > 0) {
+			addr = new InetSocketAddress(args[0], 9100);
+		}
+
+		Integer w = new Integer(System.getProperty("width", "" + screen.width));
+		Integer h = new Integer(
+				System.getProperty("height", "" + screen.height));
+		Integer x = new Integer(System.getProperty("x", "0"));
+		Integer y = new Integer(System.getProperty("y", "0"));
+
+		NetworkPointer pointer = null;
+		if (addr != null) {
+			pointer = new NetworkPointer(addr);
+			// pointer.addListener(panel);
+			pointer.setDaemon(true);
+			pointer.start();
+		}
 
 		frame.getContentPane().add(panel);
-		frame.setSize(1024, 768);
+		frame.setSize(w, h);
 		frame.addComponentListener(new WindowInfo(frame));
-		frame.setLocation(-1024, 0);
+		frame.setLocation(x, y);
 		frame.setVisible(true);
+
+		final Calibration c = new Calibration(panel);
+		if (pointer != null)
+			pointer.addListener(c);
 
 		JDialog control = new JDialog();
 		JButton clear = new JButton("clear");
@@ -146,19 +178,12 @@ public class SteelPanel extends JPanel implements PointerListener {
 			}
 		});
 
-		final JButton cal = new JButton("Start Calibration");
+		final JButton cal = new JButton("Calibration");
 		cal.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (c.running) {
-					c.stop();
-				} else {
-					Thread t = new Thread(c);
-					t.setDaemon(true);
-					t.start();
-					cal.setText("Stop Calibration");
-				}
+				c.nextMark();
 			}
 		});
 

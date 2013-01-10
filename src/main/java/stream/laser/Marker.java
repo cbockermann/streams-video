@@ -47,7 +47,28 @@ public class Marker extends ADrawable {
 
 		Color old = g.getColor();
 		g.setColor(color);
-		g.fillOval(x.intValue() - radius, y.intValue() - radius, radius, radius);
+		g.fillOval(x.intValue() - radius / 2, y.intValue() - radius / 2,
+				radius, radius);
 		g.setColor(old);
+	}
+
+	public String toString() {
+		return "Marker(" + this.x + "," + this.y + ")";
+	}
+
+	public int hashCode() {
+		return toString().hashCode();
+	}
+
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+
+		if (o instanceof Marker) {
+			Marker other = (Marker) o;
+			return toString().equals(other.toString());
+		}
+
+		return false;
 	}
 }

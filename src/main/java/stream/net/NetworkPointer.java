@@ -24,12 +24,12 @@ public class NetworkPointer extends Thread {
 	DatagramSocket socket;
 	final List<PointerListener> listener = new ArrayList<PointerListener>();
 
-	public NetworkPointer(int port) throws Exception {
+	public NetworkPointer(InetSocketAddress addr) throws Exception {
 		// socket = new DatagramSocket();
-		socket = new DatagramSocket(
-				new InetSocketAddress("192.168.128.4", port));
+		socket = new DatagramSocket(addr);
+		// new InetSocketAddress("192.168.128.4", port));
 		log.info("socket bound to {}", socket.getLocalSocketAddress());
-		log.info("NetworkPointer listening on UDP port {}", port);
+		log.info("NetworkPointer listening on UDP port {}", addr.getPort());
 	}
 
 	public void addListener(PointerListener l) {
@@ -76,7 +76,8 @@ public class NetworkPointer extends Thread {
 
 		try {
 
-			NetworkPointer pointer = new NetworkPointer(9100);
+			NetworkPointer pointer = new NetworkPointer(new InetSocketAddress(
+					"127.0.0.1", 9100));
 
 			// Calibration cal = new Calibration(1024, 768, null);
 			// pointer.addListener(cal);

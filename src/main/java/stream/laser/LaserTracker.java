@@ -61,7 +61,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		output = imageKey;
 		evalMagic = 0;
 		initialMagic = 0;
-		fSize=30;
+		fSize = 30;
 		fPoints = new Point[fSize];
 	}
 
@@ -193,21 +193,29 @@ public class LaserTracker extends AbstractImageProcessor {
 			initialPoint = getInitialPoint(img);
 			if (initialPoint != null) {
 				initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
-				log.info(
-						"********************* found initial point {} ***************************",
-						initialPoint);
+				// log.info(
+				// "********************* found initial point {} ***************************",
+				// initialPoint);
 				if (c < fPoints.length) {
 					fPoints[c++] = initialPoint;
 					for (Point fp : fPoints) {
-						if(fp==null)
+						if (fp == null)
 							break;
 						markLaserPointer2(fp, img, 0, 255, 0);
 					}
 				} else {
 					fPoints = new Point[fSize];
-					c=0;
+					c = 0;
 				}
-				this.sendUDP();
+				if (socket != null)
+					sendUDP();
+
+				if (initialPoint != null) {
+					item.put("laser:x", initialPoint.x);
+					item.put("laser:y", initialPoint.y);
+					if (socket != null)
+						sendUDP();
+				}
 			}
 			item.put(output, img);
 			return item;
@@ -224,6 +232,10 @@ public class LaserTracker extends AbstractImageProcessor {
 					initialMagic = 0;
 					initialPoint = null;
 				}
+			}
+			if (initialPoint != null) {
+				item.put("laser:x", initialPoint.x);
+				item.put("laser:y", initialPoint.y);
 			}
 			item.put(output, img);
 			return item;
@@ -244,18 +256,19 @@ public class LaserTracker extends AbstractImageProcessor {
 			if (c < fPoints.length) {
 				fPoints[c++] = initialPoint;
 				for (Point fp : fPoints) {
-					if(fp==null)
+					if (fp == null)
 						break;
 					markLaserPointer2(fp, img, 0, 255, 0);
 				}
 			} else {
 				fPoints = new Point[fSize];
-				c=0;
+				c = 0;
 			}
 			item.put(output, img);
 			item.put("laser:x", initialPoint.x);
 			item.put("laser:y", initialPoint.y);
-			this.sendUDP();
+			if (socket != null)
+				sendUDP();
 			return item;
 		}
 		//
@@ -290,10 +303,10 @@ public class LaserTracker extends AbstractImageProcessor {
 		// return null;
 
 		// log.info("can't find laserPointer");
-		initialPoint = null;
-		initialRGB = -1;
-		initialMagic = 0;
-//		return item;
+		// initialPoint = null;
+		// initialRGB = -1;
+		// initialMagic = 0;
+		// return item;
 	}
 
 	private Point evaluateLaserPointer(Point ep, int oldRGB, ImageRGB img) {
@@ -396,7 +409,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		if (idx < img.pixels.length && idx >= 0)
 			img.pixels[idx] = color;
 	}
-	
+
 	private void markLaserPointer2(Point p, ImageRGB img, int r, int g, int b) {
 		int x = p.x;
 		int y = p.y;
@@ -461,7 +474,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		x /= points.length;
 		y /= points.length;
 		Point r = new Point(x, y);
-		log.info("found point {}", r);
+		// log.info("found point {}", r);
 		return r;
 	}
 
@@ -484,7 +497,7 @@ public class LaserTracker extends AbstractImageProcessor {
 		x /= dist;
 		y /= dist;
 		Point r = new Point(x, y);
-		log.info("found point {}", r);
+		// log.info("found point {}", r);
 		return r;
 	}
 
