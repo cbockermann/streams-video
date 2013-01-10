@@ -9,6 +9,7 @@ import stream.image.ImageRGB;
 
 /**
  * @author chris
+ * @deprecated Please use the AverageRGB processor with includeRatios="true" instead.
  * 
  */
 public class AverageRGBRatios extends AbstractImageProcessor {

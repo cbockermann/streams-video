@@ -8,16 +8,32 @@ import stream.image.AbstractImageProcessor;
 import stream.image.ImageRGB;
 
 /**
- * This processor computes the average color value for all three RGB channels
+ * This processor computes the average color value for all three RGB channels.
  * 
  * @author chris, Matthias
  */
 public class AverageRGB extends AbstractImageProcessor {
 
+	Boolean includeRatios = false;
+	
 	/**
-	 * @see stream.image.AbstractImageProcessor#process(stream.Data,
-	 *      java.awt.image.BufferedImage)
+	 * If desired, the processor includes the ration between the color channels. Rations are
+	 * { (red/blue), (red/green), (green/blue) }.
+	 * 
+	 * @param includeRatios
 	 */
+	public void setIncludeRatios(boolean includeRatios) {
+		this.includeRatios = includeRatios;
+	}
+	
+	/**
+	 * Delivers, if the processor is including the ratios or not.
+	 * @return
+	 */
+	public Boolean getIncludeRatios() {
+		return includeRatios;
+	}
+	
 	@Override
 	public Data process(Data item, ImageRGB img) {
 
@@ -51,9 +67,15 @@ public class AverageRGB extends AbstractImageProcessor {
 		g = g / px;
 		b = b / px;
 
-		item.put("frame:red:avg", r);
-		item.put("frame:blue:avg", b);
-		item.put("frame:green:avg", g);
+		item.put("frame:red:average", r);
+		item.put("frame:blue:average", b);
+		item.put("frame:green:average", g);
+		
+		if (includeRatios) {
+			item.put("frame:ratio:red_blue", r / b);
+			item.put("frame:ratio:red_green", r / g);
+			item.put("frame:ratio:green_blue", g / b);
+		}
 		return item;
 	}
 }
