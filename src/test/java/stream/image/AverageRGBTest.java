@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.data.DataFactory;
+import stream.image.features.AverageRGB;
 import stream.runtime.ProcessContextImpl;
 
 /**

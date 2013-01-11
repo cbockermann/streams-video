@@ -12,6 +12,14 @@ import stream.io.SourceURL;
 public class AddNewsshowLabels extends AbstractProcessor {
 
 	String file = "file:///C:/Users/Matthias/Documents/SchulteSVN/Diplomarbeit/data/news20120911/transitions.csv";
+	
+	public void setFile(String file) {
+		this.file = file;
+	}
+	
+	public String getFile() {
+		return file;
+	}
 
 	private Map<Long, String> labels = new HashMap<Long, String>();
 	private String lastlabel = "intro";
