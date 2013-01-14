@@ -14,6 +14,7 @@ import stream.image.ImageRGB;
  */
 public class AverageRGB extends AbstractImageProcessor {
 
+//	static Logger log = org.slf4j.LoggerFactory.getLogger(AverageRGB.class);
 	Boolean includeRatios = false;
 	
 	/**
@@ -41,16 +42,16 @@ public class AverageRGB extends AbstractImageProcessor {
 		double g = 0.0;
 		double b = 0.0;
 		double px = img.pixels.length;
-		int skipped = 0;
+//		int skipped = 0;
 
 		for (int i = 0; i < img.pixels.length; i++) {
 			int argb = img.pixels[i];
 
-			int alpha = (argb >> 24) & 0xff;
-			if (alpha == 0) {
-				skipped++;
-				continue;
-			}
+//			int alpha = (argb >> 24) & 0xff;
+//			if (alpha == 0) {
+//				skipped++;
+//				continue;
+//			}
 
 			int red = (argb >> 16) & 0xFF;
 			int green = (argb >> 8) & 0xFF;
@@ -61,8 +62,8 @@ public class AverageRGB extends AbstractImageProcessor {
 			b += blue;
 		}
 		
-		px -= skipped;
-		//log.info("Skipped {} fully transparent pixels", skipped);
+//		px -= skipped;
+//		log.info("Skipped {} fully transparent pixels", skipped);
 		r = r / px;
 		g = g / px;
 		b = b / px;
