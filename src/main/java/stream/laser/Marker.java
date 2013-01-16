@@ -5,6 +5,7 @@ package stream.laser;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 
 /**
  * @author Christian Bockermann
@@ -35,6 +36,10 @@ public class Marker extends ADrawable {
 	public void translate(float dx, float dy) {
 		x += dx;
 		y += dy;
+	}
+
+	public Point getPoint() {
+		return new Point(x.intValue(), y.intValue());
 	}
 
 	/**

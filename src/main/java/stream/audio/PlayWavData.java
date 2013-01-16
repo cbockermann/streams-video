@@ -63,6 +63,7 @@ public class PlayWavData extends AbstractProcessor {
 	@Override
 	public Data process(Data input) {
 
+		log.info("processing {}", input);
 		if (header == null) {
 
 			if (input.containsKey("wav:samplerate")) {
@@ -73,7 +74,7 @@ public class PlayWavData extends AbstractProcessor {
 						input.get("wav:bytesPerSample") + "");
 
 				header = new AudioFormat(sampleRate.floatValue(),
-						8 * bytesPerSample, channels, true, true);
+						8 * bytesPerSample, channels, true, false);
 
 				log.info("Initializing audio output...");
 

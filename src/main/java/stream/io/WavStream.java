@@ -58,6 +58,7 @@ public class WavStream extends AbstractStream {
 	protected int blockSize = 48000;
 	protected Long blocksRead = 0L;
 	final Data header = DataFactory.create();
+	boolean eos = false;
 
 	public WavStream(SourceURL source) {
 		super(source);
@@ -224,6 +225,8 @@ public class WavStream extends AbstractStream {
 		// frameCounter = 0L;
 
 		log.info("Sample rate is: {}", this.sampleRate);
+		log.info("  chunk size is: {}", chunkSize);
+		this.blockSize = (new Long(chunkSize)).intValue();
 		log.info("  each sample is for {} seconds",
 				1.0d / sampleRate.doubleValue());
 		log.info("  stream block size is: {} ({} seconds for each block)",
@@ -244,14 +247,16 @@ public class WavStream extends AbstractStream {
 		return val;
 	}
 
-	public long readSample() throws IOException, WavFileException {
-		long val = 0;
+	public double readSample() throws IOException, WavFileException {
+		double val = 0;
 
 		for (int b = 0; b < bytesPerSample; b++) {
 			if (bufferPointer == bytesRead) {
 				int read = in.read(buffer, 0, BUFFER_SIZE);
-				if (read == -1)
-					throw new WavFileException("Not enough data available");
+				if (read < 0) {
+					eos = true;
+					return Double.NaN;
+				}
 				bytesRead = read;
 				bufferPointer = 0;
 			}
@@ -268,6 +273,10 @@ public class WavStream extends AbstractStream {
 	}
 
 	public Data readNext() throws Exception {
+
+		if (eos)
+			return null;
+
 		Data item = DataFactory.create();
 
 		if (blocksRead == 0)
@@ -277,12 +286,33 @@ public class WavStream extends AbstractStream {
 		double max = 0.0d;
 		double avg = 0.0d;
 		double[] block = new double[blockSize];
+		int last = 0;
+		int read = 0;
 		for (int i = 0; i < block.length; i++) {
-			block[i] = (double) readSample();
-
+			double sample = readSample();
+			if (sample == Double.NaN) {
+				eos = true;
+				log.info("EOS! Last successful block was {}", i);
+				break;
+			} else {
+				block[i] = sample;
+				last++;
+				read++;
+			}
 			min = Math.min(min, block[i]);
 			max = Math.max(max, block[i]);
 			avg += block[i];
+		}
+
+		log.info("{} samples successfully read", read);
+
+		if (last < block.length) {
+			log.info("Shrinking block to {} samples", last);
+			double[] nb = new double[last];
+			for (int i = 0; i < last; i++) {
+				nb[i] = block[i];
+			}
+			block = nb;
 		}
 
 		avg = avg / block.length;
@@ -300,6 +330,7 @@ public class WavStream extends AbstractStream {
 
 		item.put("wav:position", blocksRead.doubleValue() * blockSize * rate);
 		item.put("wav:samples", block);
+		item.put("wav:blocklength", block.length);
 		item.put("wav:max", max);
 		item.put("wav:min", min);
 		item.put("wav:variance", var);

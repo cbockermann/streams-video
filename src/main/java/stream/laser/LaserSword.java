@@ -10,7 +10,7 @@ import java.util.Iterator;
 
 import javax.swing.ImageIcon;
 
-import stream.laser.SteelPanel.PointT;
+import stream.laser.game.PointT;
 
 /**
  * @author chris

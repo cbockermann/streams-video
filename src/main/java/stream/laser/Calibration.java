@@ -8,24 +8,29 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
+import org.apache.commons.math.linear.RealMatrix;
+import org.apache.commons.math.linear.RealMatrixImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import stream.laser.SteelPanel.PointT;
+import stream.laser.game.PointT;
 import stream.net.PointerListener;
+import stream.video.TrapezoidCorrection;
 
 /**
  * @author Christian Bockermann
  * 
  */
-public class Calibration implements PointerListener, Runnable {
+public class Calibration implements PointerListener {
 
 	static Logger log = LoggerFactory.getLogger(Calibration.class);
 	final SteelPanel panel;
 	Marker mark;
 	boolean running = false;
+
+	public final static RealMatrix IDENTITY = new RealMatrixImpl(
+			new double[][] { { 1.0, 0.0 }, { 0.0, 1.0 } });
 
 	Long last = 0L;
 	PointT lastPoint = null;
@@ -37,6 +42,9 @@ public class Calibration implements PointerListener, Runnable {
 	int lastMark = -1;
 	List<Marker> calibrationMarks = new ArrayList<Marker>();
 	Map<Marker, PointT> calibrationPoints = new LinkedHashMap<Marker, PointT>();
+	Trapez trapez;
+
+	RealMatrix mapping = null;
 
 	public Calibration(SteelPanel panel) {
 		this.panel = panel;
@@ -53,18 +61,6 @@ public class Calibration implements PointerListener, Runnable {
 		calibrationMarks.add(new Marker(w - border, border, Color.WHITE));
 		calibrationMarks.add(new Marker(w - border, h - border, Color.WHITE));
 		calibrationMarks.add(new Marker(-1, -1, Color.white));
-
-		// panel.addMouseMotionListener(new MouseAdapter() {
-		// /**
-		// * @see
-		// java.awt.event.MouseAdapter#mouseMoved(java.awt.event.MouseEvent)
-		// */
-		// @Override
-		// public void mouseMoved(MouseEvent e) {
-		// super.mouseMoved(e);
-		// System.out.println(e);
-		// }
-		// });
 	}
 
 	public void nextMark() {
@@ -91,6 +87,19 @@ public class Calibration implements PointerListener, Runnable {
 			PointT bl = calibrationPoints.get(blm);
 			PointT tr = calibrationPoints.get(trm);
 			PointT br = calibrationPoints.get(brm);
+
+			trapez = new Trapez(tl, bl, tr, br);
+
+			panel.setTrapez(trapez);
+
+			Trapez g = new Trapez(tlm.getPoint(), blm.getPoint(),
+					trm.getPoint(), brm.getPoint());
+
+			RealMatrix a = TrapezoidCorrection.compute(trapez, g);
+			log.info("Correction:\n{}", a);
+			if ("true".equalsIgnoreCase(System.getProperty("trapezKorrektur"))) {
+				mapping = a;
+			}
 
 			offX = tl.x;
 			offY = tl.y;
@@ -121,70 +130,42 @@ public class Calibration implements PointerListener, Runnable {
 		// log.info("   laser at {},{}", lastPoint.x, lastPoint.y);
 		// log.info("------------------------------------------------------------");
 
-		PointT orig = new PointT(x, y);
-		PointT point = new PointT((x - offX) * scaleX, (y - offY) * scaleY);
-		log.info("Mapping {} to {}", orig, point);
+		// log.info("Mapping {} to {}", orig, point);
 
 		if (mark != null && mark.x >= 0 && mark.y >= 0) {
 			log.info("Associating mark {} with {}", mark, lastPoint);
 			calibrationPoints.put(mark, lastPoint);
 		}
 
-		panel.cut.add(point);
+		// panel.cut.add(point);
 		// if (panel.cut.size() > 30) {
 		// panel.cut.remove(0);
 		// }
 
 		lastPoint = new PointT(x, y);
 		panel.drawableChanged();
-		last = System.currentTimeMillis();
-	}
 
-	/**
-	 * @see java.lang.Runnable#run()
-	 */
-	@Override
-	public void run() {
-		int i = 0;
-		Random rnd = new Random();
-		panel.add(mark);
-		running = true;
-		int x = mark.x.intValue();
-		int y = mark.y.intValue();
-		int sleep = 200;
-
-		int dirx = 1;
-		int diry = 1;
-
-		while (running) {
-
-			// if (++i % 2 == 0) {
-			// mark.setColor(panel.getBackground());
-			// } else {
-			// mark.setColor(Color.RED);
-			// }
-			mark.setColor(Color.RED);
-
-			int dx = rnd.nextInt(5);
-			int dy = rnd.nextInt(5);
-			if (mark.x < 10)
-				dirx = 1;
-
-			if (mark.x > 1014)
-				dirx = -1;
-
-			if (mark.y < 10)
-				diry = 1;
-			if (mark.y > 758)
-				diry = -1;
-
-			mark.translate(dirx * dx, diry * dy);
-			// log.info("Painting mark at {},{}", mark.x, mark.y);
-			panel.drawableChanged();
-			sleep(10);
+		if (mapping == null) {
+			// PointT orig = new PointT(x, y);
+			PointT point = new PointT((x - offX) * scaleX, (y - offY) * scaleY);
+			panel.pointingAt(point.x, point.y);
+			last = System.currentTimeMillis();
+			return;
 		}
-		panel.remove(mark);
-		panel.drawableChanged();
+
+		RealMatrix p = new RealMatrixImpl(new double[][] { { x }, { y } });
+
+		log.info("Point is: {},{}", x, y);
+		log.info("Mapping matrix is: {}", mapping);
+		RealMatrix mapped = p.transpose().multiply(mapping); // mapping.multiply(p);
+
+		double[][] m = mapped.getData();
+		Double nx = new Double(m[0][0]);
+		Double ny = new Double(m[0][1]);
+
+		log.info("Mapped point to {},{}", nx.intValue(), ny.intValue());
+		panel.pointingAt(nx.intValue(), ny.intValue());
+		last = System.currentTimeMillis();
 	}
 
 	protected void sleep(int s) {
