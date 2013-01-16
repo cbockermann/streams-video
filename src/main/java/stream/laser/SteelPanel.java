@@ -320,6 +320,11 @@ public class SteelPanel extends JPanel implements PointerListener {
 					panel.validate();
 				}
 
+				if (e.getKeyChar() == 'p') {
+					log.info("Enable Piatkowski-Correction...");
+					System.setProperty("trapezKorrektur", "true");
+				}
+
 				if (e.getKeyChar() == 't') {
 					panel.drawTrapez = !panel.drawTrapez;
 					panel.repaint();
@@ -385,24 +390,36 @@ public class SteelPanel extends JPanel implements PointerListener {
 			this.cut.add(lastPoint);
 
 		if (backgroundImage != null) {
-			int argb = backgroundImage.getRGB(x, y);
 
-			int r = (argb >> 16) & 0xff;
-			int g = (argb >> 8) & 0xff;
-			int b = argb & 0xff;
+			if (x < 0 || x > backgroundImage.getWidth())
+				return;
 
-			// log.info("Color: (" + r + "," + g + "," + b + ")");
+			if (y < 0 || y > backgroundImage.getHeight()) {
+				return;
+			}
 
-			if (!inCircle && state == 1) {
+			try {
+				int argb = backgroundImage.getRGB(x, y);
 
-				if (r == 156 && g == 156 && b == 156) {
-					onPath++;
-					// sound.play("");
-				} else {
-					errors++;
-					// log.info("Playing swing-sound...");
-					// sound.play("swing7");
+				int r = (argb >> 16) & 0xff;
+				int g = (argb >> 8) & 0xff;
+				int b = argb & 0xff;
+
+				// log.info("Color: (" + r + "," + g + "," + b + ")");
+
+				if (!inCircle && state == 1) {
+
+					if (r == 156 && g == 156 && b == 156) {
+						onPath++;
+						// sound.play("");
+					} else {
+						errors++;
+						// log.info("Playing swing-sound...");
+						// sound.play("swing7");
+					}
 				}
+			} catch (Exception e) {
+
 			}
 		}
 

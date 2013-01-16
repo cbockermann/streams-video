@@ -61,7 +61,7 @@ public class LaserTrackerGreen extends AbstractImageProcessor {
 		output = imageKey;
 		evalMagic = 0;
 		initialMagic = 0;
-		fSize=1;
+		fSize = 1;
 		fPoints = new Point[fSize];
 	}
 
@@ -199,13 +199,13 @@ public class LaserTrackerGreen extends AbstractImageProcessor {
 				if (c < fPoints.length) {
 					fPoints[c++] = initialPoint;
 					for (Point fp : fPoints) {
-						if(fp==null)
+						if (fp == null)
 							break;
 						markLaserPointer2(fp, img, 0, 255, 0);
 					}
 				} else {
 					fPoints = new Point[fSize];
-					c=0;
+					c = 0;
 				}
 				this.sendUDP();
 			}
@@ -244,13 +244,13 @@ public class LaserTrackerGreen extends AbstractImageProcessor {
 			if (c < fPoints.length) {
 				fPoints[c++] = initialPoint;
 				for (Point fp : fPoints) {
-					if(fp==null)
+					if (fp == null)
 						break;
 					markLaserPointer2(fp, img, 0, 255, 0);
 				}
 			} else {
 				fPoints = new Point[fSize];
-				c=0;
+				c = 0;
 			}
 			item.put(output, img);
 			item.put("laser:x", initialPoint.x);
@@ -290,10 +290,11 @@ public class LaserTrackerGreen extends AbstractImageProcessor {
 		// return null;
 
 		// log.info("can't find laserPointer");
-		initialPoint = null;
-		initialRGB = -1;
-		initialMagic = 0;
-//		return item;
+
+		// initialPoint = null;
+		// initialRGB = -1;
+		// initialMagic = 0;
+		// return item;
 	}
 
 	private Point evaluateLaserPointer(Point ep, int oldRGB, ImageRGB img) {
@@ -396,7 +397,7 @@ public class LaserTrackerGreen extends AbstractImageProcessor {
 		if (idx < img.pixels.length && idx >= 0)
 			img.pixels[idx] = color;
 	}
-	
+
 	private void markLaserPointer2(Point p, ImageRGB img, int r, int g, int b) {
 		int x = p.x;
 		int y = p.y;

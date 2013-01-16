@@ -21,6 +21,9 @@ public class TrapezoidCorrection implements TrapezCorrection {
 
 	static Logger log = LoggerFactory.getLogger(TrapezoidCorrection.class);
 
+	public final static Trapez EINHEITS_TRAPEZ = new Trapez(new Point(0, 0),
+			new Point(0, 1), new Point(1, 0), new Point(1, 1));
+
 	RealMatrix A;
 
 	public TrapezoidCorrection() {
@@ -29,7 +32,6 @@ public class TrapezoidCorrection implements TrapezCorrection {
 
 	public TrapezoidCorrection(RealMatrix a) {
 		this.A = a;
-		log.info("A : {}", A);
 	}
 
 	public void setMatrix(RealMatrix a) throws Exception {
@@ -47,62 +49,78 @@ public class TrapezoidCorrection implements TrapezCorrection {
 			return new Point(x.x, x.y);
 		}
 
-		log.info("Point {},{} is", x.x, x.y);
-		RealMatrix b = new RealMatrixImpl(new double[][] { { x.x }, { x.y } });
+		RealMatrix b = new RealMatrixImpl(new double[][] { { 1.0 }, { x.x },
+				{ x.y }, { x.x * x.y } });
+		log.info("Point b = {}", b);
 		RealMatrix p = A.multiply(b);
-		Double nx = p.getData()[0][0];
-		Double ny = p.getData()[1][0];
+		log.info("   A b = {}", p);
+		Long nx = Math.round(p.getData()[1][0]);
+		Long ny = Math.round(p.getData()[2][0]);
 		log.info("   mapped to {},{}", nx, ny);
 		return new Point(nx.intValue(), ny.intValue());
 	}
 
+	public Point unmap(Point p) {
+
+		if (A == null) {
+			log.info("No matrix defined, returning point AS IS.");
+			return new Point(p.x, p.y);
+		}
+
+		log.info("Point {},{} is", p.x, p.y);
+		RealMatrix b = new RealMatrixImpl(new double[][] { { p.x }, { p.y } });
+		RealMatrix q = A.inverse().multiply(b);
+		Long nx = Math.round(q.getData()[0][0]);
+		Long ny = Math.round(q.getData()[1][0]);
+		log.info("   mapped to {},{}", nx, ny);
+		return new Point(nx.intValue(), ny.intValue());
+
+	}
+
+	public static RealMatrix subSetTrapez2matrix(Trapez from) {
+		double[][] tf = new double[][] {
+				{ 1.0, 1.0, 1.0, 1.0 },
+				{ from.tl.x, from.bl.x, from.tr.x, from.br.x },
+				{ from.tl.y, from.bl.y, from.tr.y, from.br.y },
+				{ from.tl.x * from.tl.y, from.bl.x * from.bl.y,
+						from.tr.x * from.tr.y, from.br.x * from.br.y } };
+		return new RealMatrixImpl(tf);
+	}
+
 	public static void main(String[] args) {
 
-		RealMatrix X = new RealMatrixImpl(new double[][] {
-				{ 305.0, 1503.0, 115.0, 1797.0 },
-				{ 175.0, 255.0, 902.0, 981.0 } });
+		Trapez g = new Trapez(new Point(0, 0), new Point(0, 1024), new Point(
+				768, 0), new Point(1024, 768));
 
-		RealMatrix G = new RealMatrixImpl(new double[][] { { 8.0, 1912.0 },
-				{ 8.0, 1912.0 }, { 8.0, 8.0 }, { 1134.0, 1134.0 } });
+		Trapez x = new Trapez(new Point(128, 10), new Point(92, 312),
+				new Point(517, 8), new Point(432, 303));
 
-		// X = new RealMatrixImpl(new double[][] { { 128, 10 }, { 92, 312 },
-		// { 517, 8 }, { 432, 303 } });
-		//
-		// G = new RealMatrixImpl(new double[][] { { 0, 0 }, { 0, 768 },
-		// { 1024, 0 }, { 1024, 768 } });
+		RealMatrix At = compute(x, g);
 
-		RealMatrix A;
-		RealMatrix XXt = X.multiply(X.transpose());
-		log.info("XX^T = {}", XXt);
-
-		A = X.multiply(X.transpose()).inverse().multiply(X).multiply(G);
-		// RealMatrix XXt = X.multiply(X.transpose());
-		// log.info("XXt = {}", XXt);
-		// RealMatrix XXt_inv_X = XXt.inverse().multiply(X);
-		// A = XXt_inv_X.multiply(G).transpose();
-
-		log.info("A = {}", A);
-		TrapezoidCorrection tc = new TrapezoidCorrection(A);
+		log.info("At = {}", At);
+		TrapezoidCorrection tc = new TrapezoidCorrection(At);
 		Point p = new Point(128, 10);
+		Point q;
 
-		Point q = tc.map(p);
+		q = tc.map(p);
 		log.info("{}  ~>  {}", p, q);
 
-		p = new Point(305, 1503);
+		p = new Point(92, 312);
 		q = tc.map(p);
 		log.info("{}  ->  {}", p, q);
 
-		//
-		// RealMatrix XXT = X.multiply(X.transpose());
-		// RealMatrix XXT_1 = XXT.inverse();
-		//
-		// RealMatrix A = XXT_1.multiply(X).multiply(G);
+		p = new Point(432, 303);
+		q = tc.map(p);
+		log.info("{}  ->  {}", p, q);
 	}
 
-	public static RealMatrix matrix(Trapez from) {
+	public static RealMatrix matrix4x4(Trapez from) {
 		double[][] tf = new double[][] {
-				{ from.tl.x, from.bl.x, from.tr.x, from.br.getX() },
-				{ from.tl.y, from.bl.y, from.tr.y, from.br.y } };
+				{ 1.0, 1.0, 1.0, 1.0 },
+				{ from.tl.x, from.bl.x, from.tr.x, from.br.x },
+				{ from.tl.y, from.bl.y, from.tr.y, from.br.y },
+				{ from.tl.x * from.tl.y, from.bl.x * from.bl.y,
+						from.tr.x * from.tr.y, from.br.x * from.br.y } };
 
 		return new RealMatrixImpl(tf);
 	}
@@ -117,21 +135,17 @@ public class TrapezoidCorrection implements TrapezCorrection {
 
 	public static RealMatrix compute(Trapez from, Trapez to) {
 
-		RealMatrix x = trapez2matrixT(from);
-		log.info("X = {}", x);
+		RealMatrix X = matrix4x4(from);
+		RealMatrix G = matrix4x4(to);
 
-		RealMatrix x_inv = x.inverse();
-		RealMatrix xxt = x.multiply(x.transpose());
+		RealMatrix At;
+		RealMatrix XXt_inv = X.multiply(X.transpose()).inverse();
+		// log.info("XX^T = {}", XXt);
+		//
 
-		RealMatrix xxt_inv = xxt.inverse();
+		At = XXt_inv.multiply(X).multiply(G.transpose()).transpose();
+		log.info("At = {}", At);
 
-		RealMatrix xxt_invx = xxt_inv.multiply(x);
-
-		RealMatrix g = trapez2matrixT(to);
-		log.info("G = {}", g);
-
-		RealMatrix a = xxt_invx.multiply(g);
-		log.info("A = {}", a);
-		return a;
+		return At;
 	}
 }
