@@ -278,9 +278,9 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 	private Point evaluateLaserPointer(Point ep, int oldRGB, ImageRGB img) {
 		int size = searchSize;
 
-		int count = 10;
+		int count = 100;
 		Point[] points = new Point[count];
-
+		
 		int minThreshold = threshold;
 
 		int minx = (ep.x - size > 0) ? ep.x - size : 0;
@@ -297,16 +297,16 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 				int rgbnew = pixels[idx]; // img.getRGB(x, y);
 				int gnew = (rgbnew >> 8) & 0xFF;
 
-				if (gnew > 20) {
-					int gold = (oldRGB >> 8) & 0xFF;
-					int rdiff = Math.abs(gold - gnew);
-					if (rdiff < minThreshold) {
+				if (gnew > threshold) {
+//					int gold = (oldRGB >> 8) & 0xFF;
+//					int rdiff = Math.abs(gold - gnew);
+//					if (rdiff < minThreshold) {
 						for (int i = count - 1; i > 0; i--) {
 							points[i] = points[i - 1];
 						}
-						minThreshold = rdiff;
+//						minThreshold = rdiff;
 						points[0] = new Point(x, y);
-					}
+//					}
 				}
 			}
 		}
@@ -448,9 +448,10 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 		for (Point p : points) {
 			if (p != null) {
 				double d = dist(ep, p);
-				dist += (searchSize - d);
-				x += p.x * (searchSize - d);
-				y += p.y * (searchSize - d);
+				double a = (searchSize - d)*(searchSize - d);
+				dist += a;
+				x += p.x * a;
+				y += p.y * a;
 			} else
 				count++;
 		}
