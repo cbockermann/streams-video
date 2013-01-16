@@ -14,14 +14,14 @@ import stream.image.ImageRGB;
 
 /**
  * This processor classifies a news video into anchorshots and news report shots, by matching each shot against
- * an anchorshot model. The model is given as an image. Pixels, that are white in the model, get ignored, all other pixels
+ * an image, representing an anchorshot model. Pixels, that are black in the model, get ignored, all other pixels
  * get compared pixelwise. If the difference between the current image and the model does not exceed a given threshold
  * t, the shot is predicted to be an anchorshot.
  * 
  * @author Matthias
  *
  */
-public class ModelMatching extends AbstractImageProcessor {
+public class ApplyImageModel extends AbstractImageProcessor {
 
 	/*
 	 * The threshold. If t is exceeded, a shot boundary in predicted.

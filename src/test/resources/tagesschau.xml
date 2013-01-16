@@ -3,7 +3,7 @@
     <stream
         id="video"
         class="stream.io.MJpegImageStream"
-        url="http://kirmes.cs.uni-dortmund.de/video/20120911-scaled.raw" />
+        url="http://mattis.special-operations.de/video/20120911-scaled.raw" />
 <!-- 
         url="file:/Volumes/RamDisk/video.mjpeg.raw" />
         url="http://kirmes.cs.uni-dortmund.de/video/video.mjpeg.raw" />
@@ -18,30 +18,34 @@
         <CreateID key="frame:id" />
         
 		<stream.news.helper.AddNewsshowLabels />
-		
-		<stream.image.features.CenterOfMass colorchannel="red" normalized="true" />
-		<stream.image.features.CenterOfMass colorchannel="black_and_white" normalized="true" />
-		
-		
+				
+		<stream.image.features.AverageRGB />
 		<stream.image.features.MedianRGB />
-		<stream.image.features.AverageRGB /> 
+		<stream.image.features.StandardDeviationRGB />
             
+		<stream.news.learner.anchorshotdetection.ApplyDecisionTreeModel predictionkey="@prediction:anchorshot" />
+		
+    	<stream.learner.evaluation.PredictionError label="@label:anchorshot" />
+    	
+    	
+    	
+		<!--
         <stream.plotter.Plotter
             history="1000"
             keepOpen="true"
-            keys="frame:black_and_white:CenterOfMass:normalizedY,frame:black_and_white:CenterOfMass:normalizedX" />
+            keys="frame:red:standardDeviation" />
         
+		<stream.image.features.CenterOfMass colorchannel="red" normalized="true" />
+		<stream.image.features.CenterOfMass colorchannel="black_and_white" normalized="true" />
+		<stream.image.features.MedianRGB />
         <stream.io.CsvWriter url="file:///C:/Users/Matthias/Documents/SchulteSVN/Diplomarbeit/data/news20120911/stream_features.csv" 
           separator=";" keys="frame:id,frame:red:CenterOfMass:normalizedY,frame:blue:median,frame:black_and_white:CenterOfMass:normalizedX,@label:anchorshot"/>
 		
-		
-		<!--
 		 
 		<stream.image.features.CenterOfMass colorchannel="green" normalized="true" />
 		<stream.image.features.CenterOfMass colorchannel="blue" normalized="true" />
         <stream.image.DisplayImage image="data" />
 
-		<stream.news.learner.anchorshotdetection.ModelMatching />
 		<stream.news.learner.anchorshotdetection.AnchorshotModelCreator />
 		 
 		 -->
@@ -56,7 +60,6 @@
         <stream.news.helper.ErrorOutput />
         
             
-    	<stream.learner.evaluation.PredictionError label="@label:anchorshot" />
 -->            
 
 

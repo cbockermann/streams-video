@@ -1,0 +1,61 @@
+<container>
+
+    <stream
+        id="video"
+        class="stream.io.MJpegImageStream"
+        url="http://mattis.special-operations.de/video/kapseln-random.raw" />
+
+    <process input="video" >
+<!-- 
+		<stream.image.ColorToGrayscale />
+		<stream.image.Crop x="200" y="100" width="240" height="280" output="data" />
+		<stream.image.filters.Smoothing output="data" windowSize="8" />
+        <stream.image.BorderDetection output="data" tolerance="1"/>  
+        <stream.image.ColorDiscretization output="data" quantilesPerChannel="2" /> 
+        <stream.coffee.helper.AddCoffeeLabels file="file:///C:/Users/Matthias/Documents/SchulteSVN/Diplomarbeit/data/kapseln/kapseln.csv" />   
+-->
+		
+        <CreateID key="frame:id" />
+        <Skip condition="%{data.frame:id} @lt 30" />
+	
+        <stream.image.DisplayImage image="data" />  
+        
+        
+		<stream.image.features.AverageRGB />
+        
+		<stream.coffee.eventdetection.ThresholdEventDetection predictionkey="@prediction:event" attribute="frame:red:average"
+			standardvalue="120" t="15" />
+			
+        <stream.plotter.Plotter
+            history="1000"
+            keepOpen="true"
+            keys="frame:red:average,frame:blue:average,frame:green:average" />
+        
+        <stream.coffee.tagging.MaxRBGOverEvent />
+        
+        <stream.coffee.helper.DatasetGenerator />
+        
+        <PrintData />
+        
+        <stream.io.CsvWriter url="file:///C:/Users/Matthias/Documents/SchulteSVN/Diplomarbeit/data/kapseln/events-random.cvs" 
+          separator=";" keys="event:red:min,event:green:min,event:blue:min"/>
+				
+<!--
+		<stream.coffee.eventdetection.EventDetectionEvaluation />
+        <stream.io.StoreImageToFile />
+		<stream.image.features.MedianRGB />
+		<stream.image.features.StandardDeviationRGB />
+
+		<stream.news.learner.sbdetection.GrayThreshold predictionkey="@prediction:event" />
+        
+        
+        <stream.laser.DiffImage threshold="0"/>
+        <stream.image.ColorToGrayscale />
+        <stream.image.AverageRGB />
+        <stream.news.learner.sbdetection.GrayThreshold t="35" />
+        <stream.news.helper.ErrorOutput />
+        
+            
+-->
+    </process>
+</container>
