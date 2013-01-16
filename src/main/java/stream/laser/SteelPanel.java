@@ -228,7 +228,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 		ArrayList<PointT> points = this.cut;
 		for (int i = 0; i < points.size(); i++) {
 			PointT p = points.get(i);
-			if (last == null || p.timestamp - last.timestamp > 200)
+			if (last == null)
 				last = p;
 
 			g.drawLine(last.x, last.y, p.x, p.y);
