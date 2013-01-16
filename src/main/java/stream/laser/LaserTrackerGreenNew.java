@@ -257,6 +257,7 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 				if (socket != null) {
 					packet.setData(buf);
 					socket.send(packet);
+					log.info("send"+ new String(buf));
 				}
 			} catch (Exception e) {
 				if (log.isDebugEnabled())
