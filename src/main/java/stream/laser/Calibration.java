@@ -4,6 +4,7 @@
 package stream.laser;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ public class Calibration implements PointerListener {
 	Map<Marker, PointT> calibrationPoints = new LinkedHashMap<Marker, PointT>();
 	Trapez trapez;
 
-	RealMatrix mapping = null;
+	TrapezCorrection mapping;
 
 	public Calibration(SteelPanel panel) {
 		this.panel = panel;
@@ -89,16 +90,30 @@ public class Calibration implements PointerListener {
 			PointT br = calibrationPoints.get(brm);
 
 			trapez = new Trapez(tl, bl, tr, br);
-
+			Trapez x = trapez;
 			panel.setTrapez(trapez);
 
-			Trapez g = new Trapez(tlm.getPoint(), blm.getPoint(),
-					trm.getPoint(), brm.getPoint());
+			try {
 
-			RealMatrix a = TrapezoidCorrection.compute(trapez, g);
-			log.info("Correction:\n{}", a);
-			if ("true".equalsIgnoreCase(System.getProperty("trapezKorrektur"))) {
-				mapping = a;
+				Trapez g = new Trapez(tlm.getPoint(), blm.getPoint(),
+						trm.getPoint(), brm.getPoint());
+
+				RealMatrix At = TrapezoidCorrection.compute(x, g);
+				log.info("Correction:\n{}", At);
+
+				mapping = new TrapezoidCorrection(At);
+
+				log.info("tl {} mapped to {}", tlm.getPoint(),
+						mapping.map(tlm.getPoint()));
+				log.info("bl {} mapped to {}", blm.getPoint(),
+						mapping.map(blm.getPoint()));
+				log.info("tr {} mapped to {}", trm.getPoint(),
+						mapping.map(trm.getPoint()));
+				log.info("br {} mapped to {}", brm.getPoint(),
+						mapping.map(brm.getPoint()));
+
+			} catch (Exception e) {
+				mapping = null;
 			}
 
 			offX = tl.x;
@@ -145,26 +160,20 @@ public class Calibration implements PointerListener {
 		lastPoint = new PointT(x, y);
 		panel.drawableChanged();
 
-		if (mapping == null) {
-			// PointT orig = new PointT(x, y);
-			PointT point = new PointT((x - offX) * scaleX, (y - offY) * scaleY);
-			panel.pointingAt(point.x, point.y);
+		if (mapping != null
+				&& "true".equals(System.getProperty("trapezKorrektur"))) {
+			log.info("Using Trapez-Korrektur");
+			Point mapped = mapping.map(new Point(x, y));
+			log.info("Point is: {},{}", x, y);
+			log.info("Mapped point is: {},{}", mapped.x, mapped.y);
+			panel.pointingAt(mapped.x, mapped.y);
 			last = System.currentTimeMillis();
 			return;
 		}
 
-		RealMatrix p = new RealMatrixImpl(new double[][] { { x }, { y } });
-
-		log.info("Point is: {},{}", x, y);
-		log.info("Mapping matrix is: {}", mapping);
-		RealMatrix mapped = p.transpose().multiply(mapping); // mapping.multiply(p);
-
-		double[][] m = mapped.getData();
-		Double nx = new Double(m[0][0]);
-		Double ny = new Double(m[0][1]);
-
-		log.info("Mapped point to {},{}", nx.intValue(), ny.intValue());
-		panel.pointingAt(nx.intValue(), ny.intValue());
+		// PointT orig = new PointT(x, y);
+		PointT point = new PointT((x - offX) * scaleX, (y - offY) * scaleY);
+		panel.pointingAt(point.x, point.y);
 		last = System.currentTimeMillis();
 	}
 
