@@ -11,12 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.laser.Trapez;
+import stream.laser.TrapezCorrection;
 
 /**
  * @author chris
  * 
  */
-public class TrapezoidCorrection {
+public class TrapezoidCorrection implements TrapezCorrection {
 
 	static Logger log = LoggerFactory.getLogger(TrapezoidCorrection.class);
 
@@ -64,24 +65,30 @@ public class TrapezoidCorrection {
 		RealMatrix G = new RealMatrixImpl(new double[][] { { 8.0, 1912.0 },
 				{ 8.0, 1912.0 }, { 8.0, 8.0 }, { 1134.0, 1134.0 } });
 
-		X = new RealMatrixImpl(new double[][] { { 128, 10 }, { 92, 312 },
-				{ 517, 8 }, { 432, 303 } });
+		// X = new RealMatrixImpl(new double[][] { { 128, 10 }, { 92, 312 },
+		// { 517, 8 }, { 432, 303 } });
+		//
+		// G = new RealMatrixImpl(new double[][] { { 0, 0 }, { 0, 768 },
+		// { 1024, 0 }, { 1024, 768 } });
 
-		G = new RealMatrixImpl(new double[][] { { 0, 0 }, { 0, 768 },
-				{ 1024, 0 }, { 1024, 768 } });
+		RealMatrix A;
+		RealMatrix XXt = X.multiply(X.transpose());
+		log.info("XX^T = {}", XXt);
 
-		RealMatrix XtX = X.transpose().multiply(X);
+		A = X.multiply(X.transpose()).inverse().multiply(X).multiply(G);
+		// RealMatrix XXt = X.multiply(X.transpose());
+		// log.info("XXt = {}", XXt);
+		// RealMatrix XXt_inv_X = XXt.inverse().multiply(X);
+		// A = XXt_inv_X.multiply(G).transpose();
 
-		RealMatrix XtX_inv_Xt = XtX.inverse().multiply(X.transpose());
-		RealMatrix A = XtX_inv_Xt.multiply(G);
-
+		log.info("A = {}", A);
 		TrapezoidCorrection tc = new TrapezoidCorrection(A);
 		Point p = new Point(128, 10);
 
 		Point q = tc.map(p);
 		log.info("{}  ~>  {}", p, q);
 
-		p = new Point(93, 312);
+		p = new Point(305, 1503);
 		q = tc.map(p);
 		log.info("{}  ->  {}", p, q);
 
