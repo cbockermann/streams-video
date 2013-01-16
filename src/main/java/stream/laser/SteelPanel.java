@@ -67,6 +67,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 	Point end;
 	int radius = 25;
 	int state = 0;
+	boolean flame = true;
 
 	Long startTime = 0L;
 	Long endTime = 0L;
@@ -80,8 +81,6 @@ public class SteelPanel extends JPanel implements PointerListener {
 		this.addMouseMotionListener(sword);
 		this.addMouseListener(sword);
 		icon = sword.getFlame();
-		if ("false".equalsIgnoreCase(System.getProperty("flamme")))
-			icon = null;
 
 		this.setBackground(Color.BLUE);
 		sound.init();
@@ -235,7 +234,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 			g.drawLine(last.x, last.y, p.x, p.y);
 			last = p;
 			if (i + 1 >= points.size()) {
-				if (icon != null) {
+				if (icon != null && flame) {
 					g.drawImage(icon.getImage(), p.x - (flameWidth / 2), p.y
 							- (flameHeight), flameWidth, flameHeight,
 							icon.getImageObserver());
@@ -329,6 +328,10 @@ public class SteelPanel extends JPanel implements PointerListener {
 					panel.drawTrapez = !panel.drawTrapez;
 					panel.repaint();
 					panel.validate();
+				}
+
+				if (e.getKeyChar() == 'f') {
+					panel.flame = !panel.flame;
 				}
 
 				if (e.getKeyChar() == 'l') {
