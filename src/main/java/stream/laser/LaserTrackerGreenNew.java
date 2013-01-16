@@ -46,7 +46,7 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 	protected int port = 9105;
 	protected InetAddress addr;
 	protected DatagramPacket packet;
-
+	private int c;
 	public LaserTrackerGreenNew() {
 		laserImage = null;
 		lastImage = null;
@@ -54,6 +54,7 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 		searchSize = 20;
 		threshold = 20;
 		output = imageKey;
+		c=0;
 	}
 
 	/**
@@ -189,32 +190,6 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 			return item;
 		}
 		
-		
-//		if (initialMagic < 1) {
-//			Point cp = getInitialPoint(img);
-//			if (cp == null) {
-//			} else {
-//				double magicDist = dist(initialPoint, cp);
-//
-//				if (magicDist < 50){
-//					initialMagic++;
-//					initialPoint=cp;
-//					initialRGB = img.getRGB(initialPoint.x, initialPoint.y);
-//				}
-//				else {
-//					initialMagic = 0;
-//					initialPoint = null;
-//				}
-//			}
-//			item.put(output, img);
-//			return item;
-//		}else
-//		{
-//			markLaserPointer2(initialPoint, img, 255, 0, 0);
-//			this.sendUDP();
-//			
-//		}
-		
 
 		Point evalPoint = evaluateLaserPointer(initialPoint, initialRGB, img);
 		if (evalPoint != null) {
@@ -237,13 +212,13 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 			return item;
 		}
 		log.info("Cant eval laserPointer");
-		//
-		// if (skipWithoutPoint)
-		// return null;
-
-		// log.info("can't find laserPointer");
+		if(c>4){
 		initialPoint = null;
 		initialRGB = -1;
+		c=0;
+		}
+		else
+			c++;
 		return item;
 	}
 
