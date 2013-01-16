@@ -312,8 +312,8 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 
 		// return findMinDist(p,points);
 		// return average(p,points);
-//		Point p = weightedAverage(ep, points);
-		Point p=points[0];
+		Point p = weightedAverage(ep, points);
+//		Point p=points[0];
 //		if (p == null) 
 //				return ep;
 		return p;
