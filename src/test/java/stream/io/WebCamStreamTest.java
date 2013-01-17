@@ -19,6 +19,9 @@ public class WebCamStreamTest {
 	static Logger log = LoggerFactory.getLogger(WebCamStreamTest.class);
 
 	@Test
+	public void testDummy() throws Exception {
+	}
+
 	public void test() throws Exception {
 		URL url = WebCamStreamTest.class.getResource("/webcam-stream.xml");
 		log.info("Starting MJpegImageStream-test from {}", url);

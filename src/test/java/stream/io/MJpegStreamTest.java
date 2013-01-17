@@ -27,6 +27,9 @@ public class MJpegStreamTest {
 
 	@Test
 	public void test() {
+	}
+
+	public static void main(String[] args) {
 		try {
 			SourceURL url = new SourceURL(
 					"http://kirmes.cs.uni-dortmund.de/video/20120911-micro.raw");
@@ -70,7 +73,7 @@ public class MJpegStreamTest {
 
 	}
 
-	public void dump(byte[] data, String f) throws IOException {
+	public static void dump(byte[] data, String f) throws IOException {
 		File file = new File("/Volumes/RamDisk/frame-errors/" + f);
 		file.getParentFile().mkdirs();
 		FileOutputStream fos = new FileOutputStream(file);

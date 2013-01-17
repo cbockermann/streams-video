@@ -25,10 +25,7 @@
 	<process input="audio">
 	
 		<stream.audio.PlayWavData />
-		
-		<!-- 
-		<PrintData />
-		 -->
+
 		<stream.plotter.Plotter keys="wav:min,wav:max,wav:avg,wav:variance" />
 	</process>
 </container>

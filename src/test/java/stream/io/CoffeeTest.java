@@ -19,9 +19,12 @@ public class CoffeeTest {
 	static Logger log = LoggerFactory.getLogger(CoffeeTest.class);
 
 	@Test
+	public void testDummy() {
+
+	}
+
 	public void test() throws Exception {
-		URL url = CoffeeTest.class
-				.getResource("/border-detection-stream.xml");
+		URL url = CoffeeTest.class.getResource("/border-detection-stream.xml");
 		log.info("Starting MJpegImageStream-test from {}", url);
 		stream.run.main(url);
 	}

@@ -228,7 +228,7 @@ public class WavStream extends AbstractStream {
 
 		log.info("Sample rate is: {}", this.sampleRate);
 		log.info("  chunk size is: {}", chunkSize);
-		this.blockSize = (new Long(chunkSize)).intValue();
+		// this.blockSize = (new Long(chunkSize)).intValue();
 		log.info("  each sample is for {} seconds",
 				1.0d / sampleRate.doubleValue());
 		log.info("  stream block size is: {} ({} seconds for each block)",
