@@ -1,0 +1,10 @@
+This stream implementation provides access to WAV samples that are
+read from a URL. The wav samples are read in small chunks (blocks),
+depending on the {\ttfamily blockSize} parameter of this stream.
+Each item provided by this stream contains a double array of
+{\ttfamily blockSize} values (samples).
+
+By default the samples are stored in attribute {\ttfamily wav:samples}.
+Additional information may be included in the first item of the stream,
+such as {\ttfamily wav:samplerate}, {\ttfamily wav:channels} or the
+number of bytes per sample ({\ttfamily wav:bytesPerSample}.

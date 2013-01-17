@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
+import stream.annotations.Parameter;
 import stream.audio.PlayWavData;
 import stream.data.DataFactory;
 import stream.runtime.ProcessContextImpl;
@@ -91,6 +92,7 @@ public class WavStream extends AbstractStream {
 	 * @param blockSize
 	 *            the blockSize to set
 	 */
+	@Parameter(description = "The number of samples (double values) read from the stream for each data item.")
 	public void setBlockSize(int blockSize) {
 		this.blockSize = blockSize;
 	}
