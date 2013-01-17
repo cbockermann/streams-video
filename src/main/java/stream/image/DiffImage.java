@@ -1,10 +1,18 @@
 package stream.image;
 
 import stream.Data;
+import stream.annotations.Parameter;
 
 public class DiffImage extends AbstractImageProcessor {
 
 	ImageRGB lastImage = new ImageRGB(0, 0);
+	
+	String output = "data";
+	
+	@Parameter(description="The name/key under which the output image is stored. If this name equals the name of the input image, the input image is going to be overwritten.")
+	public void setOutput(String output) {
+		this.output = output;
+	}
 
 	@Override
 	public Data process(Data item, ImageRGB img) {
@@ -62,8 +70,7 @@ public class DiffImage extends AbstractImageProcessor {
 
 		lastImage = img;
 
-		item.remove("data");
-		item.put("data", diffImage);
+		item.put(output, diffImage);
 
 		return item;
 	}

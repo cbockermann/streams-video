@@ -34,7 +34,7 @@ public class BorderDetection extends AbstractImageProcessor {
 		return tolerance;
 	}
 
-	@Parameter(description = "Tolerance")
+	@Parameter(description = "The number of neighboring pixels that may have a different color value, without causing, that the actual pixel becomes recognized as a border pixel. The higher the tolerance is, the less border pixels will be found.")
 	public void setTolerance(int tolerance) {
 		this.tolerance = tolerance;
 	}

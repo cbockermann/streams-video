@@ -44,7 +44,7 @@ public class ColorDiscretization extends AbstractImageProcessor {
 	 * 					If this name equals the name of the input image, the input image
 	 * 					is going to be overwritten.
 	 */
-	@Parameter(description ="The name/key of the output image is stored. If this name equals the name of the input image, the input image is going to be overwritten.")
+	@Parameter(description ="The name/key under which the output image is stored. If this name equals the name of the input image, the input image is going to be overwritten.")
 	public void setOutput(String output) {
 		this.output = output;
 	}
@@ -57,12 +57,12 @@ public class ColorDiscretization extends AbstractImageProcessor {
 	}
 
 	/**
-	 * @param quantilesPerChannel
+	 * @param bins
 	 *            Set the number of discrete color values, each channel in divided into
 	 */
 	@Parameter(description = "Set the number of discrete color values, each channel in divided into.")
-	public void setQuantilesPerChannel(Integer quantilesPerChannel) {
-		this.valuesPerChannel = quantilesPerChannel;
+	public void setBins(Integer bins) {
+		this.valuesPerChannel = bins;
 	}
 
 	@Override

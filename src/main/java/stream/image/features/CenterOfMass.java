@@ -1,6 +1,7 @@
 package stream.image.features;
 
 import stream.Data;
+import stream.annotations.Parameter;
 import stream.image.AbstractImageProcessor;
 import stream.image.ImageRGB;
 
@@ -22,6 +23,7 @@ public class CenterOfMass extends AbstractImageProcessor {
 	 * Tells the CenterOfMass processor, on which color to base the Center of Mass computation on.
 	 * @param colorchannel the color. Possible values are "red", "green", and "blue"
 	 */
+	@Parameter(description="Sets the color channel, on which the Center of Mass computation is based on.")
 	public void setColorchannel(String colorchannel) {
 		this.colorchannel = colorchannel;
 	}
@@ -39,6 +41,7 @@ public class CenterOfMass extends AbstractImageProcessor {
 	 * y- coordinates of the Center of Mass.
 	 * @param normalized
 	 */
+	@Parameter(description="Sets, if the processor computes the normalized Center of Mass or the absolute Center of Mass")
 	public void setNormalized(Boolean normalized) {
 		this.normalized = normalized;
 	}

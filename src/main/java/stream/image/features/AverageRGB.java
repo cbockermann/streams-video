@@ -4,6 +4,7 @@
 package stream.image.features;
 
 import stream.Data;
+import stream.annotations.Parameter;
 import stream.image.AbstractImageProcessor;
 import stream.image.ImageRGB;
 
@@ -18,11 +19,12 @@ public class AverageRGB extends AbstractImageProcessor {
 	Boolean includeRatios = false;
 	
 	/**
-	 * If desired, the processor includes the ration between the color channels. Rations are
+	 * If desired, the processor includes the ration between the color channels. Ratios are
 	 * { (red/blue), (red/green), (green/blue) }.
 	 * 
 	 * @param includeRatios
 	 */
+	@Parameter(description="Sets, if the processor includes the ration between the color channels, or just the average RGB color values. Ratios are (red/blue), (red/green), (green/blue).",defaultValue="false")
 	public void setIncludeRatios(boolean includeRatios) {
 		this.includeRatios = includeRatios;
 	}
