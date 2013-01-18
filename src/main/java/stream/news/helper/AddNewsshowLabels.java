@@ -6,6 +6,7 @@ import java.util.Map;
 import stream.AbstractProcessor;
 import stream.Data;
 import stream.ProcessContext;
+import stream.annotations.Parameter;
 import stream.io.CsvStream;
 import stream.io.SourceURL;
 
@@ -17,6 +18,7 @@ public class AddNewsshowLabels extends AbstractProcessor {
 	 * Sets the file the labels are stored in.
 	 * @param file
 	 */
+	@Parameter(description="Sets the file the labels are stored in.")
 	public void setFile(String file) {
 		this.file = file;
 	}

@@ -2,6 +2,7 @@ package stream.news.helper;
 
 import stream.AbstractProcessor;
 import stream.Data;
+import stream.annotations.Parameter;
 
 /**
  * Compares a predicted label with the true label. If both labels match, no action is performed.
@@ -21,6 +22,7 @@ public class ErrorOutput extends AbstractProcessor {
 	 * Sets the key under which the true label is stored.
 	 * @param label String
 	 */
+	@Parameter(description="Sets the key under which the true label is stored.")
 	public void setLabel(String label) {
 		this.label = label;
 	}
@@ -37,6 +39,7 @@ public class ErrorOutput extends AbstractProcessor {
 	 * Sets the key under which the predicted label was stored by the classifier.
 	 * @param label String
 	 */
+	@Parameter(description="Sets the key under which the predicted label was stored by the classifier.")
 	public void setPrediction(String prediction) {
 		this.prediction = prediction;
 	}
