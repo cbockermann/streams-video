@@ -40,10 +40,16 @@ public class Smoothing extends AbstractImageProcessor {
 	 * @param windowSize
 	 *            the windowSize to set
 	 */
+	@Parameter(description="Sets the window size. The window size determines the neighboring pixels for each pixel, that are averaged. A windowSize of 3 means that 3 times 3 = 9 pixels are taken into account.")
 	public void setWindowSize(Integer windowSize) {
 		this.windowSize = windowSize;
 	}
 
+	@Parameter(description="If a weighted smoothing technique is selected, neighbors closer to the pixel to be smoothend are counted with a higher weight.")
+	public void setWeighted(Boolean weighted) {
+		this.weighted = weighted;
+	}
+	
 	/**
 	 * @return name The name/key under which the smoothed image is stored.
 	 */
