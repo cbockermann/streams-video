@@ -1,3 +1,3 @@
 This processor adds the true label to the video frames of one news show. Three labels are attached to each data item: @label:shotboundary, telling, whether the frame is the first frame after a shot boundary or not (binominal), @label:anchorshot, telling, whether the frame belongs to a shot boundary or not (binominal), and @label:shottype, telling, what concrete type of shot the frame belongs to (multinominal).
 
-The labels have to be stored in a file.
+The labels have to be stored in a file, that gets read in before the stream process starts (during the init of this processor).

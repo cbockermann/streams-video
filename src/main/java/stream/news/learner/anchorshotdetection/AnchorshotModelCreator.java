@@ -10,6 +10,7 @@ import java.io.InputStream;
 import javax.imageio.ImageIO;
 
 import stream.Data;
+import stream.annotations.Parameter;
 import stream.image.AbstractImageProcessor;
 import stream.image.ImageRGB;
 
@@ -17,6 +18,11 @@ public class AnchorshotModelCreator extends AbstractImageProcessor {
 	
 	String model = "C:/Users/Matthias/Documents/SchulteSVN/Diplomarbeit/data/anchorshots/model.jpg";
 
+	@Parameter(description="URL of a file, where the model can be stored on the disk.")
+	public void setModel(String model) {
+		this.model = model;
+	}
+	
 	@Override
 	public Data process(Data item, ImageRGB img) {
 		

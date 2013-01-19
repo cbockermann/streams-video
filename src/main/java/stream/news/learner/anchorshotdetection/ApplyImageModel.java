@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 
 import stream.Data;
 import stream.ProcessContext;
+import stream.annotations.Parameter;
 import stream.image.AbstractImageProcessor;
 import stream.image.ImageRGB;
 
@@ -35,6 +36,7 @@ public class ApplyImageModel extends AbstractImageProcessor {
 	 * Tells the processor, where to find the model to be matched.
 	 * @param model String holding the location of the model image
 	 */
+	@Parameter(description="Tells the processor, where to find the model to be matched.")
 	public void setModel(String model) {
 		this.model = model;
 	}
@@ -51,6 +53,7 @@ public class ApplyImageModel extends AbstractImageProcessor {
 	 * Sets the threshold t to a new value.
 	 * @param t Threshold
 	 */
+	@Parameter(description="Sets the threshold t to a new value.")
 	public void setT(Integer t) {
 		this.t = t;
 	}
@@ -67,6 +70,7 @@ public class ApplyImageModel extends AbstractImageProcessor {
 	 * Sets the key under which the classifier shall store the predicted label.
 	 * @param predictionkey
 	 */
+	@Parameter(description="Sets the key under which the classifier shall store the predicted label.")
 	public void setPredictionkey(String predictionkey) {
 		this.predictionkey = predictionkey;
 	}

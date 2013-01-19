@@ -2,6 +2,7 @@ package stream.coffee.eventdetection;
 
 import stream.AbstractProcessor;
 import stream.Data;
+import stream.annotations.Parameter;
 
 public class ThresholdEventDetection extends AbstractProcessor {
 	
@@ -20,6 +21,7 @@ public class ThresholdEventDetection extends AbstractProcessor {
 	 * as an event.
 	 * @param t Threshold
 	 */
+	@Parameter(description="Sets the threshold t to a new value.")
 	public void setT(Integer t) {
 		this.t = t;
 	}
@@ -36,6 +38,7 @@ public class ThresholdEventDetection extends AbstractProcessor {
 	 * Tells the processor, on which attribute to base the event detection on.
 	 * @param graykey
 	 */
+	@Parameter(description="Tells the processor, on which attribute to base the event detection on.")
 	public void setAttribute(String attribute) {
 		this.attribute = attribute;
 	}
@@ -52,6 +55,7 @@ public class ThresholdEventDetection extends AbstractProcessor {
 	 * Sets the key under which the classifier shall store the predicted label.
 	 * @param predictionkey
 	 */
+	@Parameter(description="Sets the key under which the classifier stores the predicted label.")
 	public void setPredictionkey(String predictionkey) {
 		this.predictionkey = predictionkey;
 	}
@@ -68,6 +72,7 @@ public class ThresholdEventDetection extends AbstractProcessor {
 	 * Sets the value, attribute "attribute" has in random frames
 	 * @param standardvalue
 	 */
+	@Parameter(description="Sets the value the attribute has in random frames.")
 	public void setStandardvalue(Integer standardvalue) {
 		this.standardvalue = standardvalue;
 	}

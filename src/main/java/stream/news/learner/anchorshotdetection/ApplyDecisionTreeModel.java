@@ -2,6 +2,7 @@ package stream.news.learner.anchorshotdetection;
 
 import stream.AbstractProcessor;
 import stream.Data;
+import stream.annotations.Parameter;
 
 /**
  * This processor classifies a news video into anchorshots and news report shots, by applying a
@@ -17,6 +18,7 @@ public class ApplyDecisionTreeModel extends AbstractProcessor {
 	 * Sets the key under which the classifier shall store the predicted label.
 	 * @param predictionkey
 	 */
+	@Parameter(description="Sets the key under which the classifier shall store the predicted label.")
 	public void setPredictionkey(String predictionkey) {
 		this.predictionkey = predictionkey;
 	}

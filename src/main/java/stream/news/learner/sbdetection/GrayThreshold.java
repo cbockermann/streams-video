@@ -2,6 +2,7 @@ package stream.news.learner.sbdetection;
 
 import stream.AbstractProcessor;
 import stream.Data;
+import stream.annotations.Parameter;
 
 /**
  * This processor is a classifier, predicting shot boundaries based on the DiffImages of two successive frames. It can only
@@ -24,6 +25,7 @@ public class GrayThreshold extends AbstractProcessor {
 	 * Sets the threshold t to a new value.
 	 * @param t Threshold
 	 */
+	@Parameter(description="Sets the threshold t.")
 	public void setT(Integer t) {
 		this.t = t;
 	}
@@ -40,6 +42,7 @@ public class GrayThreshold extends AbstractProcessor {
 	 * Tells the GrayThreshold processor, where to find the gray value of the pixels.
 	 * @param graykey
 	 */
+	@Parameter(description="Tells the GrayThreshold processor, where to find the gray value of the pixels.")
 	public void setGraykey(String graykey) {
 		this.graykey = graykey;
 	}
@@ -53,15 +56,16 @@ public class GrayThreshold extends AbstractProcessor {
 	}
 	
 	/**
-	 * Sets the key under which the classifier shall store the predicted label.
+	 * The key under which the classifier shall store the predicted label.
 	 * @param predictionkey
 	 */
+	@Parameter(description="The key, under which the classifier shall store the predicted label.")
 	public void setPredictionkey(String predictionkey) {
 		this.predictionkey = predictionkey;
 	}
 	
 	/**
-	 * Delivers the key under which the classifier currently stores the predicted label.
+	 * Delivers the key, under which the classifier currently stores the predicted label.
 	 * @return
 	 */
 	public String getPredictionkey() {
