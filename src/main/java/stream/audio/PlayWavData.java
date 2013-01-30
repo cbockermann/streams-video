@@ -63,7 +63,7 @@ public class PlayWavData extends AbstractProcessor {
 	@Override
 	public Data process(Data input) {
 
-		log.info("processing {}", input);
+		// log.info("processing {}", input);
 		if (header == null) {
 
 			if (input.containsKey("wav:samplerate")) {
@@ -111,9 +111,9 @@ public class PlayWavData extends AbstractProcessor {
 			Long frames = audio.getLongFramePosition();
 			Float sampleRate = header.getSampleRate();
 			Double time = (frames.doubleValue() / sampleRate.doubleValue());
-			if (blocksProcessed % 15 == 0) {
-				log.info("Audio position is: {}", time);
-			}
+			// if (blocksProcessed % 15 == 0) {
+			// log.info("Audio position is: {}", time);
+			// }
 
 		} else {
 			log.error("No audio-header information received, yet.");

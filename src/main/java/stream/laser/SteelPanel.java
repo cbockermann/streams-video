@@ -19,6 +19,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,14 +28,23 @@ import java.util.TreeSet;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import stream.Data;
+import stream.data.DataFactory;
+import stream.laser.game.LaserMazeResult;
+import stream.laser.game.NameDialog;
 import stream.laser.game.PointT;
+import stream.laser.game.TrackListener;
 import stream.net.NetworkPointer;
 import stream.net.PointerListener;
+import stream.runtime.ProcessContextImpl;
+
+import com.lowagie.text.Font;
 
 /**
  * @author chris
@@ -53,7 +63,11 @@ public class SteelPanel extends JPanel implements PointerListener {
 			"/laser/game/images/background0.png"
 	// "/laser/game/images/background3.png",
 	};
+	final LaserMazeResult result = new LaserMazeResult();
 
+	TrackListener trackListener;
+	String name = null;
+	URL currentLevelUrl;
 	LaserSword sword = new LaserSword();
 	ImageIcon icon;
 	ArrayList<PointT> cut = new ArrayList<PointT>();
@@ -68,6 +82,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 	int radius = 25;
 	int state = 0;
 	boolean flame = true;
+	Double score = null;
 
 	Long startTime = 0L;
 	Long endTime = 0L;
@@ -84,6 +99,14 @@ public class SteelPanel extends JPanel implements PointerListener {
 
 		this.setBackground(Color.BLUE);
 		sound.init();
+
+		try {
+			this.trackListener = new TrackListener();
+			this.trackListener.init(new ProcessContextImpl());
+		} catch (Exception e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+		}
 	}
 
 	public void setTrapez(Trapez t) {
@@ -167,7 +190,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 
 			repaint();
 			validate();
-
+			this.currentLevelUrl = url;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -205,12 +228,18 @@ public class SteelPanel extends JPanel implements PointerListener {
 			g2.drawOval(end.x - radius, end.y - radius, radius * 2, radius * 2);
 		}
 
-		String info = "State is: " + state + " (Level " + level + ")";
 		g.setColor(Color.white);
-		Rectangle2D rect = g2.getFont().getStringBounds(info,
+		String nameInfo = "Name: " + name;
+		Rectangle2D rect = g2.getFont().getStringBounds(nameInfo,
 				g2.getFontRenderContext());
+
+		g2.drawString(nameInfo, getWidth() - (int) rect.getWidth() - 4,
+				0 + (int) rect.getHeight() + 0);
+
+		String info = "State is: " + state + " (Level " + level + ")";
+		rect = g2.getFont().getStringBounds(info, g2.getFontRenderContext());
 		g2.drawString(info, getWidth() - (int) rect.getWidth() - 4,
-				0 + (int) rect.getHeight() + 4);
+				0 + (int) rect.getHeight() + 14);
 
 		if (startTime > 0) {
 			if (state == 2) {
@@ -218,9 +247,25 @@ public class SteelPanel extends JPanel implements PointerListener {
 				if (endTime > 0)
 					elapsed = endTime - startTime;
 				g2.drawString("Time elapsed: " + elapsed + " ms",
-						getWidth() - 300, 35);
-				g2.drawString("Errors: " + errors, getWidth() - 300, 50);
-				g2.drawString("On path: " + onPath, getWidth() - 300, 65);
+						getWidth() - 300, 45);
+				g2.drawString("Errors: " + errors, getWidth() - 300, 60);
+				g2.drawString("On path: " + onPath, getWidth() - 300, 75);
+
+				if (score != null) {
+					java.awt.Font bold = g2.getFont().deriveFont(Font.BOLD)
+							.deriveFont(36.0f);
+					g2.setFont(bold);
+
+					DecimalFormat fmt = new DecimalFormat("0");
+					String scoreString = "Your Score: " + fmt.format(score);
+
+					rect = g2.getFont().getStringBounds(scoreString,
+							g2.getFontRenderContext());
+
+					g2.drawString(scoreString,
+							(getWidth() / 2) - ((int) rect.getWidth() / 2),
+							getHeight() / 2);
+				}
 			}
 		}
 
@@ -256,7 +301,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 
 	public static void main(String[] args) throws Exception {
 
-		JFrame frame = new JFrame();
+		final JFrame frame = new JFrame();
 		// frame.setUndecorated(true);
 
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -334,6 +379,13 @@ public class SteelPanel extends JPanel implements PointerListener {
 					panel.flame = !panel.flame;
 				}
 
+				if (e.getKeyChar() == 'n') {
+					NameDialog d = new NameDialog(frame);
+					d.center();
+					d.setVisible(true);
+					panel.setUserName(d.getName());
+				}
+
 				if (e.getKeyChar() == 'l') {
 					panel.level = (panel.level + 1) % panel.levels.length;
 					panel.setLevel(panel.level);
@@ -356,6 +408,12 @@ public class SteelPanel extends JPanel implements PointerListener {
 		});
 	}
 
+	public void setUserName(String n) {
+		this.name = n;
+		repaint();
+		validate();
+	}
+
 	/**
 	 * @see stream.net.PointerListener#pointingAt(int, int)
 	 */
@@ -367,6 +425,17 @@ public class SteelPanel extends JPanel implements PointerListener {
 		boolean inCircle = false;
 		sword.active = true;
 
+		Data item = DataFactory.create();
+
+		if (name != null) {
+			item.put("user", name);
+		}
+
+		item.put("level:", this.level);
+
+		item.put("track:x", x);
+		item.put("track:y", y);
+
 		if (start != null && state == 0) {
 			// log.info("Checking point {} against start cirlce {}", lastPoint,
 			// start);
@@ -376,6 +445,14 @@ public class SteelPanel extends JPanel implements PointerListener {
 				startTime = System.currentTimeMillis();
 				inCircle = inCircle || true;
 				sound.play("on0");
+
+				if (currentLevelUrl != null && backgroundImage != null) {
+					item.put("image:url", currentLevelUrl.toString());
+					item.put("image:width", backgroundImage.getWidth());
+					item.put("image:height", backgroundImage.getHeight());
+				}
+
+				item.put("track:point", "start");
 			}
 		}
 
@@ -386,6 +463,19 @@ public class SteelPanel extends JPanel implements PointerListener {
 				endTime = System.currentTimeMillis();
 				inCircle = inCircle || true;
 				sound.play("off0");
+				item.put("track:point", "end");
+				item.put("time", (endTime - startTime));
+				item.put("onpath", this.onPath);
+				item.put("error", this.errors);
+				item = result.process(item);
+				try {
+					this.score = new Double("" + item.get("@result"));
+				} catch (Exception e) {
+					this.score = null;
+				}
+
+				if (trackListener != null)
+					trackListener.process(item);
 			}
 		}
 
@@ -425,6 +515,9 @@ public class SteelPanel extends JPanel implements PointerListener {
 
 			}
 		}
+
+		if (state == 1 && trackListener != null)
+			trackListener.process(item);
 
 		this.repaint();
 		this.validate();

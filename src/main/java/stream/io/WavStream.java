@@ -228,7 +228,7 @@ public class WavStream extends AbstractStream {
 
 		log.info("Sample rate is: {}", this.sampleRate);
 		log.info("  chunk size is: {}", chunkSize);
-		// this.blockSize = (new Long(chunkSize)).intValue();
+		this.blockSize = (new Long(chunkSize)).intValue();
 		log.info("  each sample is for {} seconds",
 				1.0d / sampleRate.doubleValue());
 		log.info("  stream block size is: {} ({} seconds for each block)",
@@ -306,10 +306,10 @@ public class WavStream extends AbstractStream {
 			avg += block[i];
 		}
 
-		log.info("{} samples successfully read", read);
+		// log.info("{} samples successfully read", read);
 
 		if (last < block.length) {
-			log.info("Shrinking block to {} samples", last);
+			// log.info("Shrinking block to {} samples", last);
 			double[] nb = new double[last];
 			for (int i = 0; i < last; i++) {
 				nb[i] = block[i];

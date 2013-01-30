@@ -266,7 +266,8 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 				: (ep.y + size);
 
 		int[] pixels = img.pixels;
-		for (int x = minx; x < maxx; x++) {
+		int i=0;
+		m:for (int x = minx; x < maxx; x++) {
 			for (int y = miny; y < maxy; y++) {
 				int idx = y * img.width + x;
 				int rgbnew = pixels[idx]; // img.getRGB(x, y);
@@ -276,12 +277,15 @@ public class LaserTrackerGreenNew extends AbstractImageProcessor {
 //					int gold = (oldRGB >> 8) & 0xFF;
 //					int rdiff = Math.abs(gold - gnew);
 //					if (rdiff < minThreshold) {
-						for (int i = count - 1; i > 0; i--) {
-							points[i] = points[i - 1];
-						}
+//						for (int i = count - 1; i > 0; i--) {
+//							points[i] = points[i - 1];
+//						}
 //						minThreshold = rdiff;
-						points[0] = new Point(x, y);
-//					}
+//						points[0] = new Point(x, y);
+					points[i] = new Point(x, y);
+					i++;
+					if(i==points.length)
+						break m;
 				}
 			}
 		}
