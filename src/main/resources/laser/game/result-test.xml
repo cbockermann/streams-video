@@ -1,0 +1,20 @@
+<container>
+
+    <stream
+        id="results"
+        class="stream.io.JSONStream"
+        url="classpath:/laser/game/results.json" />
+       
+
+ 
+     <process input="results" >
+		
+		<stream.laser.game.LaserMazeResult/>
+		<PrintData/>
+		<stream.io.CsvWriter url="file:/Users/hendrik/result1.csv"/>
+		
+		
+		
+     </process>
+
+</container>
