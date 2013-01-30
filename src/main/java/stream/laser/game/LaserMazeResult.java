@@ -30,7 +30,9 @@ public class LaserMazeResult extends AbstractProcessor{
 		}
 		
 		if(time!=null && error !=null && onPath !=null){
-			Double result = ((onPath/error)*time)/100;
+//			Double result = ((onPath/error)*time)/100;
+			time = time/100;
+			Double result = (onPath/error);
 			data.put("@result", result);
 		}
 		return data;
