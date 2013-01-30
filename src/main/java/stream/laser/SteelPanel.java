@@ -19,6 +19,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -35,12 +36,15 @@ import org.slf4j.LoggerFactory;
 
 import stream.Data;
 import stream.data.DataFactory;
+import stream.laser.game.LaserMazeResult;
 import stream.laser.game.NameDialog;
 import stream.laser.game.PointT;
 import stream.laser.game.TrackListener;
 import stream.net.NetworkPointer;
 import stream.net.PointerListener;
 import stream.runtime.ProcessContextImpl;
+
+import com.lowagie.text.Font;
 
 /**
  * @author chris
@@ -59,6 +63,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 			"/laser/game/images/background0.png"
 	// "/laser/game/images/background3.png",
 	};
+	final LaserMazeResult result = new LaserMazeResult();
 
 	TrackListener trackListener;
 	String name = null;
@@ -77,6 +82,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 	int radius = 25;
 	int state = 0;
 	boolean flame = true;
+	Double score = null;
 
 	Long startTime = 0L;
 	Long endTime = 0L;
@@ -244,6 +250,22 @@ public class SteelPanel extends JPanel implements PointerListener {
 						getWidth() - 300, 45);
 				g2.drawString("Errors: " + errors, getWidth() - 300, 60);
 				g2.drawString("On path: " + onPath, getWidth() - 300, 75);
+
+				if (score != null) {
+					java.awt.Font bold = g2.getFont().deriveFont(Font.BOLD)
+							.deriveFont(36.0f);
+					g2.setFont(bold);
+
+					DecimalFormat fmt = new DecimalFormat("0");
+					String scoreString = "Your Score: " + fmt.format(score);
+
+					rect = g2.getFont().getStringBounds(scoreString,
+							g2.getFontRenderContext());
+
+					g2.drawString(scoreString,
+							(getWidth() / 2) - ((int) rect.getWidth() / 2),
+							getHeight() / 2);
+				}
 			}
 		}
 
@@ -445,6 +467,12 @@ public class SteelPanel extends JPanel implements PointerListener {
 				item.put("time", (endTime - startTime));
 				item.put("onpath", this.onPath);
 				item.put("error", this.errors);
+				item = result.process(item);
+				try {
+					this.score = new Double("" + item.get("@result"));
+				} catch (Exception e) {
+					this.score = null;
+				}
 
 				if (trackListener != null)
 					trackListener.process(item);
