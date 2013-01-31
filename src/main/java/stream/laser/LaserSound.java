@@ -40,10 +40,10 @@ public class LaserSound {
 		for (String name : names) {
 			URL url = LaserSound.class.getResource("/laser/game/sounds/new-"
 					+ name + ".wav");
-			log.info("Sound file: {}", url);
+			// log.info("Sound file: {}", url);
 			if (url != null) {
 				Data sound = readSound(url);
-				log.info("Sound '{}' is: {}", name, sound);
+				// log.info("Sound '{}' is: {}", name, sound);
 				if (sound != null) {
 					sounds.put(name, sound);
 				}
@@ -95,10 +95,10 @@ public class LaserSound {
 				bytes[i] = (byte) (0.5 * samples[i]);
 			}
 
-			log.info("Writing {} bytes to audio-line...", bytes.length);
+			log.debug("Writing {} bytes to audio-line...", bytes.length);
 			audio.write(bytes, 0, bytes.length);
 		} else {
-			log.info("Sound '{}' not loaded!");
+			log.debug("Sound '{}' not loaded!");
 		}
 	}
 

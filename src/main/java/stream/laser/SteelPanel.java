@@ -64,7 +64,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 	// "/laser/game/images/background3.png",
 	};
 	final LaserMazeResult result = new LaserMazeResult();
-
+	boolean debug = "true".equalsIgnoreCase(System.getProperty("debug"));
 	TrackListener trackListener;
 	String name = null;
 	URL currentLevelUrl;
@@ -246,11 +246,12 @@ public class SteelPanel extends JPanel implements PointerListener {
 				Long elapsed = System.currentTimeMillis() - startTime;
 				if (endTime > 0)
 					elapsed = endTime - startTime;
-				g2.drawString("Time elapsed: " + elapsed + " ms",
-						getWidth() - 300, 45);
-				g2.drawString("Errors: " + errors, getWidth() - 300, 60);
-				g2.drawString("On path: " + onPath, getWidth() - 300, 75);
-
+				if (debug) {
+					g2.drawString("Time elapsed: " + elapsed + " ms",
+							getWidth() - 300, 45);
+					g2.drawString("Errors: " + errors, getWidth() - 300, 60);
+					g2.drawString("On path: " + onPath, getWidth() - 300, 75);
+				}
 				if (score != null) {
 					java.awt.Font bold = g2.getFont().deriveFont(Font.BOLD)
 							.deriveFont(36.0f);
@@ -440,7 +441,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 			// log.info("Checking point {} against start cirlce {}", lastPoint,
 			// start);
 			if (start.distance(new Point(x, y)) < radius) {
-				log.info("Pointer in start-circle!");
+				// log.info("Pointer in start-circle!");
 				state = 1;
 				startTime = System.currentTimeMillis();
 				inCircle = inCircle || true;
@@ -458,7 +459,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 
 		if (end != null && state == 1) {
 			if (end.distance(new Point(x, y)) < radius) {
-				log.info("Point in end-circle!");
+				// log.info("Point in end-circle!");
 				state = 2;
 				endTime = System.currentTimeMillis();
 				inCircle = inCircle || true;

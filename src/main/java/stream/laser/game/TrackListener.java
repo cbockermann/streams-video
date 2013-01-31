@@ -90,7 +90,7 @@ public class TrackListener extends AbstractProcessor implements Runnable {
 			while (!items.isEmpty()) {
 				try {
 					Data item = items.take();
-					log.info("Writing item: {}", item);
+					// log.debug("Writing item: {}", item);
 
 					if (out == null
 							|| "start".equalsIgnoreCase(item.get("track:point")
