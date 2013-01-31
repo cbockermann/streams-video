@@ -21,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -58,9 +59,9 @@ public class SteelPanel extends JPanel implements PointerListener {
 	static Logger log = LoggerFactory.getLogger(SteelPanel.class);
 
 	int level = 0;
-	String[] levels = new String[] { "/laser/game/images/background2.png",
-			"/laser/game/images/background7.png",
-			"/laser/game/images/background0.png"
+	String[] levels = new String[] { "/laser/game/images/background8.png",
+			"/laser/game/images/background9.png",
+			"/laser/game/images/background10.png"
 	// "/laser/game/images/background3.png",
 	};
 	final LaserMazeResult result = new LaserMazeResult();
@@ -91,11 +92,15 @@ public class SteelPanel extends JPanel implements PointerListener {
 	Trapez trapez = null;
 	boolean drawTrapez = false;
 	LaserSound sound = new LaserSound();
+	private List<Point> pts;
+	private List<Point> chkPts ;
 
 	public SteelPanel() {
 		this.addMouseMotionListener(sword);
 		this.addMouseListener(sword);
 		icon = sword.getFlame();
+		pts = new ArrayList<Point>();
+		chkPts=new ArrayList<Point>();
 
 		this.setBackground(Color.BLUE);
 		sound.init();
@@ -149,9 +154,9 @@ public class SteelPanel extends JPanel implements PointerListener {
 			end = null;
 			log.debug("Background image is: {}", backgroundImage);
 			Set<String> colors = new TreeSet<String>();
-
 			for (int x = 0; x < backgroundImage.getWidth(); x++) {
 				for (int y = 0; y < backgroundImage.getHeight(); y++) {
+
 					int argb = backgroundImage.getRGB(x, y);
 
 					int r = (argb >> 16) & 0xff;
@@ -184,8 +189,11 @@ public class SteelPanel extends JPanel implements PointerListener {
 						end = new Point(x, y);
 						log.debug("Found end-point at {}", end);
 					}
+
+					drawRand(x, y, backgroundImage, pts);
 				}
 			}
+
 			log.info("colors: {}", colors);
 
 			repaint();
@@ -194,6 +202,131 @@ public class SteelPanel extends JPanel implements PointerListener {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void drawRand(int x, int y, BufferedImage img, List<Point> pts) {
+
+		int r = 0;
+		int g = 255;
+		int b = 255;
+		int color = r;
+		color = (color << 8) + g;
+		color = (color << 8) + b;
+		// Test TopRigj
+
+//		
+		 if (test1(x, y, img)) {
+		 img.setRGB(x, y, color);
+		 pts.add(new Point(x, y));
+		 return;
+		 }
+		 if (test2(x, y, img)) {
+		 img.setRGB(x, y, color);
+		 pts.add(new Point(x, y));
+		 return;
+		 }
+
+		if (test3(x, y, img)) {
+			img.setRGB(x, y, color);
+			pts.add(new Point(x, y));
+			return;
+		}
+
+	}
+
+	private boolean test1(int x, int y, BufferedImage img) {
+		int xk = x - 1;
+		int yk = y + 1;
+		boolean t1 = testColor(xk, yk, 0, 0, 0, img);
+
+		if (t1) {
+			xk = x + 1;
+			yk = y - 1;
+			boolean t2 = testColor(xk, yk, 0, 0, 0, img);
+			if (t2) {
+				xk = x + 1;
+				yk = y + 1;
+				boolean t3 = testColor(xk, yk, 156, 156, 156, img);
+				if (t3) {
+					xk = x - 1;
+					yk = y - 1;
+					return testColor(xk, yk, 0, 0, 0, img);
+				}
+				return false;
+			}
+			return false;
+		}
+		return false;
+
+	}
+
+	private boolean test2(int x, int y, BufferedImage img) {
+		int xk = x - 1;
+		int yk = y - 1;
+		boolean t1 = testColor(xk, yk, 0, 0, 0, img);
+
+		if (t1) {
+			xk = x + 1;
+			yk = y + 1;
+			boolean t2 = testColor(xk, yk, 0, 0, 0, img);
+			if (t2) {
+				xk = x + 1;
+				yk = y - 1;
+				boolean t3 = testColor(xk, yk, 156, 156, 156, img);
+				if (t3) {
+					xk = x - 1;
+					yk = y + 1;
+					return testColor(xk, yk, 0, 0, 0, img);
+				}
+				return false;
+			}
+			return false;
+		}
+		return false;
+
+	}
+
+	private boolean test3(int x, int y, BufferedImage img) {
+		int xk = x + 1;
+		int yk = y + 1;
+		boolean t1 = testColor(xk, yk, 0, 0, 0, img);
+
+		if (t1) {
+			xk = x - 1;
+			yk = y - 1;
+			boolean t2 = testColor(xk, yk, 156, 156, 156, img);
+			if (t2) {
+				xk = x - 1;
+				yk = y + 1;
+				boolean t3 = testColor(xk, yk, 156, 156, 156, img);
+				if (t3) {
+					xk = x + 1;
+					yk = y - 1;
+					return testColor(xk, yk, 156, 156, 156, img);
+				}
+				return false;
+			}
+			return false;
+		}
+		return false;
+
+	}
+
+
+	private boolean testColor(int x, int y, int r, int g, int b,
+			BufferedImage img) {
+		if (x > -1 && y > -1 && x < img.getWidth() && y < img.getHeight()) {
+			int argb = img.getRGB(x, y);
+
+			int rt = (argb >> 16) & 0xff;
+			int gt = (argb >> 8) & 0xff;
+			int bt = argb & 0xff;
+
+			if (rt == r && gt == g && bt == b)
+				return true;
+		}
+		return false;
+
 	}
 
 	public void paint(Graphics g) {
@@ -297,6 +430,11 @@ public class SteelPanel extends JPanel implements PointerListener {
 		if (trapez != null && drawTrapez) {
 			trapez.draw(g2);
 		}
+//		for (int i = 0; i < pts.size(); i++) {
+//				Point pi = pts.get(i);
+//				g2.drawOval(pi.x, pi.y, 10, 10);
+//		}
+
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -349,6 +487,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 			@Override
 			public void keyTyped(KeyEvent e) {
 				if (e.getKeyChar() == 'c' || e.getKeyChar() == 'r') {
+					panel.clearChkPts();
 					log.info("Performing clear-action...");
 					panel.resetState();
 				}
@@ -387,6 +526,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 				}
 
 				if (e.getKeyChar() == 'l') {
+					panel.clearPts();
 					panel.level = (panel.level + 1) % panel.levels.length;
 					panel.setLevel(panel.level);
 					panel.repaint();
@@ -408,6 +548,15 @@ public class SteelPanel extends JPanel implements PointerListener {
 		});
 	}
 
+	
+	private void clearPts(){
+		pts.clear();
+	}
+	
+	private void clearChkPts(){
+		chkPts.clear();
+	}
+	
 	public void setUserName(String n) {
 		this.name = n;
 		repaint();
@@ -440,6 +589,8 @@ public class SteelPanel extends JPanel implements PointerListener {
 			// log.info("Checking point {} against start cirlce {}", lastPoint,
 			// start);
 			if (start.distance(new Point(x, y)) < radius) {
+				chkPts.clear();
+				chkPts.addAll(pts);
 				log.info("Pointer in start-circle!");
 				state = 1;
 				startTime = System.currentTimeMillis();
@@ -457,7 +608,11 @@ public class SteelPanel extends JPanel implements PointerListener {
 		}
 
 		if (end != null && state == 1) {
-			if (end.distance(new Point(x, y)) < radius) {
+			
+			if (end.distance(new Point(x, y)) < radius && Math.abs(chkPts.size()-pts.size())>10) {
+				log.info("#chkPoints {}",chkPts.size());
+				
+				
 				log.info("Point in end-circle!");
 				state = 2;
 				endTime = System.currentTimeMillis();
@@ -492,21 +647,27 @@ public class SteelPanel extends JPanel implements PointerListener {
 			}
 
 			try {
-				int argb = backgroundImage.getRGB(x, y);
-
-				int r = (argb >> 16) & 0xff;
-				int g = (argb >> 8) & 0xff;
-				int b = argb & 0xff;
-
+				checkPoints(x,y);
+				
 				// log.info("Color: (" + r + "," + g + "," + b + ")");
 
 				if (!inCircle && state == 1) {
+
+					int argb = backgroundImage.getRGB(x, y);
+
+					int r = (argb >> 16) & 0xff;
+					int g = (argb >> 8) & 0xff;
+					int b = argb & 0xff;
 
 					if (r == 156 && g == 156 && b == 156) {
 						onPath++;
 						// sound.play("");
 					} else {
-						errors++;
+						int count = calcErrorIntensity(x, y, backgroundImage);
+						if (count > 0)
+							errors++;
+						else
+							errors = errors + 3;
 						// log.info("Playing swing-sound...");
 						// sound.play("swing7");
 					}
@@ -521,6 +682,74 @@ public class SteelPanel extends JPanel implements PointerListener {
 
 		this.repaint();
 		this.validate();
+	}
+
+	private void checkPoints(int x,int y){
+		int r=-1;
+		Point p = new Point(x,y);
+		for(int i=0;i<chkPts.size();i++){
+			Point pi = chkPts.get(i);
+			if(pi.distance(p)<60){
+				r=i;
+				break;
+			}	
+			
+		}
+		if(r>-1){
+			chkPts.remove(r);
+		}
+		
+	}
+	private int calcErrorIntensity(int x, int y, BufferedImage img) {
+		int size = 10;
+		int count = 0;
+
+		// right
+		int xk = x + size;
+		int yk = y;
+		if (x < img.getWidth()) {
+			int argb = img.getRGB(xk, yk);
+
+			int r = (argb >> 16) & 0xff;
+			int g = (argb >> 8) & 0xff;
+			int b = argb & 0xff;
+			if (!(r == 156 && g == 156 && b == 156))
+				count++;
+		}
+		// left
+		xk = x - size;
+		yk = y;
+		if (x > 0) {
+			int argb = img.getRGB(xk, yk);
+			int r = (argb >> 16) & 0xff;
+			int g = (argb >> 8) & 0xff;
+			int b = argb & 0xff;
+			if (!(r == 156 && g == 156 && b == 156))
+				count++;
+		}
+		// top
+		xk = x;
+		yk = y + size;
+		if (y < img.getHeight()) {
+			int argb = img.getRGB(xk, yk);
+			int r = (argb >> 16) & 0xff;
+			int g = (argb >> 8) & 0xff;
+			int b = argb & 0xff;
+			if (!(r == 156 && g == 156 && b == 156))
+				count++;
+		}
+		// bottom
+		xk = x;
+		yk = y - size;
+		if (y > 0) {
+			int argb = img.getRGB(xk, yk);
+			int r = (argb >> 16) & 0xff;
+			int g = (argb >> 8) & 0xff;
+			int b = argb & 0xff;
+			if (!(r == 156 && g == 156 && b == 156))
+				count++;
+		}
+		return count;
 	}
 
 	public void add(Drawable d) {
