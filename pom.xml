@@ -156,9 +156,9 @@
 	    </plugins>
 	</build>
        <scm>
-                <url>https://bitbucket.org/cbockermann/streams</url>
-                <developerConnection>scm:git:ssh://git@bitbucket.org/cbockermann/streams</developerConnection>
-                <connection>scm:git:ssh://git@bitbucket.org/cbockermann/streams</connection>
+                <url>https://bitbucket.org/cbockermann/streams-video.git</url>
+                <developerConnection>scm:git:ssh://git@bitbucket.org/cbockermann/streams-video.git</developerConnection>
+                <connection>scm:git:ssh://git@bitbucket.org/cbockermann/streams-video.git</connection>
         </scm>
 
 
