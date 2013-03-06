@@ -27,10 +27,6 @@
                         <name>sonatype Snapshot Repository</name>
                         <url>https://oss.sonatype.org/content/repositories/snapshots</url>
                 </snapshotRepository>
-                <site>
-                        <id>jwall-site</id>
-                        <url>scp://jwall.org/var/www/jwall.org/htdocs/streams/</url>
-                </site>
         </distributionManagement>
 
 
