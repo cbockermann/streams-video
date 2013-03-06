@@ -21,7 +21,6 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -38,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import stream.Data;
 import stream.data.DataFactory;
 import stream.laser.game.LaserMazeResult;
+import stream.laser.game.LaserMazeResult2;
+import stream.laser.game.LevelScore;
 import stream.laser.game.NameDialog;
 import stream.laser.game.PointT;
 import stream.laser.game.TrackListener;
@@ -65,6 +66,8 @@ public class SteelPanel extends JPanel implements PointerListener {
 	// "/laser/game/images/background3.png",
 	};
 	final LaserMazeResult result = new LaserMazeResult();
+	final LaserMazeResult2 scorer = new LaserMazeResult2();
+	final LevelScore levelScore = new LevelScore();
 	boolean debug = "true".equalsIgnoreCase(System.getProperty("debug"));
 	TrackListener trackListener;
 	String name = null;
@@ -82,7 +85,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 	Point end;
 	int radius = 25;
 	int state = 0;
-	boolean flame = true;
+	boolean flame = false;
 	Double score = null;
 
 	Long startTime = 0L;
@@ -93,14 +96,14 @@ public class SteelPanel extends JPanel implements PointerListener {
 	boolean drawTrapez = false;
 	LaserSound sound = new LaserSound();
 	private List<Point> pts;
-	private List<Point> chkPts ;
+	private List<Point> chkPts;
 
 	public SteelPanel() {
 		this.addMouseMotionListener(sword);
 		this.addMouseListener(sword);
 		icon = sword.getFlame();
 		pts = new ArrayList<Point>();
-		chkPts=new ArrayList<Point>();
+		chkPts = new ArrayList<Point>();
 
 		this.setBackground(Color.BLUE);
 		sound.init();
@@ -214,17 +217,17 @@ public class SteelPanel extends JPanel implements PointerListener {
 		color = (color << 8) + b;
 		// Test TopRigj
 
-//		
-		 if (test1(x, y, img)) {
-		 img.setRGB(x, y, color);
-		 pts.add(new Point(x, y));
-		 return;
-		 }
-		 if (test2(x, y, img)) {
-		 img.setRGB(x, y, color);
-		 pts.add(new Point(x, y));
-		 return;
-		 }
+		//
+		if (test1(x, y, img)) {
+			img.setRGB(x, y, color);
+			pts.add(new Point(x, y));
+			return;
+		}
+		if (test2(x, y, img)) {
+			img.setRGB(x, y, color);
+			pts.add(new Point(x, y));
+			return;
+		}
 
 		if (test3(x, y, img)) {
 			img.setRGB(x, y, color);
@@ -311,7 +314,6 @@ public class SteelPanel extends JPanel implements PointerListener {
 		return false;
 
 	}
-
 
 	private boolean testColor(int x, int y, int r, int g, int b,
 			BufferedImage img) {
@@ -431,10 +433,10 @@ public class SteelPanel extends JPanel implements PointerListener {
 		if (trapez != null && drawTrapez) {
 			trapez.draw(g2);
 		}
-//		for (int i = 0; i < pts.size(); i++) {
-//				Point pi = pts.get(i);
-//				g2.drawOval(pi.x, pi.y, 10, 10);
-//		}
+		// for (int i = 0; i < pts.size(); i++) {
+		// Point pi = pts.get(i);
+		// g2.drawOval(pi.x, pi.y, 10, 10);
+		// }
 
 	}
 
@@ -442,6 +444,7 @@ public class SteelPanel extends JPanel implements PointerListener {
 
 		final JFrame frame = new JFrame();
 		// frame.setUndecorated(true);
+		System.setProperty("trapezKorrektur", "true");
 
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		screen = new Dimension(1024, 768);
@@ -549,15 +552,14 @@ public class SteelPanel extends JPanel implements PointerListener {
 		});
 	}
 
-	
-	private void clearPts(){
+	private void clearPts() {
 		pts.clear();
 	}
-	
-	private void clearChkPts(){
+
+	private void clearChkPts() {
 		chkPts.clear();
 	}
-	
+
 	public void setUserName(String n) {
 		this.name = n;
 		repaint();
@@ -610,20 +612,32 @@ public class SteelPanel extends JPanel implements PointerListener {
 
 		if (end != null && state == 1) {
 
-			if (end.distance(new Point(x, y)) < radius && Math.abs(chkPts.size()-pts.size())>10) {
-				log.info("#chkPoints {}",chkPts.size());
+			if (end.distance(new Point(x, y)) < radius
+					&& Math.abs(chkPts.size() - pts.size()) > 10) {
+				log.info("#chkPoints {}", chkPts.size());
 				log.info("Point in end-circle!");
 				state = 2;
 				endTime = System.currentTimeMillis();
 				inCircle = inCircle || true;
 				sound.play("off0");
+				item.put("level", "" + this.level);
 				item.put("track:point", "end");
 				item.put("time", (endTime - startTime));
 				item.put("onpath", this.onPath);
 				item.put("error", this.errors);
 				item = result.process(item);
+				item = scorer.process(item);
+				log.info("item: {}", item);
+				item = levelScore.process(item);
+				log.info("mapped: {}", item);
+
 				try {
-					this.score = new Double("" + item.get("@result"));
+					if (item.containsKey("@punkte")) {
+						score = new Double("" + item.get("@punkte"));
+					} else {
+						score = Double.NaN;
+					}
+					// this.score = new Double("" + item.get("@result2"));
 				} catch (Exception e) {
 					this.score = null;
 				}
@@ -646,8 +660,8 @@ public class SteelPanel extends JPanel implements PointerListener {
 			}
 
 			try {
-				checkPoints(x,y);
-				
+				checkPoints(x, y);
+
 				// log.info("Color: (" + r + "," + g + "," + b + ")");
 
 				if (!inCircle && state == 1) {
@@ -683,22 +697,23 @@ public class SteelPanel extends JPanel implements PointerListener {
 		this.validate();
 	}
 
-	private void checkPoints(int x,int y){
-		int r=-1;
-		Point p = new Point(x,y);
-		for(int i=0;i<chkPts.size();i++){
+	private void checkPoints(int x, int y) {
+		int r = -1;
+		Point p = new Point(x, y);
+		for (int i = 0; i < chkPts.size(); i++) {
 			Point pi = chkPts.get(i);
-			if(pi.distance(p)<60){
-				r=i;
+			if (pi.distance(p) < 60) {
+				r = i;
 				break;
-			}	
-			
+			}
+
 		}
-		if(r>-1){
+		if (r > -1) {
 			chkPts.remove(r);
 		}
-		
+
 	}
+
 	private int calcErrorIntensity(int x, int y, BufferedImage img) {
 		int size = 10;
 		int count = 0;

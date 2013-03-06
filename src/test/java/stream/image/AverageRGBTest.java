@@ -68,11 +68,11 @@ public class AverageRGBTest {
 			// for
 			// computing the average red value
 			//
-			Double avgRed = (Double) item.get("frame:red:avg");
-			Assert.assertEquals(0.0, avgRed);
+			Double avgRed = (Double) item.get("frame:red:average");
+			Assert.assertEquals(85.0, avgRed);
 
-			Double avgGreen = (Double) item.get("frame:green:avg");
-			Assert.assertEquals(255 / 2.0, avgGreen);
+			Double avgGreen = (Double) item.get("frame:green:average");
+			Assert.assertEquals(85.0, avgGreen);
 
 			log.info("item: {}", item);
 

@@ -58,8 +58,12 @@ public class NameDialog extends JDialog {
 		nameField.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyTyped(KeyEvent e) {
+
 				ok.setEnabled(nameField.getText() != null
 						&& !nameField.getText().trim().isEmpty());
+
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+					ok();
 			}
 		});
 		this.pack();
@@ -71,7 +75,8 @@ public class NameDialog extends JDialog {
 
 	public void ok() {
 		this.name = nameField.getText();
-		setVisible(false);
+		if (name != null && !name.trim().isEmpty())
+			setVisible(false);
 	}
 
 	public void center() {

@@ -2,10 +2,10 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jwall</groupId>
   <artifactId>streams-video</artifactId>
-  <version>0.0.4-SNAPSHOT</version>
+  <version>0.0.5-SNAPSHOT</version>
   
   <properties>
-		<streams.version>0.9.8-SNAPSHOT</streams.version>      
+	<streams.version>0.9.8</streams.version>      
   </properties>
   
   	<repositories>
@@ -32,6 +32,37 @@
                         <url>scp://jwall.org/var/www/jwall.org/htdocs/streams/</url>
                 </site>
         </distributionManagement>
+
+
+        <licenses>
+                <license>
+                        <name>GNU Affero General Public License, Version 3</name>
+                        <url>http://www.gnu.org/licenses/agpl-3.0-standalone.html</url>
+                </license>
+        </licenses>
+
+        <developers>
+                <developer>
+                        <name>Christian Bockermann</name>
+                        <email>christian.bockermann@cs.uni-dortmund.de</email>
+                        <organization>Informatik LS8, TU-Dortmund</organization>
+                        <organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
+                        <timezone>+1</timezone>
+                </developer>
+                <developer>
+                        <name>Hendrik Blom</name>
+                        <email>hendrik.blom@cs.uni-dortmund.de</email>
+                        <organization>Informatik LS8, TU-Dortmund</organization>
+                        <organizationUrl>http://www-ai.cs.uni-dortmund.de</organizationUrl>
+                        <timezone>+1</timezone>
+                </developer>
+		<developer>
+			<name>Matthias Schulte</name>
+			<organization>Informatik LS8, TU-Dortmund</organization>
+			<organizationUrl>http://www-ai.cs.uni-dortmund.de.de</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+        </developers>
   
   <dependencies>
   	<dependency>
@@ -60,13 +91,6 @@
   		<artifactId>slf4j-log4j12</artifactId>
   		<version>1.6.6</version>
   	</dependency>
-<!--
-  	<dependency>
-  		<groupId>org.jcodec</groupId>
-  		<artifactId>jcodec</artifactId>
-  		<version>0.0.9</version>
-  	</dependency>
-  -->
   	<dependency>
   		<groupId>commons-math</groupId>
   		<artifactId>commons-math</artifactId>
@@ -87,6 +111,7 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>	
+<!--
 	        <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -127,8 +152,44 @@
 					</execution>
 				</executions>
 			</plugin>
+-->
 	    </plugins>
-	    
-	    
 	</build>
+       <scm>
+                <url>https://bitbucket.org/cbockermann/streams</url>
+                <developerConnection>scm:git:ssh://git@bitbucket.org/cbockermann/streams</developerConnection>
+                <connection>scm:git:ssh://git@bitbucket.org/cbockermann/streams</connection>
+        </scm>
+
+
+        <profiles>
+                <profile>
+                        <id>release-sign-artifacts</id>
+                        <activation>
+                                <property>
+                                        <name>performRelease</name>
+                                        <value>true</value>
+                                </property>
+                        </activation>
+                        <build>
+                                <plugins>
+                                        <plugin>
+                                                <groupId>org.apache.maven.plugins</groupId>
+                                                <artifactId>maven-gpg-plugin</artifactId>
+                                                <version>1.1</version>
+                                                <executions>
+                                                        <execution>
+                                                                <id>sign-artifacts</id>
+                                                                <phase>verify</phase>
+                                                                <goals>
+                                                                        <goal>sign</goal>
+                                                                </goals>
+                                                        </execution>
+                                                </executions>
+                                        </plugin>
+                                </plugins>
+                        </build>
+                </profile>
+	</profiles>
+
 </project>

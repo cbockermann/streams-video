@@ -1,9 +1,10 @@
 <container>
     
     <stream id="video"
+    		url="tcp://192.168.128.99:9100" class="stream.io.DataObjectStream" />
+    		<!-- 
             class="stream.io.MJpegImageStream"
             url="http://kirmes.cs.uni-dortmund.de/kapseln.mjpeg"/>
-    		<!-- 
     		url="file:/Volumes/RamDisk/bwinf-stream.obj" class="stream.io.DataObjectStream" />
          limit="500"
     		url="file:/Volumes/RamDisk/webcam.mjpeg" />
@@ -14,19 +15,19 @@
 		<CreateID key="frame:id" />
 		 
 		<stream.image.DisplayImage image="data" />
+		<!-- 
 		<stream.laser.UberDiffImage image="data" threshold="15"/>
 		<stream.image.DisplayImage image="data" />
-		<!-- 
 		<Delay time="15ms" />
 		 -->
 				
 		<!-- 
 		<stream.image.filters.SetTransparent image="data"/>
-		 -->
 		<stream.image.AverageRGB image="data"/>
+        <stream.flow.Skip condition="%{data.frame:blue:avg} == null " />
+		 -->
 		
         
-        <stream.flow.Skip condition="%{data.frame:blue:avg} == null " />
         
     	<stream.MarkPeak keys="frame:green:avg" threshold="35" />
     	
@@ -35,9 +36,6 @@
 		</OnChange>    	
     			
 		<If condition="%{process.kalk} @eq 1">
-		    <!-- 
-		    <stream.logger.Message message="Computing minima!" />
-		     -->
 			<Delay time="1s" />
 		    <stream.statistics.Average id="avg" keys="frame:red:avg,frame:green:avg,frame:blue:avg" prefix="avg:" />
 		    <stream.statistics.Maxima id="min" keys="frame:red:avg,frame:green:avg,frame:blue:avg" />

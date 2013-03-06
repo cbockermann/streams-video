@@ -3,7 +3,7 @@
     <stream
         id="video"
         class="stream.io.MJpegImageStream"
-        url="http://download.jwall.org/stuff/coffee.mjpeg.gz" />
+        url="http://download.jwall.org/stuff/coffee.mjpeg.gz" limit="100" />
 
     <process input="video" >
 
@@ -15,7 +15,7 @@
         
           <stream.image.DisplayImage image="data" />
           
-          <stream.image.AverageRGB />
+          <stream.image.features.AverageRGB />
           
           <!--  
           <stream.image.filters.Smoothing output="data" windowSize="8" />
