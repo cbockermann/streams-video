@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jwall</groupId>
   <artifactId>streams-video</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1-SNAPSHOT</version>
   
   <properties>
 	<streams.version>0.9.8</streams.version>      
