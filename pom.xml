@@ -3,10 +3,14 @@
   <groupId>org.jwall</groupId>
   <artifactId>streams-video</artifactId>
   <version>0.1.1-SNAPSHOT</version>
+  <name>streams-video</name>
+  <description>This module provides means for reading and processing video data.</description>
   
   <properties>
-	<streams.version>0.9.8</streams.version>      
+        <streams.version>0.9.8</streams.version>      
   </properties>
+
+        <url>http://www.jwall.org/streams-video</url>
   
   	<repositories>
 		<repository>
