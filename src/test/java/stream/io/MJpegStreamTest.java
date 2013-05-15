@@ -33,9 +33,9 @@ public class MJpegStreamTest {
 		try {
 			SourceURL url = new SourceURL(
 					"http://kirmes.cs.uni-dortmund.de/video/20120911-micro.raw");
-			url = new SourceURL("file:/Volumes/RamDisk/20120911-micro.raw");
-			// url = new SourceURL(
-			// "http://kirmes.cs.uni-dortmund.de/video/20120911-small-1000f.raw");
+			// url = new SourceURL("file:/Volumes/RamDisk/20120911-micro.raw");
+			url = new SourceURL(
+					"http://kirmes.cs.uni-dortmund.de/video/20120911-small-1000f.raw");
 			MJpegImageStream stream = new MJpegImageStream(url);
 			stream.setReadBufferSize(new ByteSize("16"));
 			stream.setBufferSize(new ByteSize("16M"));

@@ -37,7 +37,8 @@ public abstract class AbstractImageProcessor extends AbstractProcessor
 	 * @param data
 	 *            the data to set
 	 */
-	@Parameter(description = "The name of the attribute that contains the byte array data of the image.", required = true)
+	@Parameter(description = "The name of the attribute that contains the byte array data of the encoded image or the ImageRGB object (if previously been decoded). Default value is: `"
+			+ ImageProcessor.DEFAULT_IMAGE_KEY + "`.", required = false)
 	public void setImage(String data) {
 		this.imageKey = data;
 	}

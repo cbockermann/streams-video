@@ -123,9 +123,9 @@ public class PlayWavData extends AbstractProcessor {
 				buffer.put(bytes);
 			}
 
-			Long frames = audio.getLongFramePosition();
-			Float sampleRate = header.getSampleRate();
-			Double time = (frames.doubleValue() / sampleRate.doubleValue());
+			// Long frames = audio.getLongFramePosition();
+			// Float sampleRate = header.getSampleRate();
+			// Double time = (frames.doubleValue() / sampleRate.doubleValue());
 			// if (blocksProcessed % 15 == 0) {
 			// log.info("Audio position is: {}", time);
 			// }

@@ -33,7 +33,7 @@ public class AverageRGBTest {
 
 			Data item = DataFactory.create();
 			ImageRGB image = new ImageRGB(300, 300);
-			double size = 300 * 300;
+			// double size = 300 * 300;
 			int transparent = 0;
 
 			for (int i = 0; i < image.pixels.length; i++) {

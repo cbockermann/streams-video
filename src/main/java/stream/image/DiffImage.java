@@ -6,10 +6,10 @@ import stream.annotations.Parameter;
 public class DiffImage extends AbstractImageProcessor {
 
 	ImageRGB lastImage = new ImageRGB(0, 0);
-	
-	String output = "data";
-	
-	@Parameter(description="The name/key under which the output image is stored. If this name equals the name of the input image, the input image is going to be overwritten.")
+
+	String output = ImageProcessor.DEFAULT_IMAGE_KEY;
+
+	@Parameter(description = "The name/key under which the output image is stored. If this name equals the name of the input image, the input image is going to be overwritten.")
 	public void setOutput(String output) {
 		this.output = output;
 	}
