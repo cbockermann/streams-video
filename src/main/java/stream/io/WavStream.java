@@ -56,10 +56,11 @@ public class WavStream extends AbstractStream {
 
 	final SourceURL source;
 	InputStream in;
-	protected int blockSize = 48000;
+	protected Integer blockSize = 48000;
 	protected Long blocksRead = 0L;
 	final Data header = DataFactory.create();
 	boolean eos = false;
+	boolean initialized = false;
 
 	public WavStream(SourceURL source) {
 		super(source);
@@ -99,7 +100,17 @@ public class WavStream extends AbstractStream {
 
 	public void init() throws Exception {
 
+		if (initialized) {
+			log.info("audio-stream already initialized...");
+			return;
+		}
+
 		this.in = source.openStream();
+
+		while (in.available() < 12) {
+			log.info("Waiting for audio-samples to become available...");
+			Thread.sleep(100);
+		}
 
 		// Read the first 12 bytes of the file
 		int bytesRead = in.read(buffer, 0, 12);
@@ -228,12 +239,14 @@ public class WavStream extends AbstractStream {
 
 		log.info("Sample rate is: {}", this.sampleRate);
 		log.info("  chunk size is: {}", chunkSize);
-		this.blockSize = (new Long(chunkSize)).intValue();
+		if (blockSize == null)
+			this.blockSize = (new Long(chunkSize)).intValue();
 		log.info("  each sample is for {} seconds",
 				1.0d / sampleRate.doubleValue());
 		log.info("  stream block size is: {} ({} seconds for each block)",
 				this.blockSize, blockSize / sampleRate.doubleValue());
 
+		initialized = true;
 	}
 
 	// Get and Put little endian data from local buffer

@@ -6,6 +6,9 @@ package stream.image;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * <p>
  * 
@@ -16,6 +19,7 @@ import java.io.Serializable;
  */
 public class ImageRGB implements Serializable {
 
+	static Logger log = LoggerFactory.getLogger(ImageRGB.class);
 	/** The unique class ID */
 	private static final long serialVersionUID = -2042395350522979787L;
 	public final int height;
@@ -46,7 +50,16 @@ public class ImageRGB implements Serializable {
 	public ImageRGB(BufferedImage img) {
 		this.height = img.getHeight();
 		this.width = img.getWidth();
-		pixels = new int[width * height];
+		int[] px;
+		try {
+			px = new int[width * height];
+		} catch (Exception e) {
+			log.error(
+					"Failed to create image of size {}x{}: " + e.getMessage(),
+					width, height);
+			px = new int[0];
+		}
+		pixels = px;
 		img.getRGB(0, 0, width, height, pixels, 0, width);
 	}
 

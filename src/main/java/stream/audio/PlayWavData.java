@@ -3,6 +3,8 @@
  */
 package stream.audio;
 
+import java.nio.ByteBuffer;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine.Info;
@@ -30,6 +32,8 @@ public class PlayWavData extends AbstractProcessor {
 	Double volume = 0.5;
 	Integer blocksProcessed = 0;
 	Long samplesWritten = 0L;
+
+	ByteBuffer buffer = ByteBuffer.allocate(48 * 1024);
 
 	/**
 	 * @return the volume
@@ -104,9 +108,20 @@ public class PlayWavData extends AbstractProcessor {
 				bytes[i] = (byte) (volume * samples[i]);
 			}
 
-			// log.info("Writing {} bytes to audio-line...", bytes.length);
-			audio.write(bytes, 0, bytes.length);
-			samplesWritten += bytes.length;
+			if (this.buffer.remaining() > bytes.length) {
+				log.info("Adding {} bytes to buffer", bytes.length);
+				this.buffer.put(bytes);
+				return input;
+			} else {
+
+				buffer.flip();
+				log.info("Writing {} bytes to audio-line...", buffer.limit());
+				audio.write(buffer.array(), 0, buffer.limit());
+				samplesWritten += buffer.limit();
+
+				buffer.clear();
+				buffer.put(bytes);
+			}
 
 			Long frames = audio.getLongFramePosition();
 			Float sampleRate = header.getSampleRate();

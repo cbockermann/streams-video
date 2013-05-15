@@ -20,10 +20,11 @@ import stream.annotations.Parameter;
  * @author chris
  * 
  */
-public abstract class AbstractImageProcessor extends AbstractProcessor {
+public abstract class AbstractImageProcessor extends AbstractProcessor
+		implements ImageProcessor {
 
 	static Logger log = LoggerFactory.getLogger(AbstractImageProcessor.class);
-	protected String imageKey = "data";
+	protected String imageKey = DEFAULT_IMAGE_KEY;
 
 	/**
 	 * @return the data
