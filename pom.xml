@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jwall</groupId>
   <artifactId>streams-video</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.2.0</version>
   <name>streams-video</name>
   <description>This module provides means for reading and processing video data.</description>
   
