@@ -7,7 +7,7 @@
   <description>This module provides means for reading and processing video data.</description>
   
   <properties>
-        <streams.version>0.9.9</streams.version>      
+        <streams.version>0.9.11</streams.version>      
   </properties>
 
         <url>http://www.jwall.org/streams-video</url>
@@ -67,12 +67,12 @@
   <dependencies>
   	<dependency>
   		<groupId>org.jwall</groupId>
-  		<artifactId>stream-core</artifactId>
+  		<artifactId>streams-core</artifactId>
   		<version>${streams.version}</version>
   	</dependency>
   	<dependency>
   		<groupId>org.jwall</groupId>
-  		<artifactId>stream-runtime</artifactId>
+  		<artifactId>streams-runtime</artifactId>
   		<version>${streams.version}</version>
   	</dependency>
   	<dependency>
@@ -83,7 +83,7 @@
   	</dependency>
   	<dependency>
   		<groupId>org.jwall</groupId>
-  		<artifactId>stream-plotter</artifactId>
+  		<artifactId>streams-plotter</artifactId>
   		<version>${streams.version}</version>
   	</dependency>
   	<dependency>
