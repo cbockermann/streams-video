@@ -270,16 +270,27 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 		BufferedImage frame = null;
 		Long timestamp = null;
 
+		public ImagePanel() {
+			setBackground(Color.WHITE);
+		}
+
 		public void paint(Graphics g) {
 			super.paint(g);
+			int offx = 0;
+			int offy = 0;
 			if (frame != null) {
+
+				offx = Math.abs((frame.getWidth() - this.getWidth()) / 2);
+				offy = Math.abs((frame.getHeight() - this.getHeight()) / 2);
+
 				// log.info("Drawing frame {}", frame);
-				g.drawImage(frame, 0, 0, null);
+				g.drawImage(frame, offx, offy, null);
 			}
 
 			if (timestamp != null) {
 				g.setColor(Color.WHITE);
-				g.drawString(fmt.format(new Date(timestamp)), 4, 20);
+				g.drawString(fmt.format(new Date(timestamp)), 4 + offx,
+						20 + offy);
 			}
 		}
 
