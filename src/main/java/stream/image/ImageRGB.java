@@ -52,6 +52,7 @@ public class ImageRGB implements Serializable {
 		this.width = img.getWidth();
 		int[] px;
 		try {
+			log.debug("creating image of size  {} x {}", width, height);
 			px = new int[width * height];
 		} catch (Exception e) {
 			log.error(

@@ -16,7 +16,7 @@ import stream.Processor;
 public class Framerate implements Processor {
 
 	static Logger log = LoggerFactory.getLogger(Framerate.class);
-	String frame = "data";
+	String frame = "frame:image";
 	Long first = 0L;
 	Long last = 0L;
 	Integer count = 0;
