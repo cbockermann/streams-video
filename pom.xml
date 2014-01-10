@@ -1,14 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jwall</groupId>
 	<artifactId>streams-video</artifactId>
-	<version>0.2.2-SNAPSHOT</version>
+	<version>0.2.2</version>
 	<name>streams-video</name>
 	<description>This module provides means for reading and processing video data.</description>
 
 	<properties>
-		<streams.version>[0.9.13,)</streams.version>
+		<streams.version>[0.9.14,)</streams.version>
 	</properties>
 
 	<url>http://www.jwall.org/streams-video</url>
@@ -96,7 +95,7 @@
 		<dependency>
 			<groupId>org.jwall</groupId>
 			<artifactId>streams-plotter</artifactId>
-			<version>0.9.14-SNAPSHOT</version>
+			<version>0.9.14</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
