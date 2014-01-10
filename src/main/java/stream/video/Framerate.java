@@ -79,18 +79,18 @@ public class Framerate implements Processor {
 
 				Long dur = (System.currentTimeMillis() - first) / 1000L;
 				double rate = count.doubleValue() / dur.doubleValue();
-				// log.info("fps: {}", rate);
+				log.info("fps: {}", rate);
 
 				if (rate < fps) {
-					// log.info("Dropping frame...");
+					log.info("Dropping frame...");
 					last = System.currentTimeMillis();
 					return null;
 				}
 
 				long ago = System.currentTimeMillis() - last;
 				Long delay = frametime - ago;
-				// log.info("Last frame was {} ms ago, waiting for {} ms", ago,
-				// delay);
+				log.info("Last frame was {} ms ago, waiting for {} ms", ago,
+						delay);
 				if (delay > 0) {
 					sleep(delay);
 				}
@@ -99,6 +99,8 @@ public class Framerate implements Processor {
 				if (count % 10 == 0)
 					log.info("Video position is: {} (calculated: {})", time,
 							(count * frametime) / 1000.0d);
+			} else {
+				log.info("last = {}, fps = {}, just running...", last, fps);
 			}
 
 			last = System.currentTimeMillis();

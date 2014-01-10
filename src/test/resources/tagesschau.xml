@@ -3,9 +3,9 @@
     <stream
         id="video"
         class="stream.io.MJpegImageStream"
-        url="http://mattis.special-operations.de/video/20120911-scaled.raw" />
+        url="file:/Volumes/RamDisk/video/test.mjpeg" />
 <!-- 
-        url="file:/Volumes/RamDisk/video.mjpeg.raw" />
+        url="http://mattis.special-operations.de/video/20120911-scaled.raw" />
         url="http://kirmes.cs.uni-dortmund.de/video/video.mjpeg.raw" />
         url="file:/Volumes/RamDisk/video.mjpeg.raw" />
 -->
@@ -16,16 +16,22 @@
 -->        
         
         <CreateID key="frame:id" />
-        
+
+<!-- 
 		<stream.news.helper.AddNewsshowLabels />
+ -->        
 				
 		<stream.image.features.AverageRGB />
 		<stream.image.features.MedianRGB />
 		<stream.image.features.StandardDeviationRGB />
+        <PrintData />
             
+        <stream.image.DiffImage output="image:diff" threshold="0"/>
+            <!-- 
 		<stream.news.learner.anchorshotdetection.ApplyDecisionTreeModel predictionkey="@prediction:anchorshot" />
 		
     	<stream.learner.evaluation.PredictionError label="@label:anchorshot" />
+             -->
     	
     	
     	
@@ -44,12 +50,12 @@
 		 
 		<stream.image.features.CenterOfMass colorchannel="green" normalized="true" />
 		<stream.image.features.CenterOfMass colorchannel="blue" normalized="true" />
-        <stream.image.DisplayImage image="data" />
 
 		<stream.news.learner.anchorshotdetection.AnchorshotModelCreator />
 		 
 		 -->
-		
+        <stream.image.DisplayImage image="frame:image" />
+		<stream.image.DisplayImage image="image:diff" />
         
     	
 <!--     	

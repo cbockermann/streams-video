@@ -58,6 +58,7 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 	String onClose = "";
 	boolean closing = false;
 	AtomicBoolean stopped = new AtomicBoolean(false);
+	long id = 0;
 
 	public DisplayImage() {
 		frame = new JFrame();
@@ -158,15 +159,17 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 				time = null;
 			}
 
-			imagePanel.setFrame(image, null);
-			if (time != null)
-				info.setText(timeFormat.format(new Date(time)));
-			frame.repaint();
-			frame.validate();
-			if (!initialSize) {
-				// frame.setSize(image.getWidth(), image.getHeight() + 20);
-				frame.pack();
-				initialSize = true;
+			if (id++ % 3 == 0) {
+				imagePanel.setFrame(image, null);
+				if (time != null)
+					info.setText(timeFormat.format(new Date(time)));
+				frame.repaint();
+				frame.validate();
+				if (!initialSize) {
+					// frame.setSize(image.getWidth(), image.getHeight() + 20);
+					frame.pack();
+					initialSize = true;
+				}
 			}
 			if (!frame.isVisible()) {
 

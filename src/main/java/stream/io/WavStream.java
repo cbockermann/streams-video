@@ -105,6 +105,7 @@ public class WavStream extends AbstractStream {
 			return;
 		}
 
+		log.info("Opening stream from {}", source);
 		this.in = source.openStream();
 
 		while (in.available() < 12) {

@@ -1,0 +1,35 @@
+<container>
+
+	<stream id="video:ts" class="stream.io.TransportStream" limit="100000"
+		   url="file:/Volumes/RamDisk/vista-stream-rtl.ts" />
+		   <!-- 
+		   url="http://cb00.virtual/rtl.ts" />
+		    -->
+		   
+	<queue id="video:frames" />
+		   
+	<process input="video:ts">
+	<!-- 
+		<PrintData />
+	 -->
+		<stream.io.DecodeVideo output="video:frames" />
+	</process>
+
+	<process input="video:frames">
+	
+	<!-- 
+		<stream.video.Framerate fps="25" />
+	 -->
+	
+		<stream.audio.Volume />
+	
+		<stream.image.PixelChangeRate />
+		<stream.image.BlackFrameDetector />
+	
+		<PrintData />
+		<stream.image.DisplayImage key="frame:image" />
+		
+		<stream.plotter.Plotter history="10000" keys="wav:min,wav:max,wav:avg,frame:pixels:changed,blackRate,wav:volume" />
+	</process>
+
+</container>

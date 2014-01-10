@@ -2,7 +2,7 @@
 
 
 	<stream id="audio" class="stream.io.WavStream" blockSize="1200"
-	       url="file:/Volumes/RamDisk/vista-stream-ard.wav" />
+	       url="classpath:/tagesschau.wav.gz" />
 	       <!-- 
 		   url="file:/Users/chris/tagesschau.wav" />
 	        -->
