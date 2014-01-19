@@ -27,7 +27,9 @@
 		<stream.image.BlackFrameDetector />
 	
 		<PrintData />
+<!--
 		<stream.image.DisplayImage key="frame:image" />
+-->
 		
 		<stream.plotter.Plotter history="10000" keys="wav:min,wav:max,wav:avg,frame:pixels:changed,blackRate,wav:volume" />
 	</process>
