@@ -66,6 +66,7 @@ public class TransportStream extends AbstractStream {
 	@Override
 	public void init() throws Exception {
 		super.init();
+
 		stream = this.getInputStream();
 
 		prefetcher = new Thread() {
@@ -109,7 +110,7 @@ public class TransportStream extends AbstractStream {
 						// Integer.toBinaryString(SCRAMBLE_BIT)));
 
 						if ((flags & SCRAMBLE_BIT) > 0) {
-							log.info("scrambling found!");
+							log.debug("scrambling found!");
 						}
 
 						// log.info(
@@ -171,8 +172,9 @@ public class TransportStream extends AbstractStream {
 						item.put("packet:pid", pid);
 						item.put("packet:offset", offset - 188);
 						item.put("packet:sequence", sequenceId++);
+						item.put("packet:source:url", getUrl() + "");
 						while (queue.remainingCapacity() < 1) {
-							log.info("Waiting for queue to drain a bit...");
+							log.debug("Waiting for queue to drain a bit...");
 							Thread.sleep(100);
 						}
 						queue.add(item);

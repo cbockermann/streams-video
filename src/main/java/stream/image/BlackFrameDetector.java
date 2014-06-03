@@ -50,7 +50,7 @@ public class BlackFrameDetector extends AbstractProcessor {
 				input.put("blackRate", 100.0d * fraction);
 
 				if (fraction > threshold) {
-					input.put("frame:mark:blackFrame", 500.0);
+					input.put("frame:mark:blackFrame", 1.0);
 				} else {
 					input.put("frame:mark:blackFrame", 0.0);
 				}

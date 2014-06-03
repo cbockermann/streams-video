@@ -101,15 +101,15 @@ public class WavStream extends AbstractStream {
 	public void init() throws Exception {
 
 		if (initialized) {
-			log.info("audio-stream already initialized...");
+			log.debug("audio-stream already initialized...");
 			return;
 		}
 
-		log.info("Opening stream from {}", source);
+		log.debug("Opening stream from {}", source);
 		this.in = source.openStream();
 
 		while (in.available() < 12) {
-			log.info("Waiting for audio-samples to become available...");
+			log.debug("Waiting for audio-samples to become available...");
 			Thread.sleep(100);
 		}
 
@@ -238,13 +238,13 @@ public class WavStream extends AbstractStream {
 		bytesRead = 0;
 		// frameCounter = 0L;
 
-		log.info("Sample rate is: {}", this.sampleRate);
-		log.info("  chunk size is: {}", chunkSize);
+		log.debug("Sample rate is: {}", this.sampleRate);
+		log.debug("  chunk size is: {}", chunkSize);
 		if (blockSize == null)
 			this.blockSize = (new Long(chunkSize)).intValue();
-		log.info("  each sample is for {} seconds",
+		log.debug("  each sample is for {} seconds",
 				1.0d / sampleRate.doubleValue());
-		log.info("  stream block size is: {} ({} seconds for each block)",
+		log.debug("  stream block size is: {} ({} seconds for each block)",
 				this.blockSize, blockSize / sampleRate.doubleValue());
 
 		initialized = true;
@@ -303,27 +303,27 @@ public class WavStream extends AbstractStream {
 		double avg = 0.0d;
 		double[] block = new double[blockSize];
 		int last = 0;
-		int read = 0;
+		// int read = 0;
 		for (int i = 0; i < block.length; i++) {
 			double sample = readSample();
 			if (sample == Double.NaN) {
 				eos = true;
-				log.info("EOS! Last successful block was {}", i);
+				log.debug("EOS! Last successful block was {}", i);
 				break;
 			} else {
 				block[i] = sample;
 				last++;
-				read++;
+				// read++;
 			}
 			min = Math.min(min, block[i]);
 			max = Math.max(max, block[i]);
 			avg += block[i];
 		}
 
-		// log.info("{} samples successfully read", read);
+		// log.debug("{} samples successfully read", read);
 
 		if (last < block.length) {
-			// log.info("Shrinking block to {} samples", last);
+			// log.debug("Shrinking block to {} samples", last);
 			double[] nb = new double[last];
 			for (int i = 0; i < last; i++) {
 				nb[i] = block[i];

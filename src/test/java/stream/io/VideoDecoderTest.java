@@ -21,13 +21,7 @@ public class VideoDecoderTest {
 
 	@Test
 	public void test() {
-		try {
-			URL url = VideoDecoderTest.class.getResource("/video-decoder.xml");
-			stream.run.main(url);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("Test failed: " + e.getMessage());
-		}
+
 	}
 
 	public static void main(String[] args) {
