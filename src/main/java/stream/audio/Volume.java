@@ -47,6 +47,9 @@ public class Volume extends AbstractProcessor {
 		try {
 
 			double[] samples = (double[]) input.get(key);
+			if (samples == null) {
+				return input;
+			}
 
 			double avg = 0.0;
 			for (int i = 0; i < samples.length; i++) {

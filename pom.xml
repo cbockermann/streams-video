@@ -1,13 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jwall</groupId>
 	<artifactId>streams-video</artifactId>
-	<version>0.2.3-SNAPSHOT</version>
+	<version>0.2.4-SNAPSHOT</version>
 	<name>streams-video</name>
 	<description>This module provides means for reading and processing video data.</description>
 
 	<properties>
-		<streams.version>[0.9.17,)</streams.version>
+		<streams.version>0.9.19-SNAPSHOT</streams.version>
 	</properties>
 
 	<url>http://www.jwall.org/streams-video</url>
@@ -89,13 +90,13 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.6.4</version>
+			<version>[1.6.4,)</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jwall</groupId>
 			<artifactId>streams-plotter</artifactId>
-			<version>0.9.14</version>
+			<version>${streams.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -131,6 +132,7 @@
 		<url>https://bitbucket.org/cbockermann/streams-video.git</url>
 		<developerConnection>scm:git:ssh://git@bitbucket.org/cbockermann/streams-video.git</developerConnection>
 		<connection>scm:git:ssh://git@bitbucket.org/cbockermann/streams-video.git</connection>
+		<tag>HEAD</tag>
 	</scm>
 
 
@@ -167,21 +169,66 @@
 				<property>
 					<name>standalone</name>
 					<value>true</value>
-				</property>			
+				</property>
 			</activation>
-			
+
 			<dependencies>
 				<dependency>
 					<groupId>org.jwall</groupId>
 					<artifactId>streams-plotter</artifactId>
 					<version>${streams.version}</version>
 				</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>1.6.6</version>
-		</dependency>
+				<dependency>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+					<version>1.6.6</version>
+				</dependency>
 			</dependencies>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-shade-plugin</artifactId>
+						<version>1.5</version>
+						<configuration>
+							<finalName>streams-video-standalone-${project.version}</finalName>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<manifestEntries>
+										<Implementation-Vendor>Christian Bockermann</Implementation-Vendor>
+										<Implementation-Title>streams-video</Implementation-Title>
+										<Implementation-Version>${project.version}</Implementation-Version>
+										<Implementation-Revision>${project.version}</Implementation-Revision>
+										<Specification-Title>streams-video</Specification-Title>
+										<Specification-Version>1.0</Specification-Version>
+										<main-class>stream.run</main-class>
+									</manifestEntries>
+								</transformer>
+							</transformers>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>shade</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 	</profiles>
 

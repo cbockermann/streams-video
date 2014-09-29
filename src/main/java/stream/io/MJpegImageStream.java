@@ -31,6 +31,7 @@ public class MJpegImageStream extends AbstractStream {
 	int ok = 0;
 	int errors = 0;
 	long frame = 0;
+	boolean includeRawData = false;
 
 	public MJpegImageStream(SourceURL url) throws Exception {
 		super(url);
@@ -110,6 +111,9 @@ public class MJpegImageStream extends AbstractStream {
 
 		Data item = DataFactory.create();
 		item.put("frame:size_raw", data.length);
+		if (includeRawData) {
+			item.put("frame:data", data);
+		}
 
 		try {
 			BufferedImage img = ImageIO.read(new ByteArrayInputStream(data));
@@ -138,6 +142,21 @@ public class MJpegImageStream extends AbstractStream {
 		super.close();
 	}
 
+	/**
+	 * @return the includeRawData
+	 */
+	public boolean isIncludeRawData() {
+		return includeRawData;
+	}
+
+	/**
+	 * @param includeRawData
+	 *            the includeRawData to set
+	 */
+	public void setIncludeRawData(boolean includeRawData) {
+		this.includeRawData = includeRawData;
+	}
+
 	public void info() {
 		log.info("{} frames were read without problems.", ok);
 		log.info("{} frames could not be read", errors);
@@ -146,7 +165,8 @@ public class MJpegImageStream extends AbstractStream {
 
 	public static void main(String[] args) throws Exception {
 
-		SourceURL url = new SourceURL("file:/Volumes/RamDisk/laser.mjpeg");
+		SourceURL url = new SourceURL(
+				"file:/Volumes/RamDisk/ViSTA-TV-WerbeDemo.mjpeg");
 		MJpegImageStream stream = new MJpegImageStream(url);
 		stream.setReadBufferSize(new ByteSize("1k"));
 		stream.setBufferSize(new ByteSize("8mb"));
@@ -156,6 +176,7 @@ public class MJpegImageStream extends AbstractStream {
 		Data item = null;
 		do {
 			item = stream.read();
+			System.out.println("Frame: " + item);
 			if (item != null)
 				frames++;
 		} while (item != null);

@@ -291,8 +291,9 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 				offx = Math.abs((frame.getWidth() - this.getWidth()) / 2);
 				offy = Math.abs((frame.getHeight() - this.getHeight()) / 2);
 
-				// log.info("Drawing frame {}", frame);
+				log.debug("Drawing frame {}", frame);
 				g.drawImage(frame, offx, offy, null);
+
 			}
 
 			if (timestamp != null) {
