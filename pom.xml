@@ -8,7 +8,7 @@
 	<description>This module provides means for reading and processing video data.</description>
 
 	<properties>
-		<streams.version>0.9.19-SNAPSHOT</streams.version>
+		<streams.version>[0.9.19,)</streams.version>
 	</properties>
 
 	<url>http://www.jwall.org/streams-video</url>
