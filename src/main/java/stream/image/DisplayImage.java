@@ -159,18 +159,19 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 				time = null;
 			}
 
-			if (id++ % 3 == 0) {
-				imagePanel.setFrame(image, null);
-				if (time != null)
-					info.setText(timeFormat.format(new Date(time)));
-				frame.repaint();
-				frame.validate();
-				if (!initialSize) {
-					// frame.setSize(image.getWidth(), image.getHeight() + 20);
-					frame.pack();
-					initialSize = true;
-				}
+			log.debug("Updating image...");
+			imagePanel.setFrame(image, null);
+			if (time != null)
+				info.setText(timeFormat.format(new Date(time)));
+			frame.repaint();
+			frame.validate();
+			imagePanel.repaint();
+			if (!initialSize) {
+				// frame.setSize(image.getWidth(), image.getHeight() + 20);
+				frame.pack();
+				initialSize = true;
 			}
+
 			if (!frame.isVisible()) {
 
 				frame.setVisible(true);
