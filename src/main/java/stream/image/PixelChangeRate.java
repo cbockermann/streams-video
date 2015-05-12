@@ -60,14 +60,17 @@ public class PixelChangeRate extends AbstractImageProcessor {
 				differ++;
 			}
 
-			min = Math.min(min, diff);
+			if (diff > 0) {
+				min = Math.min(min, diff);
+			}
 			max = Math.max(max, diff);
 		}
 
-		item.put("frame:pixels:changed",
+		item.put(imageKey + ":pixels:changed", differ.intValue());
+		item.put(imageKey + ":pixels:changeRate",
 				differ.doubleValue() / total.doubleValue());
-		item.put("frame:pixels:minDiff", min);
-		item.put("frame:pixels:maxDiff", max);
+		item.put(imageKey + ":pixels:minDiff", min);
+		item.put(imageKey + ":pixels:maxDiff", max);
 		return item;
 	}
 
