@@ -25,6 +25,7 @@ public abstract class AbstractImageProcessor extends AbstractProcessor
 
 	static Logger log = LoggerFactory.getLogger(AbstractImageProcessor.class);
 	protected String imageKey = DEFAULT_IMAGE_KEY;
+	String output = "data";
 
 	/**
 	 * @return the data
@@ -43,6 +44,13 @@ public abstract class AbstractImageProcessor extends AbstractProcessor
 		this.imageKey = data;
 	}
 
+	
+	
+	@Parameter(description="The name/key under which the output image is stored. If this name equals the name of the input image, the input image is going to be overwritten.")
+	public void setOutput(String output) {
+		this.output = output;
+	}
+
 	/**
 	 * @see stream.Processor#process(stream.Data)
 	 */
@@ -51,8 +59,24 @@ public abstract class AbstractImageProcessor extends AbstractProcessor
 
 		Serializable value = input.get(imageKey);
 		if (value instanceof ImageRGB) {
-			Data result = process(input, (ImageRGB) value);
-			return result;
+			if(output.equals(imageKey)){	//are both names equal? then overwrite original
+				Data result = process(input, (ImageRGB) value);
+				return result;
+			}
+			else	//names are not equal --> create a new image so that original won't be overwritten
+			{
+				ImageRGB img = (ImageRGB) value;
+				// create deep copy
+				int width = img.width;
+				int height = img.height;
+				int[] array = new int[img.pixels.length];
+				System.arraycopy(img.pixels, 0, array, 0, array.length);
+				
+				// do all further stuff with deep copy instead
+				Data result = process(input, new ImageRGB(width, height, array));
+				return result;
+			}
+			
 		}
 
 		byte[] bytes = (byte[]) input.get(imageKey);
