@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.jwall</groupId>
 	<artifactId>streams-video</artifactId>
-	<version>0.2.6-SNAPSHOT</version>
+	<version>0.3.1-SNAPSHOT</version>
 	<name>streams-video</name>
 	<description>This module provides means for reading and processing video data.</description>
 
 	<properties>
-		<streams.version>[0.9.19,)</streams.version>
+		<streams.version>LATEST</streams.version>
 	</properties>
 
 	<url>http://www.jwall.org/streams-video</url>
@@ -73,11 +73,6 @@
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-math</groupId>
-			<artifactId>commons-math</artifactId>
-			<version>20040218.045431</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
