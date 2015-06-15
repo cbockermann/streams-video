@@ -5,14 +5,15 @@ import stream.ProcessContext;
 import stream.annotations.Parameter;
 
 /**
- * The Color Discretization Operator discretizes the color space of the input image.
+ * The Color Discretization Operator discretizes the color space of the input
+ * image.
  * 
  * @author Matthias
- *
+ * 
  */
 public class ColorDiscretization extends AbstractImageProcessor {
 
-	String output = "data";
+	String output = "frame:discretized";
 
 	Integer valuesPerChannel = 4;
 
@@ -40,11 +41,13 @@ public class ColorDiscretization extends AbstractImageProcessor {
 
 	/**
 	 * Setter for the Parameter Output
-	 * @param output The name/key under which the discretized Image is stored. 
-	 * 					If this name equals the name of the input image, the input image
-	 * 					is going to be overwritten.
+	 * 
+	 * @param output
+	 *            The name/key under which the discretized Image is stored. If
+	 *            this name equals the name of the input image, the input image
+	 *            is going to be overwritten.
 	 */
-	@Parameter(description ="The name/key under which the output image is stored. If this name equals the name of the input image, the input image is going to be overwritten.")
+	@Parameter(description = "The name/key under which the output image is stored. If this name equals the name of the input image, the input image is going to be overwritten.")
 	public void setOutput(String output) {
 		this.output = output;
 	}
@@ -58,7 +61,8 @@ public class ColorDiscretization extends AbstractImageProcessor {
 
 	/**
 	 * @param bins
-	 *            Set the number of discrete color values, each channel in divided into
+	 *            Set the number of discrete color values, each channel in
+	 *            divided into
 	 */
 	@Parameter(description = "Set the number of discrete color values, each channel in divided into.")
 	public void setBins(Integer bins) {
@@ -68,7 +72,8 @@ public class ColorDiscretization extends AbstractImageProcessor {
 	@Override
 	public Data process(Data item, ImageRGB img) {
 
-		ImageRGB discretizedImage = new ImageRGB(img.getWidth(), img.getHeight());
+		ImageRGB discretizedImage = new ImageRGB(img.getWidth(),
+				img.getHeight());
 
 		for (int x = 0; x < img.getWidth(); x++) {
 			for (int y = 0; y < img.getHeight(); y++) {
@@ -124,7 +129,6 @@ public class ColorDiscretization extends AbstractImageProcessor {
 			}
 		}
 
-		
 		item.put(output, discretizedImage);
 
 		return item;

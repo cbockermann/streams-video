@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -58,6 +59,7 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 	String onClose = "";
 	boolean closing = false;
 	AtomicBoolean stopped = new AtomicBoolean(false);
+	AtomicLong frameNumber = new AtomicLong(0L);
 	long id = 0;
 
 	public DisplayImage() {
@@ -89,6 +91,8 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 		frame.getContentPane().add(info, BorderLayout.SOUTH);
 		frame.addWindowListener(this);
 
+		info.setText("");
+
 		imagePanel.addMouseMotionListener(new MouseAdapter() {
 			/**
 			 * @see java.awt.event.MouseAdapter#mouseMoved(java.awt.event.MouseEvent)
@@ -98,17 +102,17 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 				super.mouseMoved(e);
 				int x = e.getX();
 				int y = e.getY();
+				String fn = "frame: " + frameNumber.longValue() + ", ";
 				if (imagePanel.frame != null) {
 					int rgb = imagePanel.frame.getRGB(x, y);
 
 					int red = (rgb >> 16) & 0xFF;
 					int green = (rgb >> 8) & 0xFF;
 					int blue = rgb & 0xFF;
-
-					info.setText("x: " + x + ", y: " + y + ", RGB = (" + red
-							+ " / " + green + " / " + blue + ")");
+					info.setText(fn + " x: " + x + ", y: " + y + ", RGB = ("
+							+ red + " / " + green + " / " + blue + ")");
 				} else {
-					info.setText("x: " + x + ", y: " + y);
+					info.setText(fn + "x: " + x + ", y: " + y);
 				}
 			}
 		});
@@ -152,6 +156,7 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 		if (image != null) {
 			Long time = null;
 
+			frameNumber.incrementAndGet();
 			try {
 				if (timestamp != null)
 					time = new Long(input.get(timestamp).toString());
@@ -161,8 +166,11 @@ public class DisplayImage extends AbstractProcessor implements WindowListener {
 
 			log.debug("Updating image...");
 			imagePanel.setFrame(image, null);
-			if (time != null)
+			if (time != null) {
 				info.setText(timeFormat.format(new Date(time)));
+				info.repaint();
+				info.validate();
+			}
 			frame.repaint();
 			frame.validate();
 			imagePanel.repaint();
