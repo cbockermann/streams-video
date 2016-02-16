@@ -95,7 +95,7 @@ public class Smoothing extends AbstractImageProcessor {
 		ImageRGB smoothedImage = new ImageRGB(img.getWidth(), img.getHeight());
 		int border = (windowSize / 2);
 
-		// TODO: Noch sehr unsch�n durch das von 1/1 bis Width-1/Height-1
+		// TODO: Noch sehr unschoen durch das von 1/1 bis Width-1/Height-1
 		for (int x = border; x < smoothedImage.getWidth() - border; x++) {
 			for (int y = border; y < smoothedImage.getHeight() - border; y++) {
 
