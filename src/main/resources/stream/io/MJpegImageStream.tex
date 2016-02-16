@@ -1,0 +1,10 @@
+\Stream{MjpegImageStream}
+\label{sec:stream.io.MjpegImageStream}
+
+This class implements a stream for sequences of JPEG images. The format is often
+called {\em mjpeg} and consists of frames, each compressed to the JPEG format by
+itself.
+
+
+The items produced by this stream contain a single attribute {\ttfamily frame:image},
+containing the decoded bitmap image as object of class {\ttfamily ImageRGB}.

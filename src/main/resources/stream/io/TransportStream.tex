@@ -1,0 +1,13 @@
+\Stream{TransportStream}
+\label{sec:stream.io.TransportStream}
+
+This class implements a simple stream of packets obtained from a transport
+stream. Each packet has a size of 188 bytes. The data items emitted by this
+stream contain the packet data (in {\ttfamily packet:data}) and the packet
+identifier (in {\ttfamily packet:id}).
+
+Additional attributes provided in each item are:
+\begin{itemize}
+  \item {\ttfamily packet:offset} - the number of bytes this packet starts from the start of the stream
+  \item {\ttfamily packet:sequence} - the sequence number of this packet from the stream (first packet is $0$)
+\end{itemize}

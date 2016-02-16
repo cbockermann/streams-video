@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import stream.Data;
+import stream.annotations.Parameter;
 import stream.data.DataFactory;
 import stream.io.AbstractStream;
 import stream.runtime.ProcessContextImpl;
@@ -40,6 +41,7 @@ public class SinusWave extends AbstractStream {
 	 * @param amplitude
 	 *            the amplitude to set
 	 */
+	@Parameter(description = "The amplitude of the sine wave signal. Default is 127.", required = false)
 	public void setAmplitude(Float amplitude) {
 		this.amplitude = amplitude;
 	}
@@ -55,6 +57,7 @@ public class SinusWave extends AbstractStream {
 	 * @param frequency
 	 *            the frequency to set
 	 */
+	@Parameter(description = "The frequency of the sine wave. Default value is 261.63.", required = false)
 	public void setFrequency(Double frequency) {
 		this.frequency = frequency;
 	}
@@ -70,6 +73,7 @@ public class SinusWave extends AbstractStream {
 	 * @param sampleRate
 	 *            the sampleRate to set
 	 */
+	@Parameter(description = "The sampling rate, default is 48.000 Hz.", required = false)
 	public void setSampleRate(Integer sampleRate) {
 		this.sampleRate = sampleRate;
 	}
@@ -85,6 +89,7 @@ public class SinusWave extends AbstractStream {
 	 * @param blockSize
 	 *            the blockSize to set
 	 */
+	@Parameter(description = "Number of samples collected in each item. Default is 48000.", required = false)
 	public void setBlockSize(int blockSize) {
 		this.blockSize = blockSize;
 	}
@@ -96,7 +101,7 @@ public class SinusWave extends AbstractStream {
 	public void init() throws Exception {
 		super.init();
 
-		block = new double[sampleRate];
+		block = new double[blockSize];
 
 		// length of a single sinus period, ie interval = 1 * Math.PI
 		Double interval = sampleRate.doubleValue() / frequency;
